@@ -55,7 +55,7 @@ NULL
 #' @export
 #' @rdname plotPath
 #' @importFrom igraph as_data_frame graph_from_data_frame subgraph_from_edges ends
-#' @importFrom ggraph ggraph geom_node_point geom_node_text scale_edge_colour_manual
+#' @importFrom ggraph ggraph geom_node_point geom_node_text scale_edge_colour_manual scale_edge_alpha_manual
 #' @importFrom ggplot2 aes theme_void theme
 setMethod("plotPath", signature = c(graph = "igraph"),
     function(graph, by = NULL, k = 1, include = NULL, exclude = NULL,
@@ -67,21 +67,24 @@ setMethod("plotPath", signature = c(graph = "igraph"),
     if( length(focus) != 1L || !is.logical(focus) || is.na(focus) ){
         stop("'focus' must be TRUE or FALSE.", call. = FALSE)
     }
-    
+    # Check if by is null
     by_null <- is.null(by)
-    
     if( prune && by_null ){
         stop("'prune' must be FALSE when 'by' is not defined.", call. = FALSE)
     }
-    
+    # Retrieve edges and nodes information
     graph_df <- as_data_frame(graph, what = "both")
     edge_df <- graph_df$edges
     node_df <- graph_df$vertices
-  
+    # Initialise aesthetics
     edge_df$mark <- 0
     edge_df$name <- ""
     edge_df$alpha <- TRUE
     node_df$alpha <- TRUE
+    # Set colour for unselected and selected edges
+    path_colours <- c("0" = "grey80", "1" = "red")
+    # Set alpha for unselected and selected edges
+    path_alphas <- c("FALSE" = 0, "TRUE" = 1)
 
     if( !by_null ){
         
@@ -95,8 +98,6 @@ setMethod("plotPath", signature = c(graph = "igraph"),
     # Add edge attribute to mark edges in the path
     keep <- edge_df$mark != 0
     edge_df$name[keep] <- edge_df$source[keep]
-    # Include grey for edges not in paths
-    path_colours <- c("0" = "grey80", "1" = "red")
     # Create a vector for edge alpha: 1 if marked, else 0 (transparent)
     if( prune ){
         edge_df$alpha <- edge_df$mark != 0
@@ -123,9 +124,9 @@ setMethod("plotPath", signature = c(graph = "igraph"),
         geom_node_text(aes(label = .data$name, filter = .data$alpha),
             vjust = 1.8, size = 4) +
         scale_edge_colour_manual(values = path_colours) +
+        scale_edge_alpha_manual(values = path_alphas) +
         theme_void() +
         theme(legend.position = "none")
-    
     return(p)
 })
 
