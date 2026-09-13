@@ -262,5 +262,5 @@ hex_plot <- plot_graph |>
 
 # Get sticker! ----
 
-file_path <- paste0(asset_dir, "ariadne_logo.png")
+file_path <- "man/figures/ariadne_logo.png"
 ggsave(file_path, width = 10, height = 10, units = "in", scale = 1)
