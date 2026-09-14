@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ariadne</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.7</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.8</span>
       </span>
     </div>
 
@@ -86,7 +86,9 @@
 <span>  exclude <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  res.name <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  prune <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  focus <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  focus <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  edge.type <span class="op">=</span> <span class="st">"link"</span>,</span>
+<span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -99,7 +101,7 @@
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
-<dd><p>Unused.</p></dd>
+<dd><p>Additional arguments passed to <code><a href="https://ggraph.data-imaginist.com/reference/ggraph.html" class="external-link">ggraph</a></code>.</p></dd>
 
 
 <dt id="arg-by">by<a class="anchor" aria-label="anchor" href="#arg-by"></a></dt>
@@ -135,6 +137,12 @@ should be plotted. (Default: <code>FALSE</code>)</p></dd>
 <dd><p><code>Logical scalar</code>. Whether the selected edges and nodes
 should be zoomed in. (Default: <code>FALSE</code>)</p></dd>
 
+
+<dt id="arg-edge-type">edge.type<a class="anchor" aria-label="anchor" href="#arg-edge-type"></a></dt>
+<dd><p><code>Character scalar</code> String specifying the type of edge
+to use from the options available in ggraph (geom_edge_*).
+(Default: <code>"link"</code>)</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
@@ -148,22 +156,22 @@ should be zoomed in. (Default: <code>FALSE</code>)</p></dd>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Plot graph for a subset of resources</span></span></span>
 <span class="r-in"><span><span class="fu">plotPath</span><span class="op">(</span><span class="va">graph</span>, res.name <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"KEGG"</span>, <span class="st">"WoL"</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Using alpha for a discrete variable is not advised.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Using <span style="color: #0000BB;">"stress"</span> as default layout</span>
 <span class="r-plt img"><img src="plotPath-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Plot fifth path from ko to ec</span></span></span>
 <span class="r-in"><span><span class="fu">plotPath</span><span class="op">(</span><span class="va">graph</span>, <span class="va">ko</span> <span class="op">~</span> <span class="va">ec</span>, k <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Using alpha for a discrete variable is not advised.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Using <span style="color: #0000BB;">"stress"</span> as default layout</span>
 <span class="r-plt img"><img src="plotPath-2.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Plot first path including uniref90</span></span></span>
 <span class="r-in"><span><span class="fu">plotPath</span><span class="op">(</span><span class="va">graph</span>, <span class="va">taxname</span> <span class="op">~</span> <span class="va">ko</span>, include <span class="op">=</span> <span class="st">"uniref90"</span><span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Using alpha for a discrete variable is not advised.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Using <span style="color: #0000BB;">"stress"</span> as default layout</span>
 <span class="r-plt img"><img src="plotPath-3.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Plot first 5 paths excluding uniref50 and uniref100</span></span></span>
 <span class="r-in"><span><span class="fu">plotPath</span><span class="op">(</span><span class="va">graph</span>, <span class="va">taxname</span> <span class="op">~</span> <span class="va">ko</span>, k <span class="op">=</span> <span class="fl">5</span>, exclude <span class="op">=</span> <span class="st">"uniref50"</span><span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Using alpha for a discrete variable is not advised.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Using <span style="color: #0000BB;">"stress"</span> as default layout</span>
 <span class="r-plt img"><img src="plotPath-4.png" alt="" width="700" height="433"></span>
 </code></pre></div>
     </div>
