@@ -29,6 +29,6 @@ jobs:
         run: |
           git config --local user.email "actions@github.com"
           git config --local user.name "GitHub Actions"
-          git add R/sysdata.rda inst/assets/ariadne_logo.png
+          git add R/sysdata.rda man/figures/ariadne_logo.png
           git commit -m 'Run weekly resource update'
           git push origin devel

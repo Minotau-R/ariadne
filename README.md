@@ -10,7 +10,7 @@ ariadne is a multi-purpose R package that integrates relational knowledge from
 various biological databases. It provides tools to navigate resource graphs,
 find and visualise paths between features and link them across different omics
 by leveraging the resource graph hosted in the companion package
-[ariadne.db](https://github.com/Minotau-R/ariadne.db).
+[ariadneDB](https://github.com/Minotau-R/ariadneDB).
 
 Example applications:
 
