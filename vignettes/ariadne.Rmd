@@ -135,10 +135,50 @@ into a single igraph object.
 ```{r fetch}
 # Import resource graph
 graph <- ariadne()
+```
 
+The graph can also be visualised with `plotPath`.
+
+```{r plot}
 # Plot resource graph
 plotPath(graph)
 ```
+
+Let's say we need to find all links between gene functions and enzyme activity
+represented by KEGG Orthologues (KO) and Enzyme Commission (EC) ids,
+respectively. The function `searchPath` can be used to find the `k` shortest
+paths in the graph.
+
+```{r}
+# Search for paths from ko to ec
+searchPath(graph, ko ~ ec, k = 3)
+```
+
+```{r}
+plotPath(graph, ko ~ ec, include = "uniref90", prune = TRUE, focus = TRUE)
+```
+
+The graph can be explored using all native functions from the igraph package.
+For example, we can sort its nodes by degree, that is, the number of adjacent
+edges:
+
+```{r}
+node_degrees <- graph |>
+    degree(mode = "all") |>
+    sort(decreasing = TRUE)
+
+node_degrees <- node_degrees[node_degrees >= 10]
+
+knitr::kable(node_degrees, col.names = "degree")
+```
+
+In addition, we can list all the nodes in the neighbourhood of a certain node:
+
+```{r}
+neighbors(graph, "ko", mode = "all")
+```
+
+## ariadneDB and resource versioning
 
 Some resources have multiple versions, which can be selected through the
 argument `versions`. This defaults to the latest version found in the database.
@@ -192,46 +232,7 @@ plots <- lapply(
 plots
 ```
 
-The graph can be explored using all native functions from the igraph package.
-For example, we can sort its nodes by degree, that is, the number of adjacent
-edges:
-
-```{r}
-node_degrees <- graph |>
-    degree(mode = "all") |>
-    sort(decreasing = TRUE)
-
-node_degrees <- node_degrees[node_degrees >= 10]
-
-knitr::kable(node_degrees, col.names = "degree")
-```
-
-In addition, we can list all the nodes in the neighbourhood of a certain node:
-
-```{r}
-neighbors(graph, "ko", mode = "all")
-```
-
-The graph can also be visualised with `plotPath`.
-
-```{r plot}
-# Plot resource graph
-plotPath(graph)
-```
-
-Let's say we need to find all links between gene functions and enzyme activity
-represented by KEGG Orthologues (KO) and Enzyme Commission (EC) ids,
-respectively. The function `searchPath` can be used to find the `k` shortest
-paths in the graph.
-
-```{r}
-# Search for paths from ko to ec
-searchPath(graph, ko ~ ec, k = 3)
-```
-
-```{r}
-plotPath(graph, ko ~ ec, include = "uniref90", prune = TRUE, focus = TRUE)
-```
+## Weaving with weavePath vs weaveComplex
 
 We decide to go through the simplest path, which corresponds to a `k` of 1. The
 links between KO and EC are found by the function `weavePath`, which fetches
@@ -248,6 +249,34 @@ head(ko2ec)
 The links are provided as a **linkmap**, a 2-column table where each row is a
 pair of ids (one KO and one EC). When available, the feature names are returned
 as a third optional column.
+
+## Exploring results
+
+```{r}
+# x2y
+```
+
+```{r}
+# plotModules
+```
+
+## Bioconductor SummarizedExperiment integration
+
+```{r}
+# tse <- addModules(tse, tax2path)
+```
+
+```{r}
+# agglomerateByModule
+```
+
+```{r}
+# applyByModule
+```
+
+```{r}
+# viz functional alpha/beta
+```
 
 # Resources
 
