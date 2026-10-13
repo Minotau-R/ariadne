@@ -1,0 +1,206 @@
+---
+title: "ariadne in action: common use cases in omics research"
+author:
+  - name: Giulio Benedetti
+    affiliation: University of Turku
+    email: giulio.benedetti@utu.fi
+output:
+    BiocStyle::html_document:
+        fig_height: 7
+        fig_width: 10
+        toc: true
+        toc_float: true
+        toc_depth: 2
+        number_sections: true
+        self_contained: true
+        code_folding: show
+# bibliography: ../inst/REFERENCES.bib
+date: "`r doc_date()`"
+package: "`r pkg_ver('ariadne')`"
+vignette: >
+  %\VignetteIndexEntry{ariadne in action: common use cases in omics research}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+    collapse = TRUE,
+    comment = "#>"
+)
+```
+
+```{r lib, message = FALSE, warning = FALSE}
+library(ariadne)
+library(anansi)
+library(curatedMetagenomicData)
+library(mia)
+library(miaViz)
+```
+
+```{r}
+graph <- ariadne()
+```
+
+# Functional annotation
+
+## ChocoPhlAn
+
+```{r}
+# Load gene family experiment
+genes <- curatedMetagenomicData(
+    "SankaranarayananK_2015.gene_families", dryrun = FALSE
+)
+
+genes <- genes[[1]]
+
+# Keep only unstratified gene families
+genes <- genes[!grepl("|", rownames(genes), fixed = TRUE), ]
+
+# Print experiment
+genes
+```
+
+```{r}
+searchPath(graph, uniref90 ~ gmm, k = 3)
+```
+
+```{r}
+# Weave bindings between taxa and GMMs
+uniref2gmm <- weaveComplex(graph, uniref90 ~ gmm, init = rownames(genes))
+
+# Print some results
+head(uniref2gmm)
+```
+
+```{r}
+genes <- addModules(genes, uniref2gmm, as = "names")
+
+uniref.modules <- agglomerateByModule(
+    genes, by = "rows", group = levels(uniref2gmm$gmm.name)
+)
+
+uniref.modules
+
+# miaViz::plotHeatmap
+```
+
+## WoL
+
+# Set enrichment analysis
+
+## BugSigDB
+
+```{r}
+# Import dataset
+data("Tengeler2020", package = "mia")
+tse <- Tengeler2020
+```
+
+```{r}
+searchPath(graph, taxname ~ bugsig)
+```
+
+```{r}
+tax2bugsig <- weavePath(graph, taxname ~ bugsig, init = rowData(tse)$Genus)
+
+head(tax2bugsig)
+```
+
+```{r}
+mod.names <- levels(tax2bugsig$bugsig.name)
+
+adhd.mods <- mod.names[grepl("ADHD", mod.names)]
+
+adhd.mods
+```
+
+
+```{r}
+tse <- addModules(tse, tax2bugsig, key = "Genus", as = "names")
+
+modules <- agglomerateByModule(tse, by = "rows", group = adhd.mods)
+
+modules
+```
+
+```{r}
+plotAbundance(modules)
+```
+
+## GMM/GBM
+
+GMM/GBM
+
+## MSigDB
+
+MsigDB
+
+# Pathway enrichment analysis
+
+## KEGG
+
+```{r}
+searchPath(graph, ec ~ kegg_path, include = "kegg_rxn", k = 3)
+```
+
+```{r}
+ec2path <- weaveComplex(
+    graph,
+    ec ~ kegg_path,
+    include = "kegg_rxn",
+    threshold = 0.5
+)
+
+head(ec2path)
+```
+
+## MetaCyc
+
+```{r}
+searchPath(graph, uniref90 ~ metacyc_path, k = 3)
+```
+
+```{r}
+uniref2path <- weaveComplex(graph, ec ~ metacyc_path)
+
+head(uniref2path)
+```
+
+# anansi association analysis
+
+```{r}
+# anansi
+```
+
+# Taxonomic translation
+
+With OTT
+
+```{r}
+searchPath(graph, taxid ~ silva_ssu)
+```
+
+```{r}
+taxid2taxname <- weavePath(graph, taxname ~ taxid, init = butyrate$taxname)
+
+knitr::kable(taxid2taxname)
+```
+
+
+```{r}
+# or OTT id
+taxid2silva <- weavePath(graph, taxid ~ silva_ssu, init = taxid2taxname$taxid)
+
+knitr::kable(taxid2silva)
+```
+
+# Reproducibility
+
+R session information:
+
+```{r reproduce, echo = FALSE}
+# Session info
+options(width = 120)
+sessionInfo()
+```
