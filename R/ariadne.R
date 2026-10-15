@@ -30,8 +30,8 @@ NULL
 
 #' @export
 #' @rdname ariadne
-#' @importFrom igraph read_graph as_data_frame graph_from_data_frame
-#' @importFrom stats setNames reshape
+#' @importFrom igraph graph_from_data_frame
+#' @importFrom stats setNames
 #' @importFrom BiocParallel bpmapply
 #' @importFrom data.table rbindlist dcast
 ariadne <- function(versions = NULL){
@@ -99,6 +99,7 @@ ariadne <- function(versions = NULL){
 }
 
 
+#' @importFrom igraph read_graph as_data_frame
 .fetch_graph <- function(key, url){
     # Fetch graph from ariadne.db
     graph <- read_graph(url, format = "gml")
@@ -109,9 +110,12 @@ ariadne <- function(versions = NULL){
 }
 
 
+#' @importFrom stringr str_replace fixed
 .insert_version <- function(graph_df, key){
+    # For both edges and nodes data
     graph_df <- lapply(graph_df, function(x){
-        if(!is.null(x$url)) x$url <- sub("{version}", key, x$url, fixed = TRUE)
+        # Replace version placeholders with actual versions
+        if(!is.null(x$url)) x$url <- str_replace(x$url, fixed("{version}"), key)
         return(x)
     })
     return(graph_df)
@@ -119,10 +123,10 @@ ariadne <- function(versions = NULL){
 
 
 .generic2specific <- function(edges, nodes, what = c("from", "to")){
-    # Match
+    # Match generic names to specific names used by resources
     idx <- match(edges[[what]], nodes$name)
     idy <- match(edges$source, names(nodes))
-    
+    # Retrieve specific names by indexing
     specific <- nodes[cbind(idx, idy)]
     return(specific)
 }

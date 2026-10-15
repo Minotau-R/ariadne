@@ -1,0 +1,100 @@
+---
+title: "ariadne definitions and technical details"
+author:
+  - name: Giulio Benedetti
+    affiliation: University of Turku
+    email: giulio.benedetti@utu.fi
+output:
+    BiocStyle::html_document:
+        fig_height: 7
+        fig_width: 10
+        toc: true
+        toc_float: true
+        toc_depth: 2
+        number_sections: true
+        self_contained: true
+        code_folding: show
+# bibliography: ../inst/REFERENCES.bib
+date: "`r doc_date()`"
+package: "`r pkg_ver('ariadne')`"
+vignette: >
+  %\VignetteIndexEntry{ariadne definitions and technical details}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+    collapse = TRUE,
+    comment = "#>"
+)
+```
+
+# Introduction
+
+# Definitions
+
+The table below summarises the technical terms used to make sense of ariadne in
+its vignettes and underlying code.
+
+| **Term** | **Definition** | **Examples** |
+|----------|----------------|--------------|
+| **Feature type** | A distinct type of biological entity with unique elements labeled by IDs. Written in lowercase for consistency. | `genes` (KEGG genes ID), `ko` (KEGG Orthologues), `ec` (Enzyme Commission number), `uniref90` (UniRef sequence clusters) |
+| **Level** | A unique element belonging to a feature type. Often referred to as a *feature*. | 563 (NCBI ID for *E. coli*), C00246 (KEGG compound ID for butyrate), P0DTC2 (UniProtKB ID for SARS-CoV-2 spike protein) |
+| **Linkmap** | A 2-column data frame with feature types as columns and their links in the rows. Named as `x2y`, where x and y are feature types. | `tax2cpd` (linkmap between taxon names and compounds) |
+| **Resource** | A database from which linkmaps between feature types can be retrieved. | KEGG, Rhea, UniProt |
+| **Weave** | The operation of sequentially linking feature types to create a new linkmap between two previously unlinked feature types. Uses the syntax `x ~ y`, where x is the origin and y is the target feature type. | `ko ~ ec`, `disease ~ drug`, `genes ~ metacyc` |
+
+# Technical details: strengths and limitations
+
+The ariadne approach provides several advantages to streamline the mapping
+workflow. However, it also presents certain downsides worth considering.
+
+## Graph-based resource representation
+
+Graph-based resource representation | Focused on established databases
+
+**Graph-based resource representation** using an igraph object where edges are
+resources and nodes are feature types, enabling graph theory for path selection
+and easy expansion with custom resources.
+
+**Focused on established databases**. Less permanent ones may be added manually
+by the user. This is to reduce the odds of unpredicted changes or disappearing
+of underlying resources.
+
+**Not always possible to track new databases reproducibly**. Many databases do
+not provide programmatic access (or even links) to their resources, and do not
+keep past releases accessible, so we do not include them in the core graph, even
+though can be manually added by users.
+
+## Resource query optimisation
+
+Fast queries | Internet access required
+
+**Fast queries**: with httr2 for API requests and SPARQL for even faster linkmap
+retrieval when possible.
+
+## Resource storage and caching
+
+Efficient caching and storage | Not supported for all resources
+
+**Efficient caching and storage**: to automatically cache linkmaps with
+BiocFileCache and store them in the efficient Apache Parquet format via arrow.
+
+## Cross-resource linkmap generation
+
+Optimised linkmap generation | Code complexity increases with resource coverage
+
+**Optimised linkmap generation** through the MultiFactor class, which
+streamlines factor operations to create linkmaps by sequentially combining them
+along the path from origin to target feature type.
+
+# Reproducibility
+
+R session information:
+
+```{r reproduce, echo = FALSE}
+# Session info
+options(width = 120)
+sessionInfo()
+```
