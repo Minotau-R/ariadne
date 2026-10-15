@@ -28,6 +28,9 @@ knitr::opts_chunk$set(
     collapse = TRUE,
     comment = "#>"
 )
+
+# Set global DT options
+options(DT.options = list(pageLength = 5))
 ```
 
 # Introduction
@@ -61,9 +64,12 @@ presented in
 
 # Tutorial
 
+This tutorial showcases the programmatic usage of ariadne in R/RStudio. For the Python extension, check [ariadnePy](https://github.com/Minotau-R/ariadnePy). For
+the Shiny app, check [ariadneApp](https://github.com/Minotau-R/ariadneApp).
+
 ## Installation
 
-Release:
+The Bioconductor release version can be installed as follows:
 
 ```{r install-release, eval = FALSE}
 if( !requireNamespace("BiocManager", quietly = TRUE) ){
@@ -73,10 +79,16 @@ if( !requireNamespace("BiocManager", quietly = TRUE) ){
 BiocManager::install("ariadne")
 ```
 
-Beta:
+For the latest functionality, the devel version can be installed as follows:
 
 ```{r install-beta, eval = FALSE}
-remotes::install_github("Minotau-R/ariadne")
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+# Initialise devel version
+BiocManager::install(version = "devel")
+
+BiocManager::install("ariadne")
 ```
 
 ## Import and explore the resource graph
@@ -91,9 +103,9 @@ and stored in Zenodo.
 
 ```{r lib, message = FALSE, warning = FALSE}
 library(ariadne)
-library(igraph)
-library(dplyr)
-library(ggplot2)
+library(mia)
+library(miaViz)
+library(DT)
 ```
 
 The resource graph can be imported with the function `ariadne`, which returns
@@ -136,18 +148,22 @@ igraph package. For example, we can sort its nodes by degree, that is, the
 number of adjacent edges:
 
 ```{r degree}
+# Find and sort node degrees
 node_degrees <- graph |>
     degree(mode = "all") |>
     sort(decreasing = TRUE)
 
+# Select nodes above degree threshold
 node_degrees <- node_degrees[node_degrees >= 10]
 
-knitr::kable(node_degrees, col.names = "degree")
+# View node degrees
+kable(node_degrees, col.names = "degree")
 ```
 
 We can also list all the nodes in the neighbourhood of a certain node:
 
 ```{r neighbour}
+# List neighbours of ko node
 neighbors(graph, "ko", mode = "all")
 ```
 
@@ -161,7 +177,7 @@ database.
 versions <- listResourceVersions(default = TRUE)
 
 # View versions
-knitr::kable(versions)
+datatable(versions)
 ```
 
 Some resources have multiple versions, which can be selected through the
@@ -216,7 +232,7 @@ as a third optional column.
 
 ```{r}
 # View some links
-knitr::kable(ko2ec)
+datatable(ko2ec)
 ```
 
 The weave can be initialised with a set of identifiers belonging to the `from`
@@ -233,24 +249,29 @@ ko2ec <- weavePath(graph, ko ~ ec, init = ko.ids)
 knitr::kable(ko2ec)
 ```
 
+Sometimes, we would like to know how much each origin id covers each target id
+in terms of percent coverage (useful for pathway enrichment analysis). This can
+be achieved with the alternative function `weaveComplex`. For example, we can
+estimate the percentage of kegg pathways covered by different ec ids, and select
+only those links above a certain `threshold`.
+
 ```{r}
 # Find complex links between ko and kegg pathways
-ko2path <- weaveComplex(
+ec2path <- weaveComplex(
     graph,
-    ko ~ kegg_path,
-    include = "kegg_rxn",
+    ec ~ kegg_path,
     threshold = 0.5
 )
 
 # View some links
-knitr::kable(ko2path)
+knitr::kable(ec2path)
 ```
 
 The links can be visualised with the function `plotModules`.
 
 ```{r}
 # Visualise links
-plotModules(ko2path) + coord_flip()
+plotModules(ko2path, layout = "sugiyama") + coord_flip()
 ```
 
 ## Ensure reproducibility of the ariadne workflow
@@ -259,62 +280,97 @@ A path table is a metadata describing the complete workflow. The data object
 `pathMeta` shows an example of the contained information and format.
 
 ```{r pathMeta}
+# Import pathMeta object
 data("pathMeta", package = "ariadne")
 
-knitr::kable(pathMeta)
+# View pathMeta object
+datatable(pathMeta)
 ```
 
 To generate a the table for a given path, `drawPath` can be used.
 
 ```{r draw}
+# Draw path table from ko to ec
 path_df <- drawPath(graph, ko ~ ec, k = 1)
 
-knitr::kable(path_df)
+datatable(path_df)
 ```
+
+The returned path can be directly passed to `weavePath` to reproduce the full
+ariadne workflow.
 
 ```{r weave-drawn}
 ko2ec.simple <- weavePath(path_df)
 
-knitr::kable(ko2ec.simple)
+datatable(ko2ec.simple)
 ```
+
+Similarly, the path table can also be passed to `weaveComplex` to reproduce a
+coverage-based ariadne workflow.
 
 ```{r complex-drawn}
 ko2ec.complex <- weaveComplex(path_df)
 
-knitr::kable(ko2ec.complex)
+datatable(ko2ec.complex)
 ```
 
 ## Add results to SummarizedExperiment for downstream analyses
 
+ariadne works in combination with the wider Bioconductor framework, in
+particular the data containers derived from SummarizedExperiment (SE), the mia
+package for microbiome data analysis, and the anansi package for
+knowledge-driven association analysis. First, we import the `Tengeler2020`
+TreeSE object.
+
 ```{r}
+# Import experiment object
 data("Tengeler2020", package = "mia")
-data("butyrate", package = "ariadne")
 
 # Rename experiment object
 tse <- Tengeler2020
+
+# View experiment object
+tse
 ```
 
-SummarizedExperiment objects
+We also import `butyrate` linkmap on butyrate-producing bacteria, which is
+included in the ariadne package as an example output of the `weave*` functions.
+
+```{r}
+# Import butyrate linkmap
+data("butyrate", package = "ariadne")
+
+# View butyrate linkmap
+datatable(butyrate)
+```
+
+The function `getModules` matches each level of the origin feature type
+(taxname in this case) with any variable specified in `key` (in the given order)
+and it returns a modules table where rows and columns represent origin and
+target features, respectively, and cell values indicate presence/absence
+membership or coverage fraction.
 
 ```{r}
 # Get butyrate-producer module membership
-modules <- getModules(tse, butyrate, key = "Genus")
-
-knitr::kable(modules)
-```
-
-
-```{r}
-# Get modules based on multiple variables given in order of priority
 modules <- getModules(tse, butyrate, key = c("Genus", "Family"))
 
-knitr::kable(modules)
+# View modules table
+datatable(modules)
 ```
+
+Using the function `addModules`, the modules table is directly added to the
+side information of the TreeSE object, so that it can be used in downstream
+analysis.
 
 ```{r}
 # Add modules to experiment as names instead of ids
 tse <- addModules(tse, butyrate, key = "Genus", as = "names")
 ```
+
+The mia package provides two key methods to apply module-wise operations to
+a SE object. The first is `agglomerateByModule`, which agglomerates the count
+table along `by` for each module in the side information included in `group`
+(only one in this case).
 
 ```{r}
 # Agglomerate features by membership to butyrate-producer module
@@ -324,7 +380,13 @@ mod.se <- agglomerateByModule(tse, by = "rows", group = "butyrate")
 plotAbundance(mod.se)
 ```
 
+The second method allows to apply any operation module-wise on an SE object
+using the functio `applyByModule`. For example, it is possible to estimate
+alpha diversity for each module (only one in this case), which is sometimes
+called _functional diversity_.
+
 ```{r}
+# Estimate alpha diversity for each module
 tse <- applyByModule(
     tse,
     .by = "rows",
@@ -371,7 +433,7 @@ point, check the
 
 R session information:
 
-```{r reproduce, echo=FALSE}
+```{r reproduce, echo = FALSE}
 # Session info
 options(width = 120)
 sessionInfo()

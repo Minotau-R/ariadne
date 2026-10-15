@@ -38,6 +38,9 @@ knitr::opts_chunk$set(
     collapse = TRUE,
     comment = "#>"
 )
+
+# Set global DT options
+options(DT.options = list(pageLength = 5))
 ```
 
 ```{r lib, message = FALSE, warning = FALSE}
@@ -45,6 +48,7 @@ library(ariadne)
 library(igraph)
 library(dplyr)
 library(ggplot2)
+library(DT)
 ```
 
 When `ariadne` is executed, the graph for each resource is retrieved from the
@@ -64,10 +68,10 @@ argument `versions`. This defaults to the latest version found in the database.
 
 ```{r res_versions}
 # List available resource versions
-versions <- listResourceVersions(default = TRUE)
+versions <- listResourceVersions()
 
 # View versions
-knitr::kable(versions)
+datatable(versions)
 ```
 
 The igraph object is made of two components: edges data and nodes (or vertices)
@@ -94,7 +98,7 @@ df <- edge_df |>
     summarise(edges = n(), nodes = n_distinct(c(from, to)))
 
 # View stats
-knitr::kable(df)
+datatable(df)
 ```
 
 The graph for each resource can be visualized with its own graph.
@@ -114,7 +118,7 @@ plots
 
 R session information:
 
-```{r reproduce, echo=FALSE}
+```{r reproduce, echo = FALSE}
 # Session info
 options(width = 120)
 sessionInfo()

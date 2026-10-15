@@ -40,7 +40,7 @@ Provide workflow supported with screenshots.
 
 R session information:
 
-```{r reproduce, echo=FALSE}
+```{r reproduce, echo = FALSE}
 # Session info
 options(width = 120)
 sessionInfo()

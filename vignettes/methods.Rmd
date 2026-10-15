@@ -93,7 +93,7 @@ along the path from origin to target feature type.
 
 R session information:
 
-```{r reproduce, echo=FALSE}
+```{r reproduce, echo = FALSE}
 # Session info
 options(width = 120)
 sessionInfo()

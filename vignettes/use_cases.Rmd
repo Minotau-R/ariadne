@@ -28,6 +28,9 @@ knitr::opts_chunk$set(
     collapse = TRUE,
     comment = "#>"
 )
+
+# Set global DT options
+options(DT.options = list(pageLength = 5))
 ```
 
 ```{r lib, message = FALSE, warning = FALSE}
@@ -39,60 +42,16 @@ library(miaViz)
 ```
 
 ```{r}
+# Import resource graph
 graph <- ariadne()
 ```
-
-# Functional annotation
-
-## ChocoPhlAn
-
-```{r}
-# Load gene family experiment
-genes <- curatedMetagenomicData(
-    "SankaranarayananK_2015.gene_families", dryrun = FALSE
-)
-
-genes <- genes[[1]]
-
-# Keep only unstratified gene families
-genes <- genes[!grepl("|", rownames(genes), fixed = TRUE), ]
-
-# Print experiment
-genes
-```
-
-```{r}
-searchPath(graph, uniref90 ~ gmm, k = 3)
-```
-
-```{r}
-# Weave bindings between taxa and GMMs
-uniref2gmm <- weaveComplex(graph, uniref90 ~ gmm, init = rownames(genes))
-
-# Print some results
-head(uniref2gmm)
-```
-
-```{r}
-genes <- addModules(genes, uniref2gmm, as = "names")
-
-uniref.modules <- agglomerateByModule(
-    genes, by = "rows", group = levels(uniref2gmm$gmm.name)
-)
-
-uniref.modules
-
-# miaViz::plotHeatmap
-```
-
-## WoL
 
 # Set enrichment analysis
 
 ## BugSigDB
 
 ```{r}
-# Import dataset
+# Import experiment object
 data("Tengeler2020", package = "mia")
 tse <- Tengeler2020
 ```
@@ -128,14 +87,6 @@ modules
 plotAbundance(modules)
 ```
 
-## GMM/GBM
-
-GMM/GBM
-
-## MSigDB
-
-MsigDB
-
 # Pathway enrichment analysis
 
 ## KEGG
@@ -145,32 +96,121 @@ searchPath(graph, ec ~ kegg_path, include = "kegg_rxn", k = 3)
 ```
 
 ```{r}
+# Weave path from ec to kegg pathways
 ec2path <- weaveComplex(
     graph,
     ec ~ kegg_path,
     include = "kegg_rxn",
     threshold = 0.5
 )
+```
 
-head(ec2path)
+```{r}
+# View linkmap
+datatable(ec2path)
 ```
 
 ## MetaCyc
 
+The MetaCyc pathways are provided from WoL2. However, this corresponds to
+an older version of MetaCyc before it changed to a license scheme.
+
 ```{r}
-searchPath(graph, uniref90 ~ metacyc_path, k = 3)
+# Search paths from ec to metacyc pathways
+searchPath(graph, ec ~ metacyc_path, k = 3)
 ```
 
 ```{r}
-uniref2path <- weaveComplex(graph, ec ~ metacyc_path)
+# Weave path from ec to metacyc pathways
+ec2path <- weaveComplex(graph, ec ~ metacyc_path)
+```
 
-head(uniref2path)
+
+```{r}
+# View linkmap
+datatable(ec2path)
+```
+
+# Functional annotation
+
+```{r}
+# Load gene family experiment
+genes <- curatedMetagenomicData(
+    "SankaranarayananK_2015.gene_families", dryrun = FALSE
+)
+
+genes <- genes[[1]]
+
+# Keep only unstratified gene families
+genes <- genes[!grepl("|", rownames(genes), fixed = TRUE), ]
+
+# Print experiment
+genes
+```
+
+```{r}
+searchPath(graph, uniref90 ~ gmm, k = 3)
+```
+
+```{r}
+# Weave bindings between taxa and GMMs
+uniref2gmm <- weaveComplex(graph, uniref90 ~ gmm, init = rownames(genes))
+
+# Print some results
+head(uniref2gmm)
+```
+
+Alternatively, WoL can be used instead, but only its older version provides
+uniref to ko bindings, so we need to import a past release of the resource
+graph.
+
+```{r}
+# Import past release of the resource graph
+graph <- ariadne(versions = list(WoL = "v20April2021"))
+
+# Weave path through WoL
+uniref2gmm <- weaveComplex(
+    graph,
+    uniref90 ~ gmm,
+    init = rownames(genes),
+    res.name = c("WoL", "GM")
+)
+```
+
+
+```{r}
+genes <- addModules(genes, uniref2gmm, as = "names")
+
+uniref.modules <- agglomerateByModule(
+    genes, by = "rows", group = levels(uniref2gmm$gmm.name)
+)
+
+uniref.modules
+
+# miaViz::plotHeatmap
 ```
 
 # anansi association analysis
 
 ```{r}
-# anansi
+# Weave path from ec to kegg compounds
+ec2cpd <- weavePath(graph, ec ~ kegg_cpd)
+
+# View linkmap
+datatable(ec2cpd)
+```
+
+
+```{r}
+# web <- weaveWeb(ec ~ kegg_cpd, link = ec2cpd)
+```
+```{r}
+# out <- anansi(web)
+```
+
+
+```{r}
+# plotAnansi(out)
 ```
 
 # Taxonomic translation
@@ -184,7 +224,7 @@ searchPath(graph, taxid ~ silva_ssu)
 ```{r}
 taxid2taxname <- weavePath(graph, taxname ~ taxid, init = butyrate$taxname)
 
-knitr::kable(taxid2taxname)
+datatable(taxid2taxname)
 ```
 
 
@@ -192,7 +232,7 @@ knitr::kable(taxid2taxname)
 # or OTT id
 taxid2silva <- weavePath(graph, taxid ~ silva_ssu, init = taxid2taxname$taxid)
 
-knitr::kable(taxid2silva)
+datatable(taxid2silva)
 ```
 
 # Reproducibility
