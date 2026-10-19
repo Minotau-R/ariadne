@@ -161,17 +161,17 @@ setMethod("weavePath", signature = c(graph = "data.frame"),
 #' @export
 #' @rdname weavePath
 #' @importFrom stats reformulate
-#' @importFrom MultiFactor MultiFactor weave
+#' @importFrom multifactor multifactor weave
 setMethod("weavePath", signature = c(graph = "igraph"),
     function(graph, by, k = 1, include = NULL, exclude = NULL, res.name = NULL,
     init = NULL, prune = TRUE, use.names = TRUE, verbose = TRUE, timeout = 1e6,
     ...){
-    # Build MultiFactor from path linkmaps
+    # Build multifactor from path linkmaps
     mf <- .build_path_mf(
         graph, by, k, include, exclude, res.name,
         init, prune, prune, verbose, timeout, ...
     )
-    # Weave desired linkmap from MultiFactor
+    # Weave desired linkmap from multifactor
     out <- weave(mf, by) |> as.data.frame()
     # Add feature names
     if( use.names ){
@@ -236,8 +236,8 @@ setMethod("weavePath", signature = c(graph = "igraph"),
         # Update init
         init <- if( prune_vec[i] ) levels(linkmap[[g$initTo]]) else NULL
     }
-    # Construct MultiFactor from linkmaps
-    mf <- MultiFactor(linkmaps)
+    # Construct multifactor from linkmaps
+    mf <- multifactor(linkmaps)
     return(mf)
 }
 
@@ -245,7 +245,7 @@ setMethod("weavePath", signature = c(graph = "igraph"),
 #' @importFrom KEGGREST keggConv keggLink
 #' @importFrom arrow read_parquet open_dataset
 #' @importFrom dplyr select filter collect
-#' @importFrom MultiFactor LinkMap
+#' @importFrom multifactor linkmap
 #' @importFrom tidyselect all_of
 #' @importFrom rlang sym
 .fetch_edge <- function(g, init, timeout, ...){
@@ -328,7 +328,7 @@ setMethod("weavePath", signature = c(graph = "igraph"),
     # Add edge names
     colnames(df) <- c(g$initFrom, g$initTo)
     # Convert characters to factors
-    df <- LinkMap(df)
+    df <- linkmap(df)
     return(df)
 }
 

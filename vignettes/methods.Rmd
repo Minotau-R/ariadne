@@ -85,7 +85,7 @@ BiocFileCache and store them in the efficient Apache Parquet format via arrow.
 
 Optimised linkmap generation | Code complexity increases with resource coverage
 
-**Optimised linkmap generation** through the MultiFactor class, which
+**Optimised linkmap generation** through the multifactor class, which
 streamlines factor operations to create linkmaps by sequentially combining them
 along the path from origin to target feature type.
 

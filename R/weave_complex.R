@@ -54,7 +54,7 @@ setMethod("weaveComplex", signature = c(graph = "igraph"),
     }else{
         inner_by <- by
     }
-    # Build MultiFactor from path linkmaps
+    # Build multifactor from path linkmaps
     mf <- .build_path_mf(
         graph, inner_by, k, include, exclude, res.name,
         init, prune, TRUE, verbose, timeout, ...
@@ -69,8 +69,8 @@ setMethod("weaveComplex", signature = c(graph = "igraph"),
         colnames(origin2feature) <- c("origin", "feature")
         # Include origin2feature linkmap in list
         linkmaps[["origin2feature"]] <- origin2feature
-        # Construct MultiFactor from linkmaps
-        mf <- MultiFactor(linkmaps)
+        # Construct multifactor from linkmaps
+        mf <- multifactor(linkmaps)
         # Map features to complex modules
         mat <- .map_complex_modules(mf)
     }else{
@@ -112,7 +112,7 @@ setMethod("weaveComplex", signature = c(graph = "igraph"),
 
 #' @importFrom Matrix crossprod colSums
 .map_complex_modules <- function(mf){
-    # Retrieve matrices from MultiFactor
+    # Retrieve matrices from multifactor
     mats <- lapply(mf, as.matrix, terms = c(2L, 1L))
     # Link binarised origin ids to complexes
     complex2origin <- crossprod(
@@ -135,7 +135,7 @@ setMethod("weaveComplex", signature = c(graph = "igraph"),
 
 
 #' @importFrom readr read_lines
-#' @importFrom MultiFactor MultiFactor weave
+#' @importFrom multifactor multifactor weave
 .process_complex_modules <- function(
     x, br = "///", AND = ",", OR = "\t", output.format = "linkmap", ...){
     # Read file content
@@ -177,7 +177,7 @@ setMethod("weaveComplex", signature = c(graph = "igraph"),
     )
     if( output.format == "linkmap" ){
         out <- out |>
-            MultiFactor() |>
+            multifactor() |>
             weave(module ~ feature) |>
             data.frame()
     }

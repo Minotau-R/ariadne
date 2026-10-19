@@ -42,7 +42,7 @@ Imports:
     KEGGREST,
     Matrix,
     methods,
-    MultiFactor,
+    multifactor,
     readr,
     rlang,
     rotl,
@@ -64,7 +64,7 @@ Suggests:
     TreeSummarizedExperiment,
     testthat (>= 3.0.0)
 Remotes:
-    github::Minotau-R/MultiFactor
+    github::Minotau-R/multifactor
 URL: https://github.com/Minotau-R/ariadne
 BugReports: https://github.com/Minotau-R/ariadne/issues
 Config/testthat/parallel: true

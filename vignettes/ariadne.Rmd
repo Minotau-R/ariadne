@@ -33,9 +33,7 @@ knitr::opts_chunk$set(
 options(DT.options = list(pageLength = 5))
 ```
 
-# Introduction
-
-## Motivation
+# Motivation
 
 All domains of biology involve relational information, such as links between
 genes, organisms, and their interactions. For example, organisms form symbiotic
@@ -418,8 +416,8 @@ ariadne originates from the joint effort of the R/Bioconductor community. It is
 mainly based on the following software:
 
 - [R](https://www.r-project.org/), statistical programming language [@core2025r]
-- [MultiFactor](https://github.com/thomazbastiaanssen/anansi/),
-  Annotation-based Analysis of Specific Interactions [@bastiaanssen2023anansi]
+- [multifactor](https://github.com/Minotau-R/multifactor/),
+  S7 classes for relational data [@bastiaanssen2023anansi]
 
 ## Help
 
