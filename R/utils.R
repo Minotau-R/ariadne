@@ -44,6 +44,8 @@ listResourceVersions <- function(default = FALSE){
     meta$resource <- meta$source
     # Select relevant columns to print
     meta <- meta[ , c("resource", "version", "url")]
+    # Reset row indices
+    rownames(meta) <- NULL
     return(meta)
 }
 

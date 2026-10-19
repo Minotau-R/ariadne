@@ -1,0 +1,47 @@
+---
+title: "ariadneApp: interactively explore the ariadne resource graph"
+author:
+  - name: Giulio Benedetti
+    affiliation: University of Turku
+    email: giulio.benedetti@utu.fi
+output:
+    BiocStyle::html_document:
+        fig_height: 7
+        fig_width: 10
+        toc: true
+        toc_float: true
+        toc_depth: 2
+        number_sections: true
+        self_contained: true
+        code_folding: show
+# bibliography: ../inst/REFERENCES.bib
+date: "`r doc_date()`"
+package: "`r pkg_ver('ariadne')`"
+vignette: >
+  %\VignetteIndexEntry{ariadneApp: interactively explore the ariadne resource graph}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+    collapse = TRUE,
+    comment = "#>"
+)
+```
+
+ariadneApp is a web app version of the ariadne package designed to interactively
+weave resources across the ariadne graph. It is openly available at
+[this address](https://ariadneapp-minotaur.2.rahtiapp.fi/)
+
+Provide workflow supported with screenshots.
+
+# Reproducibility
+
+R session information:
+
+```{r reproduce, echo = FALSE}
+# Session info
+options(width = 120)
+sessionInfo()
+```

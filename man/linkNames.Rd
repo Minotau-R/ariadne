@@ -27,7 +27,7 @@ corresponding ids. (Default: \code{NULL})}
 console. (Default: \code{TRUE})}
 }
 \value{
-A \code{\link[MultiFactor:LinkMap]{LinkMap}} with ids and names in the first
+A \code{\link[multifactor:linkmap]{linkmap}} with ids and names in the first
 and second column, respectively.
 }
 \description{

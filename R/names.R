@@ -24,7 +24,7 @@
 #' @param ... Unused.
 #' 
 #' @returns
-#' A \code{\link[MultiFactor:LinkMap]{LinkMap}} with ids and names in the first
+#' A \code{\link[multifactor:linkmap]{linkmap}} with ids and names in the first
 #' and second column, respectively.
 #' 
 #' @examples
@@ -64,9 +64,7 @@ setMethod("linkNames", signature = c(graph = "igraph"),
     # Map ids and names to one another
     name_links <- .fetch_node(g, ids)
     # Return empty object if no names are available
-    if( is.null(name_links) ){
-        return(NULL)
-    }
+    if( is.null(name_links) ) return(NULL)
     # Select ids and names that matched an entry
     name_links <- name_links |>
         .match_key2val(x, 1L, ids, verbose) |>

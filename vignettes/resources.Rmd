@@ -1,0 +1,158 @@
+---
+title: "ariadneDB: a harmonised graph of biological databases and relations"
+author:
+  - name: Giulio Benedetti
+    affiliation: University of Turku
+    email: giulio.benedetti@utu.fi
+output:
+    BiocStyle::html_document:
+        fig_height: 7
+        fig_width: 10
+        toc: true
+        toc_float: true
+        toc_depth: 2
+        number_sections: true
+        self_contained: true
+        code_folding: show
+bibliography: ../inst/REFERENCES.bib
+date: "`r doc_date()`"
+package: "`r pkg_ver('ariadne')`"
+vignette: >
+    %\VignetteIndexEntry{ariadneDB: a harmonised graph of biological databases and relations}
+    %\VignetteEngine{knitr::rmarkdown}
+    %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+    collapse = TRUE,
+    comment = "#>"
+)
+
+# Set global DT options
+options(DT.options = list(pageLength = 5))
+```
+
+# Introduction
+
+The way that ariadne retrieves and combines relational data is informed by its
+companion data package [ariadneDB](https://github.com/Minotau-R/ariadneDB),
+which contains information about the feature types and mappings available from
+a handful of popular databases. From here on, we will refer to those databases
+as _resources_ to distinguish them from the ariadne database itself.
+
+The relational information of each resource is described by a graph, where nodes
+and edges represent feature types and mappings between them, respectively. In
+ariadneDB, these graphs are stored in the Graph Modelling Language (GML), which
+is a standard format for relational data. Currently, ariadneDB includes 11
+resources that span a diverse set of biological domains and applications.
+
+| **Resource** | **Description** | **Usage** | **Reference** |
+|--------------|-----------------|-----------|---------------|
+| [BugSigDB](https://bugsigdb.org) | Literature-based association of signature taxa by phenotype | Link taxa to associated phenotypes | @geistlinger2024bugsigdb |
+| [ChocoPhlAn](https://huttenhower.sph.harvard.edu/humann) | Pangenome database resulting from the ChocoPhlAn pipeline | Link UniRef gene families to functional information | @franzosa2018species |
+| [Gut Modules (GM)](https://raeslab.org/software/) | Legacy versions of gut metabolic modules and gut brain modules | Link KOs to gut modules | @vieira2016species; @valles2019neuroactive |
+| [Gene Ontology (GO)](https://www.geneontology.org/) | | | @ashburner2000gene |
+| [KEGG](https://www.genome.jp/kegg/) | Metabolic pathway database | Link ko and ec to reactions, pathways and organisms | @kanehisa2000kegg |
+| [MSigDB](https://www.gsea-msigdb.org/gsea/msigdb) | | | @subramanian2005gene |
+| [Open Tree of Life (OTT)](https://opentreeoflife.github.io/) | Synthetic tree of life constructed by combining public phylogenetic trees and taxonomic data | Link different taxonomies and taxon names | @subramanian2005gene |
+| [Rhea](https://www.rhea-db.org/) | The reactome database | Link rhea reactions to chebi compounds and external pathways | @bansal2022rhea |
+| [TIGRFAMs](https://www.ncbi.nlm.nih.gov/refseq/annotation_prok/tigrfams/) |  | Link TIGRFAMs to GO | @haft2001tigrfams |
+| [UniProt](https://www.uniprot.org/) | The proteome database | Link UniRef gene families to uniprotkb proteins, NCBI taxa and other external identifiers | @bateman2025uniprot |
+| [Web of Life (WoL)](https://www.web-of-life.es/) | Biological network database | Link UniRef gene families to functional and taxonomic information | @zhu2019phylogenomics |
+
+# Tutorial
+
+This tutorial demonstrates how to import and explore the ariadne resource graph.
+First, we set up the environment by loading the necessary dependencies.
+
+```{r lib, message = FALSE, warning = FALSE}
+# Load required packages
+library(ariadne)
+library(igraph)
+library(dplyr)
+library(ggplot2)
+library(DT)
+```
+
+When `ariadne` is executed, the graph for each resource is retrieved from the
+database release on [Zenodo](https://zenodo.org/records/18788725) and combined
+into a single igraph object.
+
+```{r fetch}
+# Import resource graph
+graph <- ariadne()
+
+# Plot resource graph
+plotPath(graph, layout = "stress")
+```
+
+Some resources have multiple versions, which can be selected through the
+argument `versions`. This defaults to the latest version found in the database.
+
+```{r res_versions}
+# List available resource versions
+versions <- listResourceVersions()
+
+# View versions
+datatable(versions)
+```
+
+The igraph object is made of two components: edges data and nodes (or vertices)
+data, which are stored in two different data tables.
+
+```{r graph2df}
+# Convert igraph to data.frame pair
+graph_df <- igraph::as_data_frame(graph, what = "both")
+
+# Extract edges data
+edge_df <- graph_df$edges
+# Extract nodes data
+node_df <- graph_df$vertices
+```
+
+As mentioned above, the resource graph is composed of feature types (nodes) and
+mappings (edges) from several resources. We generate the summary statistics for
+each resource integrated within ariadne.
+
+```{r stats}
+# Get stats for each resource
+df <- edge_df |>
+    group_by(source) |>
+    summarise(edges = n(), nodes = n_distinct(c(from, to)))
+
+# View stats
+datatable(df)
+```
+
+The number of edges and nodes represent the amount of links and feature types
+provided by each resource, respectively. These two metrics largely vary between
+the available resources. The size and graph for each resource can be visualized
+by generating individual graphs with the argument `res.name`.
+
+```{r plot_graphs}
+# Create resource graphs
+plots <- lapply(
+    df$source, function(x) {
+        plotPath(graph, res.name = x, layout = "stress", focus = TRUE) +
+            ggtitle(x)
+    }
+)
+
+# View resource graphs
+plots
+```
+
+As seen in the graphs, each resource includes unique links between different
+feature types, which ariadneDB integrates into a single organised graph to
+benefit from its emerging properties.
+
+# Reproducibility
+
+R session information:
+
+```{r reproduce, echo = FALSE}
+# Session info
+options(width = 120)
+sessionInfo()
+```

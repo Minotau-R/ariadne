@@ -1,5 +1,5 @@
 ---
-title: "ariadne: Integrate Knowledge in your Bioinformatic Analysis"
+title: "ariadne: integrate prior knowledge in your bioinformatic analysis"
 author:
   - name: Giulio Benedetti
     affiliation: University of Turku
@@ -18,127 +18,58 @@ output:
 date: "`r doc_date()`"
 package: "`r pkg_ver('ariadne')`"
 vignette: >
-  %\VignetteIndexEntry{ariadne: Integrate Knowledge into your Bioinformatic Analysis}
+  %\VignetteIndexEntry{ariadne: integrate prior knowledge into your bioinformatic analysis}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>"
+    collapse = TRUE,
+    comment = "#>"
 )
+
+# Set global DT options
+options(DT.options = list(pageLength = 5))
 ```
 
-All domains of biology have to do with relational information. From genes to
-organisms, each and every biological entity has some link to other entities. For
-example, bugs are friends or foes with other bugs, have foods they like and
-foods they hate (sometimes to death). All these links we call relational
-information, which becomes knowledge once it is smartly combined with other
-pieces and kept safe and open in a wonderfully organised place, usually a
-database.
+# Motivation
 
-Building a database from scratch is no easy task. Fortunately, nowadays
-databases for all kinds of relational information are available: UniProt for
-proteins, Rhea for reactions, KEGG for pretty much anything, and many others,
-which keep growing together with the field they support. As a scientist, having
-access to such vast knowledge from past research can truly make us "stand on the
-shoulders of giants".
+All domains of biology involve relational information, such as links between
+genes, organisms, and their interactions. For example, organisms form symbiotic
+or antagonistic relationships, consume specific foods, or avoid others, creating
+a web of connections that define biological systems. When this relational
+information is systematically organised and made accessible through databases
+such as UniProt (proteins), Rhea (reactions), and KEGG (metabolic pathways), it
+empowers scientists to build upon decades of research. However, leveraging
+these resources in routine bioinformatic analyses is often hindered by
+challenges such as inaccessible data repositories, incompatible formats, and
+the sheer volume of data that exceeds local storage capacities. Without a
+structured approach, navigating the labyrinth of biological knowledge can feel
+overwhelming, time-consuming, and discouraging.
 
-In practice, though, it is not always easy (or even possible) to leverage such
-knowledge in routine bioinformatic analyses due to three main challenges. First,
-data is usually deposited somewhere online, so there must be a fast and reliable
-method to retrieve and import it in the local environment. Second, data size
-often exceeds the disk space of a typical laptop, which requires smart ways to
-efficiently subset and store data in a lightweight, accessible format. Third,
-unless you are lucky, data will need a tidy-up before it is compatible with your
-dataset and other resources, necessitating a systematic approach to integrate
-information from multiple resources.
-
-## Motivation
-
-Sometimes biology seems like a huge labyrinth with no simple paths between its
-building blocks (genes, proteins, organisms, etc.). Even when the path to take
-is clear, many obstacles may hide on the way: inaccessible resources, long query
-times, incompatible formats, just to name a few. Crossing the labyrinth without
-a strategy is a seriously boring and discouraging task.
-
-Luckily, ariadne is here to help. By "Assembling Relational Information Across
-the Database Network", ariadne provides a harmonised graph of interlinked
-resources and a rich toolkit to navigate its underexplored paths. 
-
-The harmonised graph of resources was built with a reproducible pipeline hosted
-in the companion package `ariadne.db`, and it is openly available on [Zenodo](https://doi.org/10.5281/zenodo.18788725), including its previous
-versions.
-
-
-## Implementation
-
-Before describing how ariadne functions, let us explain some important jargon:
-
-- **feature type**: a distinct type of biological entity which includes a set of
-  unique elements labelled with ids. For consistency, all feature types are
-  written in lower case characters. Examples: `genes`, (KEGG genes id), `ko`
-  (KEGG Orthologues), `ec` (Enzyme Commission number) or `uniref90` (90%
-  similarity UniRef sequence clusters).
-- **level**: a unique element belonging to a feature type. The term _feature_
-  could be used as well, but it is not ideal due to its many closely related
-  meanings. Examples: 563 (NCBI id for E. coli), C00246 (KEGG compound id for
-  butyrate) or P0DTC2 (UniProtKB id for the SARS-CoV-2 spike protein).
-- **linkmap**: 2-column data.frame where columns are the feature types and rows
-  the links between them. This is how relational information is represented in
-  ariadne. It is often named with the syntax `x2y`, where x and y are the names
-  of the feature types in the first and second columns, respectively. Sometimes,
-  there is also a third column with the names for the target feature type y.
-  Examples: `tax2cpd` (linkmap between taxon names and compounds).
-- **resource**: a database from where linkmaps between feature types can be
-  retrieved. Examples: KEGG, Rhea or UniProt.
-- **weave**: the operation of sequentially linking feature types to generate
-  a new linkmap between two feature types that originally were not directly
-  linked. This operation follows the syntax `x ~ y`, where x and y are the
-  origin and target feature type to be linked, respectively. Examples:
-  `ko ~ ec`, `disease ~ drug`, `genes ~ metacyc`.
-
-Looking inside ariadne:
-
-- The resource graph is represented as an `igraph` object, where edges are
-  resources and nodes feature types. This is a natural choice for relational
-  data and enables applying graph theory to select the preferred path from one
-  feature type to another. It can be also easily expanded with user-defined
-  resources.
-- Resources are queried via fast `httr2` requests or using pre-existing APIs.
-  Whenever possible, even faster SPARQL queries are used to fetch linkmaps.
-- Linkmaps are automatically cached with `BiocFileCache` and efficiently stored
-  and imported using the Apache parquet columnar format from `arrow`.
-- The `MultiFactor` class, designed for optimised factor operations, takes care
-  of generating the desired linkmap by sequentially weaving linkmaps along the
-  path from the origin to the target feature type.
-
-
-## Applications
-
-ariadne provides a graph-based approach to integrate relational knowledge in
-routine bioinformatic analyses. As such, it can be used to annotate any type of
-biological data when related databases are available. This opens up potential
-applications in various corners of bioinformatics, from knowledge-driven
-feature annotation and stratification to goal-oriented feature selection and
-prediction.
-
-
-With microbes as features, ariadne allows to functionally annotate them using
-ChocoPhlAn or WoL and to stratify them by Bug Signatures or Gut Modules. (ideas
-for examples with metabolites, proteins, genes etc?)
-
-
-ariadne is interoperable with the Bioconductor ecosystem. In particular, the SummarizedExperiment (SE) data container and its derived classes can be directly
-annotated or stratified by relational information with ariadne.
-
+With its reproducible graph of interlinked biological resources and a robust
+toolkit to explore it, ariadne is designed to simplify this process by
+"Assembling Relational Information Across the Database Network". ariadne can be
+used for knowledge-driven annotation, feature stratification, and goal-oriented
+selection. For instance, it enables functional annotation of microbial features
+using databases like ChocoPhlAn and WoL, or stratification by Gut Modules and
+Bug Signatures. ariadne also extends to other biological data types, such as
+metabolites, proteins, or genes, making it a flexible tool for integrating
+relational knowledge into routine bioinformatic analyses (example use cases are
+presented in
+[this vignette](https://minotau-r.github.io/ariadne/articles/use_cases.html)).
 
 # Tutorial
 
+This tutorial showcases the programmatic usage of ariadne in R/RStudio. For the Python extension, check [ariadnePy](https://github.com/Minotau-R/ariadnePy). For
+the Shiny app, check [ariadneApp](https://github.com/Minotau-R/ariadneApp).
+
 ## Installation
 
-```{r install, eval=FALSE}
+The Bioconductor release version can be installed as follows:
+
+```{r install-release, eval = FALSE}
 if( !requireNamespace("BiocManager", quietly = TRUE) ){
     install.packages("BiocManager")
 }
@@ -146,41 +77,41 @@ if( !requireNamespace("BiocManager", quietly = TRUE) ){
 BiocManager::install("ariadne")
 ```
 
-## Explore the resource graph
+For the latest functionality, the devel version can be installed as follows:
+
+```{r install-beta, eval = FALSE}
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+# Initialise devel version
+BiocManager::install(version = "devel")
+
+BiocManager::install("ariadne")
+```
+
+## Import and explore the resource graph
 
 ariadne combines different resources into a single graph highlighting the links
-between biological entities. The resource graph can be imported as an igraph
-object with the function `ariadne`.
+between biological entities. The way that ariadne retrieves and combines
+relational data is further described in
+[this vignette](https://minotau-r.github.io/ariadne/articles/resources.html).
+In a nutshell, the data package ariadneDB contains information about the feature
+types and mappings across a handful of popular databases, represented as graphs
+and stored in Zenodo.
 
-```{r lib, message=FALSE, warning=FALSE}
+```{r lib, message = FALSE, warning = FALSE}
 library(ariadne)
-library(igraph)
+library(mia)
+library(miaViz)
+library(DT)
+```
 
+The resource graph can be imported with the function `ariadne`, which returns
+the combined resources as a single igraph object.
+
+```{r fetch}
 # Import resource graph
 graph <- ariadne()
-
-# View graph
-summary(graph)
-```
-
-The graph can be explored using all native functions from the igraph package.
-For example, we can sort its nodes by degree, that is, the number of adjacent
-edges:
-
-```{r}
-node_degrees <- graph |>
-    degree(mode = "all") |>
-    sort(decreasing = TRUE)
-
-node_degrees <- node_degrees[node_degrees >= 10]
-
-knitr::kable(node_degrees, col.names = "degree")
-```
-
-In addition, we can list all the nodes in the neighbourhood of a certain node:
-
-```{r}
-neighbors(graph, "ko", mode = "all")
 ```
 
 The graph can also be visualised with `plotPath`.
@@ -190,35 +121,282 @@ The graph can also be visualised with `plotPath`.
 plotPath(graph)
 ```
 
-Let's say we need to find all links between gene functions and enzyme activity
-represented by KEGG Orthologues (KO) and Enzyme Commission (EC) ids,
+Let's say we need to find the links between gene functions and enzyme activity
+represented by KEGG orthologues (ko) and enzyme commission ids (ec),
 respectively. The function `searchPath` can be used to find the `k` shortest
 paths in the graph.
 
-```{r}
+```{r search}
 # Search for paths from ko to ec
 searchPath(graph, ko ~ ec, k = 3)
 ```
 
-```{r}
-plotPath(graph, ko ~ ec, include = "uniref90", prune = TRUE, focus = TRUE)
+The top three paths found include the KEGG direct ko-ec link and the paths
+through uniref90 or uniref50 provided by ChocoPhlAn in combination with UniProt.
+Assuming that we are interested in the latter, paths satisfying specific
+requirements can be selected with the arguments `include`, `exclude` and
+`res.name`.
+
+```{r plot-path}
+plotPath(graph, ko ~ ec, include = "uniref90", prune = TRUE)
 ```
+
+In addition, the graph can be explored using all native functions from the
+igraph package. For example, we can sort its nodes by degree, that is, the
+number of adjacent edges:
+
+```{r degree}
+# Find and sort node degrees
+node_degrees <- graph |>
+    degree(mode = "all") |>
+    sort(decreasing = TRUE)
+
+# Select nodes above degree threshold
+node_degrees <- node_degrees[node_degrees >= 10]
+
+# View node degrees
+kable(node_degrees, col.names = "degree")
+```
+
+We can also list all the nodes in the neighbourhood of a certain node:
+
+```{r neighbour}
+# List neighbours of ko node
+neighbors(graph, "ko", mode = "all")
+```
+
+## Select and customise the resource graph
+
+The available resources default to the latest version found in the original
+database.
+
+```{r res-defaults}
+# List available resource versions
+versions <- listResourceVersions(default = TRUE)
+
+# View versions
+datatable(versions)
+```
+
+Some resources have multiple versions, which can be selected through the
+argument `versions`. 
+
+```{r res-versions}
+# List custom versions
+versions <- list(BugSigDB = "v1.2.2", WoL = "v20April2021")
+
+# Import graph with custom versions
+graph <- ariadne(versions = versions)
+```
+
+If the resource you need is missing, but you know where its mapping files
+reside (also locally in your machine), it is possible to add it as a custom
+resource to the ariadne graph using the function `addResource`. For example,
+we can add the links between taxa and antibiotic resistance traits from the EMBL
+AMR Portal.
+
+```{r}
+# Set URL to custom resource
+url <- "https://ftp.ebi.ac.uk/pub/databases/amr_portal/releases/2025-12/"
+url <- paste0(url, "genotype.csv.gz")
+
+# Add resource to ariadne graph
+graph <- addResource(
+    graph,
+    url,
+    res.name = "AMR",
+    select = c("taxon_id", "antibiotic_ontology"),
+    col.names = c("taxid", "aro")
+)
+
+# Search for newly added path
+searchPath(graph, taxid ~ aro)
+```
+
+## Cross the graph to link biological entities
 
 We decide to go through the simplest path, which corresponds to a `k` of 1. The
 links between KO and EC are found by the function `weavePath`, which fetches
-the necessary resources and weaves a path from KO to EC.
+the necessary resources and weaves a path from ko to ec.
 
 ```{r}
 # Weave path from ko to ec
 ko2ec <- weavePath(graph, ko ~ ec, k = 1)
-
-# View some links
-head(ko2ec)
 ```
 
 The links are provided as a **linkmap**, a 2-column table where each row is a
-pair of ids (one KO and one EC). When available, the feature names are returned
+pair of ids (one ko and one ec). When available, the feature names are returned
 as a third optional column.
+
+```{r}
+# View some links
+datatable(ko2ec)
+```
+
+The weave can be initialised with a set of identifiers belonging to the `from`
+id type. This is specified with the argument `init`.
+
+```{r}
+# Define custom ko initial values
+ko.ids <- c("K00665", "K05913", "K11533")
+
+# Weave path with initial values
+ko2ec <- weavePath(graph, ko ~ ec, init = ko.ids)
+
+# View links
+knitr::kable(ko2ec)
+```
+
+Sometimes, we would like to know how much each origin id covers each target id
+in terms of percent coverage (useful for pathway enrichment analysis). This can
+be achieved with the alternative function `weaveComplex`. For example, we can
+estimate the percentage of kegg pathways covered by different ec ids, and select
+only those links above a certain `threshold`.
+
+```{r}
+# Find complex links between ko and kegg pathways
+ec2path <- weaveComplex(
+    graph,
+    ec ~ kegg_path,
+    threshold = 0.5
+)
+
+# View some links
+knitr::kable(ec2path)
+```
+
+The links can be visualised with the function `plotModules`.
+
+```{r}
+# Visualise links
+plotModules(ko2path, layout = "sugiyama") + coord_flip()
+```
+
+## Ensure reproducibility of the ariadne workflow
+
+A path table is a metadata describing the complete workflow. The data object
+`pathMeta` shows an example of the contained information and format.
+
+```{r pathMeta}
+# Import pathMeta object
+data("pathMeta", package = "ariadne")
+
+# View pathMeta object
+datatable(pathMeta)
+```
+
+To generate a the table for a given path, `drawPath` can be used.
+
+```{r draw}
+# Draw path table from ko to ec
+path_df <- drawPath(graph, ko ~ ec, k = 1)
+
+datatable(path_df)
+```
+
+The returned path can be directly passed to `weavePath` to reproduce the full
+ariadne workflow.
+
+```{r weave-drawn}
+ko2ec.simple <- weavePath(path_df)
+
+datatable(ko2ec.simple)
+```
+
+Similarly, the path table can also be passed to `weaveComplex` to reproduce a
+coverage-based ariadne workflow.
+
+```{r complex-drawn}
+ko2ec.complex <- weaveComplex(path_df)
+
+datatable(ko2ec.complex)
+```
+
+## Add results to SummarizedExperiment for downstream analyses
+
+ariadne works in combination with the wider Bioconductor framework, in
+particular the data containers derived from SummarizedExperiment (SE), the mia
+package for microbiome data analysis, and the anansi package for
+knowledge-driven association analysis. First, we import the `Tengeler2020`
+TreeSE object.
+
+```{r}
+# Import experiment object
+data("Tengeler2020", package = "mia")
+
+# Rename experiment object
+tse <- Tengeler2020
+
+# View experiment object
+tse
+```
+
+We also import `butyrate` linkmap on butyrate-producing bacteria, which is
+included in the ariadne package as an example output of the `weave*` functions.
+
+```{r}
+# Import butyrate linkmap
+data("butyrate", package = "ariadne")
+
+# View butyrate linkmap
+datatable(butyrate)
+```
+
+The function `getModules` matches each level of the origin feature type
+(taxname in this case) with any variable specified in `key` (in the given order)
+and it returns a modules table where rows and columns represent origin and
+target features, respectively, and cell values indicate presence/absence
+membership or coverage fraction.
+
+```{r}
+# Get butyrate-producer module membership
+modules <- getModules(tse, butyrate, key = c("Genus", "Family"))
+
+# View modules table
+datatable(modules)
+```
+
+Using the function `addModules`, the modules table is directly added to the
+side information of the TreeSE object, so that it can be used in downstream
+analysis.
+
+```{r}
+# Add modules to experiment as names instead of ids
+tse <- addModules(tse, butyrate, key = "Genus", as = "names")
+```
+
+The mia package provides two key methods to apply module-wise operations to
+a SE object. The first is `agglomerateByModule`, which agglomerates the count
+table along `by` for each module in the side information included in `group`
+(only one in this case).
+
+```{r}
+# Agglomerate features by membership to butyrate-producer module
+mod.se <- agglomerateByModule(tse, by = "rows", group = "butyrate")
+
+# Plot abundance of butyrate producers
+plotAbundance(mod.se)
+```
+
+The second method allows to apply any operation module-wise on an SE object
+using the functio `applyByModule`. For example, it is possible to estimate
+alpha diversity for each module (only one in this case), which is sometimes
+called _functional diversity_.
+
+```{r}
+# Estimate alpha diversity for each module
+tse <- applyByModule(
+    tse,
+    .by = "rows",
+    .group = "butyrate",
+    FUN = getAlpha,
+    index = c("shannon", "faith"),
+    min.group.size = 2
+)
+
+# viz functional alpha/beta
+plotBoxplot(tse, col.var = "shannon_1")
+```
 
 # Resources
 
@@ -232,17 +410,14 @@ information to cite the package and the overall approach. Thank you!
 citation("ariadne")
 ```
 
-## Background Knowledge
+## Acknowledgements
 
 ariadne originates from the joint effort of the R/Bioconductor community. It is
 mainly based on the following software:
 
 - [R](https://www.r-project.org/), statistical programming language [@core2025r]
-- [mia](https://bioconductor.org/packages/release/bioc/html/mia.html),
-  framework for microbiome data analysis [@borman2025mia]
-- [MultiFactor](https://github.com/thomazbastiaanssen/anansi/),
-  Annotation-based Analysis of Specific Interactions [@bastiaanssen2023anansi]
-- [TreeSummarizedExperiment](https://bioconductor.org/packages/release/bioc/html/TreeSummarizedExperiment.htmlm), S4 container for hierarchical data [@huang2020treesummarizedexperiment]
+- [multifactor](https://github.com/Minotau-R/multifactor/),
+  S7 classes for relational data [@bastiaanssen2023anansi]
 
 ## Help
 
@@ -256,7 +431,7 @@ point, check the
 
 R session information:
 
-```{r reproduce, echo=FALSE}
+```{r reproduce, echo = FALSE}
 # Session info
 options(width = 120)
 sessionInfo()

@@ -1,0 +1,353 @@
+---
+title: "ariadne in action: common use cases in omics research"
+author:
+  - name: Giulio Benedetti
+    affiliation: University of Turku
+    email: giulio.benedetti@utu.fi
+output:
+    BiocStyle::html_document:
+        fig_height: 7
+        fig_width: 10
+        toc: true
+        toc_float: true
+        toc_depth: 2
+        number_sections: true
+        self_contained: true
+        code_folding: show
+# bibliography: ../inst/REFERENCES.bib
+date: "`r doc_date()`"
+package: "`r pkg_ver('ariadne')`"
+vignette: >
+  %\VignetteIndexEntry{ariadne in action: common use cases in omics research}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+    collapse = TRUE,
+    comment = "#>"
+)
+
+# Set global DT options
+options(DT.options = list(pageLength = 5))
+```
+
+| **Use case** | **Resources** | **Objective** |
+|--------------|---------------|---------------|
+| Functional annotation | ChocoPhlAn, WoL | Annotate microbial or gene features (UniRef) with sequence-based related functional information (KO, EC, pfam, etc.) |
+| Taxonomic translation | OTT, UniProt | Convert taxonomic names and ids across taxonomies (NCBI, SILVA, OTT, etc.) |
+| Set enrichment analysis | BugSigDB, GM, GO, MSigDB | Test for enriched or depleted functional sets of features between conditions |
+| Pathway enrichment analysis | KEGG, Rhea, WoL | Test for enriched or depleted metabolic pathways linked to features between conditions |
+| Knowledge-driven association analysis | KEGG, UniProt | Test previously reported associations between different omics layers (microbes, metabolites, genes, etc.) |
+
+
+```{r lib, message = FALSE, warning = FALSE}
+library(ariadne)
+library(anansi)
+library(curatedMetagenomicData)
+library(mia)
+library(miaViz)
+library(DT)
+```
+
+```{r}
+# Import resource graph
+graph <- ariadne()
+```
+
+# Functional annotation
+
+```{r}
+# Load gene family experiment
+genes <- curatedMetagenomicData(
+    "SankaranarayananK_2015.gene_families", dryrun = FALSE
+)
+
+# Extract experiment from list
+genes <- genes[[1]]
+
+# Keep only unstratified gene families
+genes <- genes[!grepl("|", rownames(genes), fixed = TRUE), ]
+
+# Print experiment
+genes
+```
+
+```{r}
+searchPath(graph, uniref90 ~ gmm, k = 3)
+```
+
+```{r}
+# Weave bindings between taxa and GMMs
+uniref2gmm <- weaveComplex(graph, uniref90 ~ gmm, init = rownames(genes))
+
+# Print some results
+datatable(uniref2gmm)
+```
+
+Alternatively, WoL can be used instead, but only its older version provides
+uniref to ko bindings, so we need to import a past release of the resource
+graph.
+
+```{r}
+# Import past release of the resource graph
+graph <- ariadne(versions = list(WoL = "v20April2021"))
+
+# Weave path through WoL
+uniref2gmm <- weaveComplex(
+    graph,
+    uniref90 ~ gmm,
+    init = rownames(genes),
+    res.name = c("WoL", "GM")
+)
+```
+
+
+```{r}
+# Add modules to experiment side information
+genes <- addModules(genes, uniref2gmm, as = "names")
+
+# Agglomerate experiment by modules
+mod.se <- agglomerateByModule(
+    genes, by = "rows", group = levels(uniref2gmm$gmm.name)
+)
+
+# View experiment object
+mod.se
+```
+
+```{r}
+plotHeatmap(mod.se, assay.type = "counts")
+```
+
+# Taxonomic translation
+
+First, we load the butyrate linkmap from the ariadne package, which contains
+microbial features known for butyrate production.
+
+```{r}
+# Import butyrate linkmap
+data("butyrate", package = "ariadne")
+
+# View butyrate linkmap
+datatable(butyrate)
+```
+
+The resource OTT can be used to link NCBI taxon ids to other taxonomies, such as
+SILVA, OTT, etc.
+
+```{r}
+# Search for path from taxid to silva id
+searchPath(graph, taxid ~ silva_ssu, res.name = "OTT")
+```
+
+We link NCBI taxon ids to the corresponding SILVA ids starting from the taxon
+ids found in the butyrate linkmap.
+
+```{r}
+# Convert taxid to silva
+taxid2silva <- weavePath(graph, taxid ~ silva_ssu, init = taxid2taxname$taxid)
+
+# View linkmap
+datatable(taxid2silva)
+```
+
+Additionally, we can use OTT to match taxon names to the corresponding NCBI or
+OTT taxon ids using a fuzzy strategy, so that partial matches are also
+successful.
+
+```{r}
+# Weave path with initial values
+taxid2taxname <- weavePath(
+    graph,
+    taxname ~ taxid,
+    init = butyrate$taxname,
+    res.name = "OTT"
+)
+
+# View linkmap
+datatable(taxid2taxname)
+```
+
+
+# Set enrichment analysis
+
+## BugSigDB
+
+```{r}
+# Import experiment object
+data("Tengeler2020", package = "mia")
+
+# Rename experiment object
+tse <- Tengeler2020
+
+# Transform counts to relative abundance
+tse <- transformAssay(tse, method = "relabundance")
+
+# View experiment object
+tse
+```
+
+```{r}
+# Search for path from taxname to bugsig
+searchPath(graph, taxname ~ bugsig)
+```
+
+```{r}
+# Weave path from taxname to bugsig
+tax2bugsig <- weavePath(graph, taxname ~ bugsig, init = rowData(tse)$Genus)
+
+# View linkmap
+datatable(tax2bugsig)
+```
+
+```{r}
+# Retrieve all unique modules
+mod.names <- levels(tax2bugsig$bugsig.name)
+
+# Extract modules related to ADHD
+adhd.mods <- grepv("ADHD", mod.names)
+
+# View modules of interest
+knitr::kable(adhd.mods, col.names = "Modules of interest")
+```
+
+
+```{r}
+tse <- addModules(tse, tax2bugsig, key = "Genus", as = "names")
+
+mod.se <- agglomerateByModule(tse, by = "rows", group = adhd.mods)
+
+mod.se
+```
+
+```{r}
+plotHeatmap(mod.se, assay.type = "relabundance", col.var = "patient_status")
+```
+
+# Pathway enrichment analysis
+
+## KEGG
+
+```{r}
+# Search paths from ec to kegg pathways
+searchPath(graph, ec ~ kegg_path, include = "kegg_rxn", k = 3)
+```
+
+```{r}
+# Weave path from ec to kegg pathways
+ec2path <- weaveComplex(
+    graph,
+    ec ~ kegg_path,
+    include = "kegg_rxn",
+    threshold = 0.5
+)
+```
+
+```{r}
+# View linkmap
+datatable(ec2path)
+```
+
+## MetaCyc
+
+The MetaCyc pathways are provided from WoL2. However, this corresponds to
+an older version of MetaCyc before it changed to a license scheme.
+
+```{r}
+# Search paths from ec to metacyc pathways
+searchPath(graph, ec ~ metacyc_path, k = 3)
+```
+
+```{r}
+# Weave path from ec to metacyc pathways
+ec2path <- weaveComplex(graph, ec ~ metacyc_path)
+```
+
+
+```{r}
+# View linkmap
+datatable(ec2path)
+```
+
+
+# Knowledge-driven association analysis
+
+```{r}
+data("HintikkaXOData", package = "mia")
+mae <- HintikkaXOData
+```
+
+```{r}
+searchPath(graph, taxname ~ kegg_cpd, k = 5, include = c("taxid", "uniref90"))
+```
+
+```{r}
+mae[["microbiota"]] <- agglomerateByRank(mae[["microbiota"]], rank = "Genus")
+```
+
+
+```{r}
+# Retrieve taxon names
+tax.labs <- getTaxonomyLabels(mae[["microbiota"]], make.unique = FALSE)
+tax.labs <- sub("D_5__", "", tax.labs)
+```
+
+```{r}
+tax.ids <- weavePath(
+    graph,
+    taxname ~ taxid,
+    init = tax.labs,
+    res.name = "OTT",
+    use.names = FALSE
+)
+```
+
+
+```{r}
+tax2cpd <- weavePath(
+    graph,
+    taxname ~ kegg_cpd,
+    include = c("taxid", "uniref90"),
+    init = tax.labs[50:55],
+    k = 4
+)
+```
+
+
+```{r}
+cpd.ids <- linkNames(graph, "kegg_cpd", names = rownames(mae[["metabolites"]]))
+
+datatable(cpd.ids)
+```
+
+```{r}
+names(tax2cpd) <- c("microbiota", "metabolites")
+
+datatable(tax2cpd)
+```
+
+
+```{r}
+web <- weaveWeb(mae, microbiota ~ metabolites, link = tax2cpd)
+```
+
+```{r}
+out <- anansi(web)
+```
+
+
+```{r}
+plotAnansi(out)
+```
+
+# Reproducibility
+
+R session information:
+
+```{r reproduce, echo = FALSE}
+# Session info
+options(width = 120)
+sessionInfo()
+```

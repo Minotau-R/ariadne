@@ -1,5 +1,5 @@
 Package: ariadne
-Version: 0.2.8
+Version: 0.2.9
 Authors@R: 
     c(person(given = "Giulio", family = "Benedetti", role = c("aut", "cre"),
           email = "giulio.benedetti@utu.fi",
@@ -42,7 +42,7 @@ Imports:
     KEGGREST,
     Matrix,
     methods,
-    MultiFactor,
+    multifactor,
     readr,
     rlang,
     rotl,
@@ -53,6 +53,7 @@ Imports:
     tools,
     utils
 Suggests:
+    anansi,
     BiocStyle,
     curatedMetagenomicData,
     knitr,
@@ -63,13 +64,11 @@ Suggests:
     TreeSummarizedExperiment,
     testthat (>= 3.0.0)
 Remotes:
-    github::microbiome/mia,
-    github::Minotau-R/MultiFactor
+    github::Minotau-R/multifactor
 URL: https://github.com/Minotau-R/ariadne
 BugReports: https://github.com/Minotau-R/ariadne/issues
 Config/testthat/parallel: true
 Roxygen: list(markdown = TRUE)
 VignetteBuilder: knitr
-LazyData: true
 Config/roxygen2/version: 8.0.0
 RoxygenNote: 7.3.3
