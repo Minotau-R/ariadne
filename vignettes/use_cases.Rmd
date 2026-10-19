@@ -33,6 +33,15 @@ knitr::opts_chunk$set(
 options(DT.options = list(pageLength = 5))
 ```
 
+| **Use case** | **Resources** | **Objective** |
+|--------------|---------------|---------------|
+| Functional annotation | ChocoPhlAn, WoL | Annotate microbial or gene features (UniRef) with sequence-based related functional information (KO, EC, pfam, etc.) |
+| Taxonomic translation | OTT, UniProt | Convert taxonomic names and ids across taxonomies (NCBI, SILVA, OTT, etc.) |
+| Set enrichment analysis | BugSigDB, GM, GO, MSigDB | Test for enriched or depleted functional sets of features between conditions |
+| Pathway enrichment analysis | KEGG, Rhea, WoL | Test for enriched or depleted metabolic pathways linked to features between conditions |
+| Knowledge-driven association analysis | KEGG, UniProt | Test previously reported associations between different omics layers (microbes, metabolites, genes, etc.) |
+
+
 ```{r lib, message = FALSE, warning = FALSE}
 library(ariadne)
 library(anansi)
@@ -46,6 +55,121 @@ library(DT)
 # Import resource graph
 graph <- ariadne()
 ```
+
+# Functional annotation
+
+```{r}
+# Load gene family experiment
+genes <- curatedMetagenomicData(
+    "SankaranarayananK_2015.gene_families", dryrun = FALSE
+)
+
+# Extract experiment from list
+genes <- genes[[1]]
+
+# Keep only unstratified gene families
+genes <- genes[!grepl("|", rownames(genes), fixed = TRUE), ]
+
+# Print experiment
+genes
+```
+
+```{r}
+searchPath(graph, uniref90 ~ gmm, k = 3)
+```
+
+```{r}
+# Weave bindings between taxa and GMMs
+uniref2gmm <- weaveComplex(graph, uniref90 ~ gmm, init = rownames(genes))
+
+# Print some results
+datatable(uniref2gmm)
+```
+
+Alternatively, WoL can be used instead, but only its older version provides
+uniref to ko bindings, so we need to import a past release of the resource
+graph.
+
+```{r}
+# Import past release of the resource graph
+graph <- ariadne(versions = list(WoL = "v20April2021"))
+
+# Weave path through WoL
+uniref2gmm <- weaveComplex(
+    graph,
+    uniref90 ~ gmm,
+    init = rownames(genes),
+    res.name = c("WoL", "GM")
+)
+```
+
+
+```{r}
+# Add modules to experiment side information
+genes <- addModules(genes, uniref2gmm, as = "names")
+
+# Agglomerate experiment by modules
+mod.se <- agglomerateByModule(
+    genes, by = "rows", group = levels(uniref2gmm$gmm.name)
+)
+
+# View experiment object
+mod.se
+```
+
+```{r}
+plotHeatmap(mod.se, assay.type = "counts")
+```
+
+# Taxonomic translation
+
+First, we load the butyrate linkmap from the ariadne package, which contains
+microbial features known for butyrate production.
+
+```{r}
+# Import butyrate linkmap
+data("butyrate", package = "ariadne")
+
+# View butyrate linkmap
+datatable(butyrate)
+```
+
+The resource OTT can be used to link NCBI taxon ids to other taxonomies, such as
+SILVA, OTT, etc.
+
+```{r}
+# Search for path from taxid to silva id
+searchPath(graph, taxid ~ silva_ssu, res.name = "OTT")
+```
+
+We link NCBI taxon ids to the corresponding SILVA ids starting from the taxon
+ids found in the butyrate linkmap.
+
+```{r}
+# Convert taxid to silva
+taxid2silva <- weavePath(graph, taxid ~ silva_ssu, init = taxid2taxname$taxid)
+
+# View linkmap
+datatable(taxid2silva)
+```
+
+Additionally, we can use OTT to match taxon names to the corresponding NCBI or
+OTT taxon ids using a fuzzy strategy, so that partial matches are also
+successful.
+
+```{r}
+# Weave path with initial values
+taxid2taxname <- weavePath(
+    graph,
+    taxname ~ taxid,
+    init = butyrate$taxname,
+    res.name = "OTT"
+)
+
+# View linkmap
+datatable(taxid2taxname)
+```
+
 
 # Set enrichment analysis
 
@@ -147,72 +271,8 @@ ec2path <- weaveComplex(graph, ec ~ metacyc_path)
 datatable(ec2path)
 ```
 
-# Functional annotation
 
-```{r}
-# Load gene family experiment
-genes <- curatedMetagenomicData(
-    "SankaranarayananK_2015.gene_families", dryrun = FALSE
-)
-
-genes <- genes[[1]]
-
-# Keep only unstratified gene families
-genes <- genes[!grepl("|", rownames(genes), fixed = TRUE), ]
-
-# Print experiment
-genes
-```
-
-```{r}
-searchPath(graph, uniref90 ~ gmm, k = 3)
-```
-
-```{r}
-# Weave bindings between taxa and GMMs
-uniref2gmm <- weaveComplex(graph, uniref90 ~ gmm, init = rownames(genes))
-
-# Print some results
-datatable(uniref2gmm)
-```
-
-Alternatively, WoL can be used instead, but only its older version provides
-uniref to ko bindings, so we need to import a past release of the resource
-graph.
-
-```{r}
-# Import past release of the resource graph
-graph <- ariadne(versions = list(WoL = "v20April2021"))
-
-# Weave path through WoL
-uniref2gmm <- weaveComplex(
-    graph,
-    uniref90 ~ gmm,
-    init = rownames(genes),
-    res.name = c("WoL", "GM")
-)
-```
-
-
-```{r}
-# Add modules to experiment side information
-genes <- addModules(genes, uniref2gmm, as = "names")
-
-# Agglomerate experiment by modules
-mod.se <- agglomerateByModule(
-    genes, by = "rows", group = levels(uniref2gmm$gmm.name)
-)
-
-# View experiment object
-mod.se
-```
-
-```{r}
-plotHeatmap(mod.se, assay.type = "counts")
-```
-
-
-# anansi association analysis
+# Knowledge-driven association analysis
 
 ```{r}
 data("HintikkaXOData", package = "mia")
@@ -261,6 +321,7 @@ cpd.ids <- linkNames(graph, "kegg_cpd", names = rownames(mae[["metabolites"]]))
 
 datatable(cpd.ids)
 ```
+
 ```{r}
 names(tax2cpd) <- c("microbiota", "metabolites")
 
@@ -278,29 +339,7 @@ out <- anansi(web)
 
 
 ```{r}
-# plotAnansi(out)
-```
-
-# Taxonomic translation
-
-
-
-```{r}
-searchPath(graph, taxid ~ silva_ssu)
-```
-
-```{r}
-taxid2taxname <- weavePath(graph, taxname ~ taxid, init = butyrate$taxname)
-
-datatable(taxid2taxname)
-```
-
-
-```{r}
-# or OTT id
-taxid2silva <- weavePath(graph, taxid ~ silva_ssu, init = taxid2taxname$taxid)
-
-datatable(taxid2silva)
+plotAnansi(out)
 ```
 
 # Reproducibility
