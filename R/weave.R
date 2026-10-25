@@ -242,11 +242,12 @@ setMethod("weavePath", signature = c(graph = "igraph"),
 }
 
 
-#' @importFrom KEGGREST keggConv keggLink
 #' @importFrom arrow read_parquet open_dataset
 #' @importFrom dplyr select filter collect
+#' @importFrom KEGGREST keggConv keggLink
 #' @importFrom multifactor linkmap
 #' @importFrom tidyselect all_of
+#' @importFrom enviPathR epLink
 #' @importFrom rlang sym
 .fetch_edge <- function(g, init, timeout, ...){
     # Check if init exists
@@ -258,7 +259,11 @@ setMethod("weavePath", signature = c(graph = "igraph"),
             ".", call. = FALSE)
     }
     # Retrieve linkmap from corresponding resource
-    if( g$source == "KEGG" ){
+    if( g$source == "enviPath" ){
+        # Get links from enviPath
+        df <- epLink(g$specFrom, g$specTo, init)
+    # Query KEGG
+    }else if( g$source == "KEGG" ){
         # List external databases
         ext <- c("chebi", "geneid", "proteinid", "pubchem", "uniprotkb")
         # Select function based on id types

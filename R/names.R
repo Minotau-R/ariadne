@@ -76,12 +76,12 @@ setMethod("linkNames", signature = c(graph = "igraph"),
     return(name_links)
 })
 
-
+#' @importFrom stringr str_split str_remove fixed
 #' @importFrom KEGGREST listDatabases keggList
 #' @importFrom arrow read_parquet open_dataset
 #' @importFrom dplyr select filter collect
-#' @importFrom stringr str_split fixed
 #' @importFrom tidyselect all_of
+#' @importFrom enviPathR epList
 #' @importFrom readr read_lines
 #' @importFrom data.table fread
 #' @importFrom rlang sym
@@ -94,20 +94,12 @@ setMethod("linkNames", signature = c(graph = "igraph"),
             ".", call. = FALSE)
     }
     
-    if( g$name == "bugsig" ){
+    if( str_detect(g$name, fixed("envipath")) ){
         
-        url <- "https://zenodo.org/records/15272273/files/bugsigdb_signatures_mixed_ncbi.gmt"
+        name_links <- epList(g$enviPath)
         
-        name_links <- url |>
-            read_lines(skip = 1L) |>
-            str_split(fixed("\t")) |>
-            vapply(`[`, 1L, FUN.VALUE = character(1L)) |>
-            str_split(fixed("_"), n = 2L, simplify = TRUE) |>
-            as.data.frame()
+        name_links <- name_links[c("id", "name")]
         
-        name_links[[1L]] <- sub("bsdb:", "", name_links[[1L]], fixed = TRUE)
-        name_links[[2L]] <- sub("^.+:", "", name_links[[2L]])
-    
     }else if( g$name %in% c("gmm", "gbm") ){
       
         name_links <- fread(g$url, header = FALSE, showProgress = FALSE)
@@ -115,7 +107,7 @@ setMethod("linkNames", signature = c(graph = "igraph"),
     }else if( !is.na(g$url) ){
         # Build name colname
         name_col <-  paste0(g$spec, "_name")
-        if( g$name == "msig" ) name_col <- sub("_id", "", name_col, fixed = TRUE)
+        if( g$name == "msig" ) name_col <- str_remove(name_col, fixed("_id"))
         # Get file path to cached resource
         cached <- .cache_resource(g$url, g$source, g$spec, name_col)
         # If initial values are given
@@ -142,7 +134,7 @@ setMethod("linkNames", signature = c(graph = "igraph"),
         name_vec <- keggList(init)
         # Keep only first name (and last for ko)
         to_remove <- ifelse(g$KEGG == "ko", ".*;", ";.*")
-        name_vec <- sub(to_remove, "", name_vec)
+        name_vec <- str_remove(name_vec, to_remove)
         # Convert to linkmap
         name_links <- data.frame(
             x = names(name_vec), y = name_vec, row.names = NULL

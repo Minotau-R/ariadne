@@ -2,7 +2,7 @@
 devtools::load_all()
 source("inst/scripts/utils.R")
 
-default.graph <- 19397292
+default.graph <- 23584782
 dfs <- list()
 
 # Add BugSigDB versions
@@ -67,7 +67,7 @@ dfs[["TIGRFAMs"]] <- data.frame(
 )
 
 # Add unversioned resources
-not_versioned <- c("KEGG", "OTT", "Rhea", "UniProt")
+not_versioned <- c("enviPath", "KEGG", "OTT", "Rhea", "UniProt")
 nover_dfs <- lapply(
     not_versioned,
     function(x) data.frame(version = "latest", key = "", graph = default.graph)
@@ -88,6 +88,7 @@ df <- df[order(df$source), ]
 attr(df, "urls") <- c(
     BugSigDB = "https://zenodo.org/records/",
     ChocoPhlAn = "https://zenodo.org/records/",
+    enviPath = "https://envipath.org/",
     GM = "https://github.com/",
     GO = "https://release.geneontology.org/",
     KEGG = "https://www.genome.jp/kegg",

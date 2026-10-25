@@ -4,7 +4,7 @@
 #' 
 #' @description
 #' \code{ariadne} imports the resource graph hosted in the companion package
-#' ariadne.db.
+#' ariadneDB.
 #' 
 #' @param versions \code{Character list}. A named list of resource versions to
 #' load. Latest versions are used if not specified. (Default: \code{NULL})
@@ -14,7 +14,7 @@
 #' @seealso
 #' \itemize{
 #'   \item \code{\link{listResourceVersions}}
-#'   \item ariadne.db: \url{https://github.com/Minotau-R/ariadne.db}
+#'   \item ariadneDB: \url{https://github.com/Minotau-R/ariadneDB}
 #'   \item Zenodo: \url{https://zenodo.org/records/18788725}
 #' }
 #' 

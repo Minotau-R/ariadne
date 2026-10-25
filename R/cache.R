@@ -6,7 +6,7 @@
     # Initialise cache
     bfc <- .init_cache()
     # Build resource name
-    rname <- file.path(res.name, basename(url))
+    rname <- file.path(res.name, paste(from, to, sep = "2"))
     # Check if preprocessed file is cached
     cached <- bfcquery(bfc, rname)$rpath
     # Return preprocessed file if available
@@ -17,25 +17,47 @@
         ChocoPhlAn = function(x) .process_one2many(
             x, key.FUN = function(keys) str_remove(keys, fixed("GO:"))
         ),
-        WoL = function(x) .process_one2many(
-            x, key.FUN = ifelse(from == "uniref90",
-                function(keys) paste0("UniRef90_", keys), identity),
-            val.FUN = function(vals) str_remove(vals, fixed("EC-"))
-        ),
-        BugSigDB = function(x) .process_one2many(
-            x, val.cols = -c(1L, 2L), skip = 1L, key.FUN = function(keys){
-                # Remove module prefix and description
-                keys <- keys |>
-                    str_remove(fixed("bsdb:")) |>
-                    str_remove("_.*$")
+        WoL = function(x){
+            if( from == "wol" && to != "metacyc_prt" ){
+                
+                is_uniref <- to == "uniref90"
+                
+                .process_one2one(x, select = c(1L, 2L), header = !is_uniref,
+                    key.FUN = function(keys) str_remove(keys, "_.*"),
+                    val.FUN = ifelse(is_uniref,
+                        function(vals) paste0("UniRef90_", vals), identity))
+            }else{
+                .process_one2many(x,
+                    key.FUN = switch(from,
+                        wol = function(keys) str_remove(keys, "_.*"),
+                        uniref90 = function(keys) paste0("UniRef90_", keys),
+                        identity),
+                    val.FUN = ifelse(to == "ec",
+                        function(vals) str_remove(vals, fixed("EC-")), identity))
             }
-        ),
+        },
+        BugSigDB = function(x){
+            is_name <- to == "bugsigdb_name"
+            val.cols <- if( is_name ) 1L else -c(1L, 2L)
+            
+           .process_one2many(x, val.cols = val.cols, skip = 1L,
+               key.FUN = function(keys){
+                   # Remove module prefix and description
+                   keys <- keys |>
+                       str_remove(fixed("bsdb:")) |>
+                       str_remove("_.*$")},
+               val.FUN = ifelse(is_name,
+                   function(vals) str_remove(vals, "^.+:"), identity))
+        },
         TIGRFAMs = function(x) .process_one2one(
-            x, header = FALSE, select = c(1L, 2L)
+            x, header = FALSE, select = c(1L, 2L),
+            val.FUN = function(vals) str_remove(vals, fixed("GO:"))
         ),
         GO = function(x) .process_one2one(
             x, header = FALSE, key.FUN = function(keys){
-                keys <- str_remove(keys, " >.*")
+                keys <- keys |>
+                    str_remove(" >.*") |>
+                    str_remove("^[^:]*:")
             }
         ),
         GM = .process_complex_modules,
@@ -87,15 +109,20 @@
 # from to args?
 #' @importFrom data.table fread
 #' @importFrom stringr str_remove fixed
-.process_one2one <- function(x, key.FUN = identity, ...){
+.process_one2one <- function(x, key.FUN = identity, val.FUN = identity, ...){
     # Read linkmap
     linkmap <- fread(x, ...)
+    # Check linkmap
+    if( ncol(linkmap) != 2L ){
+        stop(".process_one2one received a table with a number of columns ",
+            "not equal to two.", call. = FALSE)
+    }
+    # Add temporary colnames
+    colnames(linkmap) <- c("V1", "V2")
     # Process keys with custom function
     linkmap$V1 <- key.FUN(linkmap$V1)
-    # Remove id prefix ending with : (for GO resources)
-    linkmap$V1 <- str_remove(linkmap$V1, "^[^:]*:")
-    # Remove GO prefix (for GO and TIGRFAMs resources)
-    linkmap$V2 <- str_remove(linkmap$V2, fixed("GO:"))
+    # Process values with custom function
+    linkmap$V2 <- val.FUN(linkmap$V2)
     return(linkmap)
 }
 
