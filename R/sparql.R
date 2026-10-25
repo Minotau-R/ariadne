@@ -58,11 +58,9 @@
 .composeSPARQL <- function(from, to, preface, clause, endpoint, init){
     # If init is defined
     if( !is.null(init) && length(init) != 0L ){
-        # Pass values to sciName for taxname ids
-        spec.from <- ifelse(from == "taxname", "sciName", from)
         # Limit query with values
         values <- paste0(
-            "VALUES ?", spec.from, " {\n",
+            "VALUES ?", from, " {\n",
                 paste(.iri_table(init, from, to, endpoint), collapse = " "), "
             }\n")
         # Pre-append values to clause
@@ -90,8 +88,8 @@
     spterms <- c(from, to)
     
     internals <- c(
-        "uniref", "uniprotkb", "taxname", "taxid", "enzyme", "rhea", "chebi",
-        "inchikey", "inchi", "smiles"
+        "uniref", "uniprotkb", "taxid", "enzyme", "rhea", "chebi", "inchikey",
+        "inchi", "smiles", "name"
     )
     
     ext <- setdiff(spterms, internals)
@@ -108,16 +106,14 @@
         ?member up:organism ?taxid.
     ")
     
-    taxname2taxid <- "
+    taxid2name <- "
         # Bind taxa to scientific names and ranks
         ?taxid up:scientificName ?sciName; up:rank ?rank.
     
         # Process name to prefix__taxon format
         BIND(lcase(substr(strafter(str(?rank), 'Rank_'), 1, 1)) as ?prefix)
-        BIND(concat(?prefix, '__', ?sciName) as ?taxname)
+        BIND(concat(?prefix, '__', ?sciName) as ?name)
     "
-    
-    uniref2taxname <- paste0(uniref2taxid, taxname2taxid)
     
     uniref2uniprotkb <- paste0(
         which_uniref, "
@@ -143,6 +139,10 @@
     "
     
     uniref2rhea <- paste0(uniref2uniprotkb, uniprotkb2rhea)
+    
+    name2chebi <- "
+        ?chebi up:name ?name
+    "
     
     rhea2chebi <- "
         ?rhea rdfs:subClassOf rh:Reaction.
@@ -197,14 +197,14 @@
     triple <- switch(
         key,
         uniref2taxid = uniref2taxid,
-        taxname2taxid = taxname2taxid,
-        uniref2taxname = uniref2taxname,
+        taxid2name = taxid2name,
         uniref2uniprotkb = uniref2uniprotkb,
         uniref2enzyme = uniref2enzyme,
         uniprotkb2enzyme = uniprotkb2enzyme,
         uniprotkb2rhea = uniprotkb2rhea,
         uniref2rhea = uniref2rhea,
         rhea2chebi = rhea2chebi,
+        name2chebi = name2chebi,
         rhea2enzyme = rhea2enzyme,
         inchi2chebi = inchi2chebi,
         inchikey2chebi = inchikey2chebi,
@@ -243,7 +243,6 @@
         smiles = "",
         inchi = "",
         inchikey = "",
-        taxname = "",
         enzyme = "enzyme",
         rhea = "rh",
         "external"

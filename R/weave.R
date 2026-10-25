@@ -352,12 +352,13 @@ setMethod("weavePath", signature = c(graph = "igraph"),
     return(x)
 }
 
+#' @importFrom stringr str_remove str_detect regex
 .strip_iri <- function(x, name){
     
-    y <- sub("http.+/", "", x)
+    y <- str_remove(x, "http.+/")
     
-    if( !grepl("^genes$|^uniref", name) ){
-        y <- sub(paste0("^", name, "[:_]"), "", y, ignore.case = TRUE)
+    if( !str_detect(name, "^genes$|^uniref") ){
+        y <- str_remove(y, regex(paste0("^", name, "[:_]"), ignore_case = TRUE))
     }
     
     return(y)

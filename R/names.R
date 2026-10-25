@@ -139,17 +139,15 @@ setMethod("linkNames", signature = c(graph = "igraph"),
         name_links <- data.frame(
             x = names(name_vec), y = name_vec, row.names = NULL
         )
-    }else if( g$name == "chebi" ){
-        query <- "
-            PREFIX up: <http://purl.uniprot.org/core/>
-            SELECT DISTINCT ?chebi ?name
-            WHERE {?chebi up:name ?name}
-        "
-        name_links <- .sendSPARQL(query, "Rhea", 1e6)
-        name_links[[1L]] <- sub(
-            "http://purl.obolibrary.org/obo/CHEBI_", "",
-            name_links[[1L]], fixed = TRUE
-        )
+    }else if( g$name %in% c("chebi", "taxid") ){
+        # Select endpoint based on node
+        endpoint <- switch(g$name, chebi = "Rhea", taxid = "UniProt")
+        # Add iri to ids
+        ids <- if( is_init ) .add_iri(ids, endpoint, g$name) else ids
+        # Fetch names with SPARQL query
+        name_links <- .querySPARQL(g$name, "name", endpoint, ids, NULL, 1e6)
+        # Strip iri from ids
+        name_links[[1L]] <- .strip_iri(name_links[[1L]], g$name)
     }else{
         return(NULL)
     }
