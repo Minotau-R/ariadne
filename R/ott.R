@@ -1,18 +1,23 @@
 
 #' @importFrom stats na.omit
+#' @importFrom stringr str_remove
 #' @importFrom BiocParallel bplapply
-.queryOTT <- function(from, to, init, timeout, ...){
-    # Remove rank prefixes
-    x <- sub("^[a-z]__", "", init)
+.queryOTT <- function(from, to, init, timeout, flip = FALSE, ...){
+    # Invert features if flipped
+    if( flip ){
+        tmp <- to
+        to <- from
+        from <- tmp
+    }
     # If source is taxname
-    if( from == "taxname" ){
+    if( from == "name" ){
         # Search with TNRS API
-        y <- .queryTNRS(x, to, ...)
+        y <- .queryTNRS(init, to, ...)
     }
     # If source is ott
     else if( from == "ott" ){
         # Convert to numeric
-        x <- as.numeric(x)
+        x <- as.numeric(init)
         # Search with taxon_info API
         y <- bplapply(
             x, .queryTaxonInfo, to = to, prefix = "ott_id", timeout = timeout
@@ -20,7 +25,7 @@
     # If source is external taxon id
     }else if( from %in% c("ncbi", "gbif", "worms", "if", "irmng") ){
         # Add prefix
-        x <- paste0(from, ":", x)
+        x <- paste0(from, ":", init)
         # Search with taxon_info API
         y <- bplapply(
             x, .queryTaxonInfo, to = to, prefix = "source_id", timeout = timeout
@@ -38,11 +43,14 @@
     # Omit rows with missing values
     linkmap <- na.omit(linkmap)
     # Strip source prefix
-    linkmap$y <- sub("^.+:", "", linkmap$y)
+    linkmap$y <- str_remove(linkmap$y, "^.+:")
+    # Revert columns if flipped
+    if( flip ) linkmap <- rev(linkmap)
     return(linkmap)
 }
 
 
+#' @importFrom stringr str_subset fixed
 #' @importFrom httr2 request req_method req_body_json req_perform resp_body_json
 .queryTaxonInfo <- function(x, to, prefix, timeout){
     
@@ -66,13 +74,11 @@
     
     if( to == "ott" ){
         y <- resp$ott_id
-    }else if( to == "taxname" ){
-        tax_rank <- substr(resp$rank, 1, 1)
-        tax_name <- resp$unique_name
-        y <- paste0(tax_rank, "__", tax_name)
+    }else if( to == "name" ){
+        y <- resp$unique_name
     }else{
         tax_sources <- unlist(resp$tax_sources)
-        y <- tax_sources[grepl(to, tax_sources, fixed = TRUE)]
+        y <- str_subset(tax_sources, fixed(to))
     }
     return(y)
 }
@@ -92,6 +98,7 @@
 
 
 #' @importFrom rotl tnrs_match_names tax_sources
+#' @importFrom stringr str_subset fixed
 .subqueryTNRS <- function(x, to){
     # Match input names
     res <- tnrs_match_names(x)
@@ -101,7 +108,7 @@
         y <- res$ott_id
     }else{
         # Find ids for each input
-        y <- lapply(tax_sources(res), function(x) grepv(to, x, fixed = TRUE))
+        y <- lapply(tax_sources(res), str_subset, pattern = fixed(to))
         # Match ids to input names
         y <- y[res$unique_name]
     }

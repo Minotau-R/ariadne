@@ -60,7 +60,9 @@
                     str_remove("^[^:]*:")
             }
         ),
-        GM = .process_complex_modules,
+        GM = ifelse(to == "ko", .process_complex_modules,
+            function(x) .process_one2one(x, header = FALSE)
+        ),
         MSigDB = .process_rdslist
     )
     # Preprocess data

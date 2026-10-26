@@ -2,8 +2,14 @@
 #' @importFrom BiocParallel bplapply
 #' @importFrom data.table rbindlist
 .querySPARQL <- function(from, to, endpoint, init, uniref.identity, timeout,
-    batch.size = 25000, workers = NULL, factor = 3){
-    
+    flip = FALSE, batch.size = 25000, workers = NULL, factor = 3){
+    # Invert features if flipped
+    if( flip ){
+        tmp <- to
+        to <- from
+        from <- tmp
+    }
+    # Set common prefixes
     preface <- paste0("
         PREFIX chebislash: <http://purl.obolibrary.org/obo/chebi/>
         PREFIX enzyme: <http://purl.uniprot.org/enzyme/>
@@ -32,6 +38,8 @@
     })
     # Bind output linkmaps
     out <- rbindlist(out.list)
+    # Revert columns if flipped
+    if( flip ) out <- rev(out)
     return(out)
 }
 
@@ -107,12 +115,8 @@
     ")
     
     taxid2name <- "
-        # Bind taxa to scientific names and ranks
-        ?taxid up:scientificName ?sciName; up:rank ?rank.
-    
-        # Process name to prefix__taxon format
-        BIND(lcase(substr(strafter(str(?rank), 'Rank_'), 1, 1)) as ?prefix)
-        BIND(concat(?prefix, '__', ?sciName) as ?name)
+        # Bind taxa to scientific names
+        ?taxid up:scientificName ?name.
     "
     
     uniref2uniprotkb <- paste0(
@@ -141,7 +145,7 @@
     uniref2rhea <- paste0(uniref2uniprotkb, uniprotkb2rhea)
     
     name2chebi <- "
-        ?chebi up:name ?name
+        ?chebi up:name ?name.
     "
     
     rhea2chebi <- "
@@ -240,11 +244,12 @@
         uniprotkb = "protein",
         uniref = "uniref",
         taxid = "taxon",
+        enzyme = "enzyme",
+        rhea = "rh",
         smiles = "",
         inchi = "",
         inchikey = "",
-        enzyme = "enzyme",
-        rhea = "rh",
+        name = "",
         "external"
     )
     

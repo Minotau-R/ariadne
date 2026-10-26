@@ -8,7 +8,14 @@
 #' 
 #' @returns
 #' A linkmap with 16 butyrate-producing microbial features characterised at the
-#' genus or species level.
+#' genus or species level based on the NCBI taxonomy. Its format reflects the
+#' output of \code{\link{weavePath}} and contains the following variables:
+#' 
+#' \itemize{
+#'   \item kegg_cpd: KEGG compound identifiers (butyrate) 
+#'   \item taxid: NCBI taxon identifiers
+#'   \item taxid.name: Organism names associated with the taxon identifiers
+#' }
 #' 
 #' @references 
 #' Kullberg, Robert FJ, et al.
