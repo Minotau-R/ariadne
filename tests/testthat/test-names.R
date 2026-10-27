@@ -15,10 +15,10 @@ test_that("names", {
     name.vec <- c("alcohol dehydrogenase", "alditol oxidase")
     x <- linkNames(graph, "ec", names = name.vec)
     
-    expect_equal(x[[2L]], name.vec)
+    expect_equal(as.vector(x[[2L]]), name.vec)
     
     expect_warning(
-        x <- linkNames(graph, "bugsig", ids = c("83/1/1", "wrong", "39/2/1")),
+        x <- linkNames(graph, "bugsig", ids = c("83/1/1", "wrong", "817/2/1")),
         "names for 1 bugsig ids not found.", fixed = TRUE         
     )
     

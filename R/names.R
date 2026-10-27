@@ -45,6 +45,7 @@ NULL
 #' @export
 #' @rdname linkNames
 #' @importFrom igraph as_data_frame
+#' @importFrom multifactor linkmap
 setMethod("linkNames", signature = c(graph = "igraph"),
     function(graph, x, ids = NULL, names = NULL, verbose = TRUE){
     # Retrieve nodes data
@@ -71,8 +72,8 @@ setMethod("linkNames", signature = c(graph = "igraph"),
         .match_key2val(x, 2L, names, verbose)
     # Use keywords as column names
     colnames(name_links) <- c(x, paste0(x, ".name"))
-    # Convert to data.frame
-    name_links <- as.data.frame(name_links)
+    # Convert characters to factors
+    name_links[] <- lapply(name_links, as.factor)
     return(name_links)
 })
 

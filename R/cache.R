@@ -18,7 +18,7 @@
             x, key.FUN = function(keys) str_remove(keys, fixed("GO:"))
         ),
         WoL = function(x){
-            if( from == "wol" && to != "metacyc_prt" ){
+            if( from == "wol" && to != "protein" ){
                 
                 is_uniref <- to == "uniref90"
                 
@@ -27,7 +27,7 @@
                     val.FUN = ifelse(is_uniref,
                         function(vals) paste0("UniRef90_", vals), identity))
             }else{
-                .process_one2many(x,
+                .process_one2many(x, n_max = 1000000,
                     key.FUN = switch(from,
                         wol = function(keys) str_remove(keys, "_.*"),
                         uniref90 = function(keys) paste0("UniRef90_", keys),

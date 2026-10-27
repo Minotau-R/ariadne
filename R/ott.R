@@ -3,6 +3,8 @@
 #' @importFrom stringr str_remove
 #' @importFrom BiocParallel bplapply
 .queryOTT <- function(from, to, init, timeout, flip = FALSE, ...){
+    # Unfactorise init
+    if( is.factor(init) ) init <- as.character(init)
     # Invert features if flipped
     if( flip ){
         tmp <- to
