@@ -45,6 +45,7 @@ NULL
 #' @export
 #' @rdname linkNames
 #' @importFrom igraph as_data_frame
+#' @importFrom multifactor linkmap
 setMethod("linkNames", signature = c(graph = "igraph"),
     function(graph, x, ids = NULL, names = NULL, verbose = TRUE){
     # Retrieve nodes data
@@ -62,7 +63,7 @@ setMethod("linkNames", signature = c(graph = "igraph"),
     # Get specific name of x for source database
     g$spec <- .generic2specific(g, node_df, "name")
     # Map ids and names to one another
-    name_links <- .fetch_node(g, ids)
+    name_links <- .fetch_node(g, ids, names)
     # Return empty object if no names are available
     if( is.null(name_links) ) return(NULL)
     # Select ids and names that matched an entry
@@ -71,51 +72,36 @@ setMethod("linkNames", signature = c(graph = "igraph"),
         .match_key2val(x, 2L, names, verbose)
     # Use keywords as column names
     colnames(name_links) <- c(x, paste0(x, ".name"))
-    # Convert to data.frame
-    name_links <- as.data.frame(name_links)
+    # Convert characters to factors
+    name_links[] <- lapply(name_links, as.factor)
     return(name_links)
 })
 
-
+#' @importFrom stringr str_split str_remove fixed
 #' @importFrom KEGGREST listDatabases keggList
 #' @importFrom arrow read_parquet open_dataset
 #' @importFrom dplyr select filter collect
-#' @importFrom stringr str_split fixed
 #' @importFrom tidyselect all_of
+#' @importFrom enviPathR epList
 #' @importFrom readr read_lines
 #' @importFrom data.table fread
 #' @importFrom rlang sym
-.fetch_node <- function(g, ids){
-    # Check if init ids exist
+.fetch_node <- function(g, ids, names){
+    # Check if values exist
     is_init <- !is.null(ids)
+    is_exit <- !is.null(names)
+    # Select initial values
+    init <- if( is_init ) unique(ids) else if( is_exit ) unique(names) else NULL
     # Check nodes where init is necessary
     if( g$name == "kegg_genes" && !is_init ){
         stop("Only searches with 'ids' are currently supported for ", g$name,
             ".", call. = FALSE)
     }
     
-    if( g$name == "bugsig" ){
-        
-        url <- "https://zenodo.org/records/15272273/files/bugsigdb_signatures_mixed_ncbi.gmt"
-        
-        name_links <- url |>
-            read_lines(skip = 1L) |>
-            str_split(fixed("\t")) |>
-            vapply(`[`, 1L, FUN.VALUE = character(1L)) |>
-            str_split(fixed("_"), n = 2L, simplify = TRUE) |>
-            as.data.frame()
-        
-        name_links[[1L]] <- sub("bsdb:", "", name_links[[1L]], fixed = TRUE)
-        name_links[[2L]] <- sub("^.+:", "", name_links[[2L]])
-    
-    }else if( g$name %in% c("gmm", "gbm") ){
-      
-        name_links <- fread(g$url, header = FALSE, showProgress = FALSE)
-    
-    }else if( !is.na(g$url) ){
+    if( !is.na(g$url) ){
         # Build name colname
         name_col <-  paste0(g$spec, "_name")
-        if( g$name == "msig" ) name_col <- sub("_id", "", name_col, fixed = TRUE)
+        if( g$name == "msig" ) name_col <- str_remove(name_col, fixed("_id"))
         # Get file path to cached resource
         cached <- .cache_resource(g$url, g$source, g$spec, name_col)
         # If initial values are given
@@ -134,30 +120,36 @@ setMethod("linkNames", signature = c(graph = "igraph"),
             )
         }
     }else if( g$KEGG %in% c(listDatabases(), "ec", "network") ){
-        # Use ids as input if specified
-        init <- if( is_init ) unique(ids) else g$KEGG
-        # For many ids, global search is faster
-        if( length(init) > 50 ) init <- g$KEGG
+        # Use ids as input if specified and not too many
+        if( !is_init || length(init) > 50 ) init <- g$KEGG
         # Get vector of feature names
         name_vec <- keggList(init)
         # Keep only first name (and last for ko)
         to_remove <- ifelse(g$KEGG == "ko", ".*;", ";.*")
-        name_vec <- sub(to_remove, "", name_vec)
+        name_vec <- str_remove(name_vec, to_remove)
         # Convert to linkmap
         name_links <- data.frame(
             x = names(name_vec), y = name_vec, row.names = NULL
         )
-    }else if( g$name == "chebi" ){
-        query <- "
-            PREFIX up: <http://purl.uniprot.org/core/>
-            SELECT DISTINCT ?chebi ?name
-            WHERE {?chebi up:name ?name}
-        "
-        name_links <- .sendSPARQL(query, "Rhea", 1e6)
-        name_links[[1L]] <- sub(
-            "http://purl.obolibrary.org/obo/CHEBI_", "",
-            name_links[[1L]], fixed = TRUE
+    }else if( str_detect(g$name, fixed("envipath")) ){
+        # List available objects
+        name_links <- epList(g$enviPath)
+        # Select columns of interest
+        name_links <- name_links[c("id", "name")]
+    }else if( g$name == "ott" ){
+        # Link ott ids and names
+        name_links <- .queryOTT(g$name, "name", init, 1e6, flip = is_exit)
+    }else if( g$name %in% c("chebi", "taxid") ){
+        # Select endpoint based on node
+        endpoint <- switch(g$name, chebi = "Rhea", taxid = "UniProt")
+        # Add iri to ids
+        if( is_init ) init <- .add_iri(init, endpoint, g$name)
+        # Fetch names with SPARQL query
+        name_links <- .querySPARQL(
+            g$name, "name", endpoint, init, NULL, 1e6, flip = is_exit
         )
+        # Strip iri from ids
+        name_links[[1L]] <- .strip_iri(name_links[[1L]], g$name)
     }else{
         return(NULL)
     }

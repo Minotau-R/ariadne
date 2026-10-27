@@ -15,7 +15,7 @@ An igraph object with the ariadne resource graph.
 }
 \description{
 \code{ariadne} imports the resource graph hosted in the companion package
-ariadne.db.
+ariadneDB.
 }
 \examples{
 # Import default resource graph
@@ -28,7 +28,7 @@ graph <- ariadne(versions = versions)
 \seealso{
 \itemize{
 \item \code{\link{listResourceVersions}}
-\item ariadne.db: \url{https://github.com/Minotau-R/ariadne.db}
+\item ariadneDB: \url{https://github.com/Minotau-R/ariadneDB}
 \item Zenodo: \url{https://zenodo.org/records/18788725}
 }
 }

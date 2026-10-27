@@ -129,7 +129,8 @@ setMethod("weavePath", signature = c(graph = "data.frame"),
 })
 
 
-#' @importFrom igraph as_data_frame subgraph_from_edges
+#' @importFrom stats na.omit
+#' @importFrom igraph E as_data_frame subgraph_from_edges
 .graph_from_path_df <- function(path_df){
     # If versions are provided
     if( "version" %in% names(path_df) ){
@@ -160,8 +161,7 @@ setMethod("weavePath", signature = c(graph = "data.frame"),
 
 #' @export
 #' @rdname weavePath
-#' @importFrom stats reformulate
-#' @importFrom multifactor multifactor weave
+#' @importFrom multifactor weave
 setMethod("weavePath", signature = c(graph = "igraph"),
     function(graph, by, k = 1, include = NULL, exclude = NULL, res.name = NULL,
     init = NULL, prune = TRUE, use.names = TRUE, verbose = TRUE, timeout = 1e6,
@@ -177,12 +177,15 @@ setMethod("weavePath", signature = c(graph = "igraph"),
     if( use.names ){
         target <- colnames(out)[2L]
         name_links <- linkNames(graph, target, out[[2L]], verbose = verbose)
-        out[paste0(target, ".name")] <- as.factor(name_links[[2L]])
+        out[paste0(target, ".name")] <- name_links[[2L]]
     }
     return(out)
 })
 
 
+#' @importFrom data.table as.data.table
+#' @importFrom multifactor multifactor
+#' @importFrom stats na.omit reformulate
 .build_path_mf <- function(graph, by, k, include, exclude, res.name, init,
     prune, prune.last, verbose, timeout, ...){
     # Check shared numeric args
@@ -198,6 +201,8 @@ setMethod("weavePath", signature = c(graph = "igraph"),
     }
     # Set timeout for downloads
     options(timeout = timeout)
+    # Select non-missing unique input
+    if( !is.null(init) ) init <- as.data.table(init) |> unique() |> na.omit()
     # Initialise list of linkmaps
     linkmaps <- list()
     # For stratified input
@@ -207,16 +212,15 @@ setMethod("weavePath", signature = c(graph = "igraph"),
         # Remove first step in the path
         path_by <- reformulate(all.vars(by)[2L], init_vars[2L])
         # Print stratification
-        if( verbose ) message(init_vars[1L], " stratified by ", init_vars[2L])
+        if( verbose ) message(init_vars[2L], " stratified by ", init_vars[1L])
         # Add init linkmap to linkmaps
         linkmaps[["init"]] <- init
-        # Extract initial values for second step
-        init <- init[[2L]]
     }else{
+        # Use plain by as path formula
         path_by <- by
     }
-    # Select unique input
-    init <- unique(init)
+    # Reduce init to vector
+    init <- init[[ncol(init)]]
     # Draw kth path from source to target
     path_df <- .draw_path(graph, path_by, k, include, exclude, res.name)
     # Add edges metadata
@@ -242,11 +246,12 @@ setMethod("weavePath", signature = c(graph = "igraph"),
 }
 
 
-#' @importFrom KEGGREST keggConv keggLink
 #' @importFrom arrow read_parquet open_dataset
 #' @importFrom dplyr select filter collect
+#' @importFrom KEGGREST keggConv keggLink
 #' @importFrom multifactor linkmap
 #' @importFrom tidyselect all_of
+#' @importFrom enviPathR epLink
 #' @importFrom rlang sym
 .fetch_edge <- function(g, init, timeout, ...){
     # Check if init exists
@@ -258,7 +263,11 @@ setMethod("weavePath", signature = c(graph = "igraph"),
             ".", call. = FALSE)
     }
     # Retrieve linkmap from corresponding resource
-    if( g$source == "KEGG" ){
+    if( g$source == "enviPath" ){
+        # Get links from enviPath
+        df <- epLink(g$specFrom, g$specTo, init)
+    # Query KEGG
+    }else if( g$source == "KEGG" ){
         # List external databases
         ext <- c("chebi", "geneid", "proteinid", "pubchem", "uniprotkb")
         # Select function based on id types
@@ -347,12 +356,13 @@ setMethod("weavePath", signature = c(graph = "igraph"),
     return(x)
 }
 
+#' @importFrom stringr str_remove str_detect regex
 .strip_iri <- function(x, name){
     
-    y <- sub("http.+/", "", x)
+    y <- str_remove(x, "http.+/")
     
-    if( !grepl("^genes$|^uniref", name) ){
-        y <- sub(paste0("^", name, "[:_]"), "", y, ignore.case = TRUE)
+    if( !str_detect(name, "^genes$|^uniref") ){
+        y <- str_remove(y, regex(paste0("^", name, "[:_]"), ignore_case = TRUE))
     }
     
     return(y)

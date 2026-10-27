@@ -134,23 +134,20 @@ data("butyrate", package = "ariadne")
 datatable(butyrate)
 ```
 
-The resource OTT can be used to link NCBI taxon ids to other taxonomies, such as
-SILVA, OTT, etc.
-
 ```{r}
-# Search for path from taxid to silva id
-searchPath(graph, taxid ~ silva_ssu, res.name = "OTT")
-```
-
-We link NCBI taxon ids to the corresponding SILVA ids starting from the taxon
-ids found in the butyrate linkmap.
-
-```{r}
-# Convert taxid to silva
-taxid2silva <- weavePath(graph, taxid ~ silva_ssu, init = taxid2taxname$taxid)
+# Link taxon ids to names
+tax2name <- linkNames(graph, "taxid", ids = butyrate$taxid)
 
 # View linkmap
-datatable(taxid2silva)
+datatable(tax2name)
+```
+
+```{r}
+# Link taxon names to ids
+name2tax <- linkNames(graph, "taxid", names = butyrate$taxid.name)
+
+# View linkmap
+datatable(name2tax)
 ```
 
 Additionally, we can use OTT to match taxon names to the corresponding NCBI or
@@ -158,18 +155,42 @@ OTT taxon ids using a fuzzy strategy, so that partial matches are also
 successful.
 
 ```{r}
-# Weave path with initial values
-taxid2taxname <- weavePath(
+# Link taxon names to OTT ids
+name2ott <- linkNames(graph, "ott", names = butyrate$taxid.name)
+
+# Map OTT ids to NCBI taxon ids
+name2tax <- weavePath(graph, ott.name ~ taxid, init = rev(name2ott))
+
+# View linkmap
+datatable(name2tax)
+```
+
+The resource OTT can also be used to link NCBI taxon ids to other taxonomies,
+such as SILVA, OTT, etc. We link NCBI taxon ids to the corresponding SILVA ids
+starting from the taxon ids found in the butyrate linkmap.
+
+```{r}
+# Convert taxid to silva
+tax2silva <- weavePath(
     graph,
-    taxname ~ taxid,
-    init = butyrate$taxname,
-    res.name = "OTT"
+    taxid ~ silva_ssu,
+    init = butyrate$taxid,
+    use.names = FALSE
 )
 
 # View linkmap
-datatable(taxid2taxname)
+datatable(tax2silva)
 ```
 
+Using WoL, GreenGenes ids can also be translated to NCBI taxon ids.
+
+```{r}
+# Convert greengenes to taxid
+gg2tax <- weavePath(graph, greengenes ~ taxid)
+
+# View linkmap
+datatable(gg2tax)
+```
 
 # Set enrichment analysis
 
@@ -275,54 +296,49 @@ datatable(ec2path)
 # Knowledge-driven association analysis
 
 ```{r}
+# Import dataset
 data("HintikkaXOData", package = "mia")
-mae <- HintikkaXOData
-```
 
-```{r}
-searchPath(graph, taxname ~ kegg_cpd, k = 5, include = c("taxid", "uniref90"))
+# Rename object
+mae <- HintikkaXOData
+
+# View multi-assay experiment
+mae
 ```
 
 ```{r}
 mae[["microbiota"]] <- agglomerateByRank(mae[["microbiota"]], rank = "Genus")
-```
 
-
-```{r}
 # Retrieve taxon names
-tax.labs <- getTaxonomyLabels(mae[["microbiota"]], make.unique = FALSE)
-tax.labs <- sub("D_5__", "", tax.labs)
+tax.labs <- rowData(mae[["microbiota"]])$Genus
+
+tax.labs <- unique(sub("D_5__", "", tax.labs))
+```
+
+
+```{r}
+name2ott <- linkNames(graph, "ott", names = tax.labs)
+
+name2tax <- weavePath(graph, ott.name ~ taxid, init = rev(name2ott))
+
+datatable(name2tax)
 ```
 
 ```{r}
-tax.ids <- weavePath(
-    graph,
-    taxname ~ taxid,
-    init = tax.labs,
-    res.name = "OTT",
-    use.names = FALSE
-)
+cpd.names <- rownames(mae[["metabolites"]])
+
+name2cpd <- linkNames(graph, "kegg_cpd", names = cpd.names)
+
+datatable(name2cpd)
 ```
-
-
 ```{r}
 tax2cpd <- weavePath(
     graph,
-    taxname ~ kegg_cpd,
-    include = c("taxid", "uniref90"),
-    init = tax.labs[50:55],
-    k = 4
+    taxid ~ kegg_cpd,
+    init = name2tax$taxid,
+    res.name = c("WoL", "KEGG")
 )
-```
 
-
-```{r}
-cpd.ids <- linkNames(graph, "kegg_cpd", names = rownames(mae[["metabolites"]]))
-
-datatable(cpd.ids)
-```
-
-```{r}
 names(tax2cpd) <- c("microbiota", "metabolites")
 
 datatable(tax2cpd)

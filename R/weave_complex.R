@@ -104,7 +104,7 @@ setMethod("weaveComplex", signature = c(graph = "igraph"),
     # Add feature names
     if( use.names ){
         name_links <- linkNames(graph, target, out[[2L]], verbose = verbose)
-        out[paste0(target, ".name")] <- as.factor(name_links[[2L]])
+        out[paste0(target, ".name")] <- name_links[[2L]]
     }
     return(out)
 })

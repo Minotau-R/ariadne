@@ -2,8 +2,14 @@
 #' @importFrom BiocParallel bplapply
 #' @importFrom data.table rbindlist
 .querySPARQL <- function(from, to, endpoint, init, uniref.identity, timeout,
-    batch.size = 25000, workers = NULL, factor = 3){
-    
+    flip = FALSE, batch.size = 25000, workers = NULL, factor = 3){
+    # Invert features if flipped
+    if( flip ){
+        tmp <- to
+        to <- from
+        from <- tmp
+    }
+    # Set common prefixes
     preface <- paste0("
         PREFIX chebislash: <http://purl.obolibrary.org/obo/chebi/>
         PREFIX enzyme: <http://purl.uniprot.org/enzyme/>
@@ -32,6 +38,8 @@
     })
     # Bind output linkmaps
     out <- rbindlist(out.list)
+    # Revert columns if flipped
+    if( flip ) out <- rev(out)
     return(out)
 }
 
@@ -58,11 +66,9 @@
 .composeSPARQL <- function(from, to, preface, clause, endpoint, init){
     # If init is defined
     if( !is.null(init) && length(init) != 0L ){
-        # Pass values to sciName for taxname ids
-        spec.from <- ifelse(from == "taxname", "sciName", from)
         # Limit query with values
         values <- paste0(
-            "VALUES ?", spec.from, " {\n",
+            "VALUES ?", from, " {\n",
                 paste(.iri_table(init, from, to, endpoint), collapse = " "), "
             }\n")
         # Pre-append values to clause
@@ -90,8 +96,8 @@
     spterms <- c(from, to)
     
     internals <- c(
-        "uniref", "uniprotkb", "taxname", "taxid", "enzyme", "rhea", "chebi",
-        "inchikey", "inchi", "smiles"
+        "uniref", "uniprotkb", "taxid", "enzyme", "rhea", "chebi", "inchikey",
+        "inchi", "smiles", "name"
     )
     
     ext <- setdiff(spterms, internals)
@@ -108,16 +114,10 @@
         ?member up:organism ?taxid.
     ")
     
-    taxname2taxid <- "
-        # Bind taxa to scientific names and ranks
-        ?taxid up:scientificName ?sciName; up:rank ?rank.
-    
-        # Process name to prefix__taxon format
-        BIND(lcase(substr(strafter(str(?rank), 'Rank_'), 1, 1)) as ?prefix)
-        BIND(concat(?prefix, '__', ?sciName) as ?taxname)
+    taxid2name <- "
+        # Bind taxa to scientific names
+        ?taxid up:scientificName ?name.
     "
-    
-    uniref2taxname <- paste0(uniref2taxid, taxname2taxid)
     
     uniref2uniprotkb <- paste0(
         which_uniref, "
@@ -143,6 +143,10 @@
     "
     
     uniref2rhea <- paste0(uniref2uniprotkb, uniprotkb2rhea)
+    
+    name2chebi <- "
+        ?chebi up:name ?name.
+    "
     
     rhea2chebi <- "
         ?rhea rdfs:subClassOf rh:Reaction.
@@ -197,14 +201,14 @@
     triple <- switch(
         key,
         uniref2taxid = uniref2taxid,
-        taxname2taxid = taxname2taxid,
-        uniref2taxname = uniref2taxname,
+        taxid2name = taxid2name,
         uniref2uniprotkb = uniref2uniprotkb,
         uniref2enzyme = uniref2enzyme,
         uniprotkb2enzyme = uniprotkb2enzyme,
         uniprotkb2rhea = uniprotkb2rhea,
         uniref2rhea = uniref2rhea,
         rhea2chebi = rhea2chebi,
+        name2chebi = name2chebi,
         rhea2enzyme = rhea2enzyme,
         inchi2chebi = inchi2chebi,
         inchikey2chebi = inchikey2chebi,
@@ -240,12 +244,12 @@
         uniprotkb = "protein",
         uniref = "uniref",
         taxid = "taxon",
+        enzyme = "enzyme",
+        rhea = "rh",
         smiles = "",
         inchi = "",
         inchikey = "",
-        taxname = "",
-        enzyme = "enzyme",
-        rhea = "rh",
+        name = "",
         "external"
     )
     
