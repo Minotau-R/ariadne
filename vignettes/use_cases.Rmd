@@ -296,28 +296,27 @@ datatable(ec2path)
 # Knowledge-driven association analysis
 
 ```{r}
+# Import dataset
 data("HintikkaXOData", package = "mia")
 
+# Rename object
 mae <- HintikkaXOData
 
+# View multi-assay experiment
 mae
 ```
 
 ```{r}
-searchPath(graph, taxid ~ kegg_cpd, k = 4, res.name = c("WoL", "KEGG"))
-```
-
-```{r}
 mae[["microbiota"]] <- agglomerateByRank(mae[["microbiota"]], rank = "Genus")
-```
 
-
-```{r}
 # Retrieve taxon names
-tax.labs <- getTaxonomyLabels(mae[["microbiota"]], make.unique = FALSE)
+tax.labs <- rowData(mae[["microbiota"]])$Genus
 
 tax.labs <- unique(sub("D_5__", "", tax.labs))
+```
 
+
+```{r}
 name2ott <- linkNames(graph, "ott", names = tax.labs)
 
 name2tax <- weavePath(graph, ott.name ~ taxid, init = rev(name2ott))
@@ -326,22 +325,20 @@ datatable(name2tax)
 ```
 
 ```{r}
+cpd.names <- rownames(mae[["metabolites"]])
+
+name2cpd <- linkNames(graph, "kegg_cpd", names = cpd.names)
+
+datatable(name2cpd)
+```
+```{r}
 tax2cpd <- weavePath(
     graph,
     taxid ~ kegg_cpd,
     init = name2tax$taxid,
     res.name = c("WoL", "KEGG")
 )
-```
 
-
-```{r}
-cpd.ids <- linkNames(graph, "kegg_cpd", names = rownames(mae[["metabolites"]]))
-
-datatable(cpd.ids)
-```
-
-```{r}
 names(tax2cpd) <- c("microbiota", "metabolites")
 
 datatable(tax2cpd)

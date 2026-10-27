@@ -202,14 +202,11 @@ setMethod("weavePath", signature = c(graph = "igraph"),
     # Set timeout for downloads
     options(timeout = timeout)
     # Select non-missing unique input
-    init <- init |>
-        as.data.table() |>
-        unique() |>
-        na.omit()
+    if( !is.null(init) ) init <- as.data.table(init) |> unique() |> na.omit()
     # Initialise list of linkmaps
     linkmaps <- list()
     # For stratified input
-    if( ncol(init) == 2L ){
+    if( is.data.frame(init) && ncol(init) == 2L ){
         # Retrieve init variable names
         init_vars <- colnames(init)
         # Remove first step in the path
@@ -218,14 +215,12 @@ setMethod("weavePath", signature = c(graph = "igraph"),
         if( verbose ) message(init_vars[2L], " stratified by ", init_vars[1L])
         # Add init linkmap to linkmaps
         linkmaps[["init"]] <- init
-        # Extract initial values for second step
-        init <- init[[2L]]
     }else{
         # Use plain by as path formula
         path_by <- by
-        # Reduce init to vector
-        init <- init[[1L]]
     }
+    # Reduce init to vector
+    init <- init[[ncol(init)]]
     # Draw kth path from source to target
     path_df <- .draw_path(graph, path_by, k, include, exclude, res.name)
     # Add edges metadata
