@@ -48,6 +48,7 @@ library(anansi)
 library(curatedMetagenomicData)
 library(mia)
 library(miaViz)
+library(stringr)
 library(DT)
 ```
 
@@ -68,7 +69,7 @@ genes <- curatedMetagenomicData(
 genes <- genes[[1]]
 
 # Keep only unstratified gene families
-genes <- genes[!grepl("|", rownames(genes), fixed = TRUE), ]
+genes <- genes[str_detect(rownames(genes), fixed("|"), negate = TRUE), ]
 
 # Print experiment
 genes
