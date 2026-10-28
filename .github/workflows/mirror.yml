@@ -1,0 +1,12 @@
+name: mirror
+on:
+  push:
+    branches:
+    - devel
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: lissy93/repo-mirror-action@main
+        with:
+          ssh_key: ${{ secrets.MIRROR_SSH }}
