@@ -86,26 +86,18 @@
 #' chebi2gmm <- weavePath(pathMeta, init = c(15377, 30616, 4167))
 #' 
 #' 
-#' # Import mia package
-#' library(mia)
-#' 
-#' # Import dataset
-#' data("Tengeler2020", package = "mia")
-#' tse <- Tengeler2020
-#' 
-#' # Retrieve taxon names
-#' tax.labs <- getTaxonomyLabels(tse, make.unique = FALSE)
-#' tax.labs <- sub("^.+:", "", tax.labs)
+#' # Import butyrate dataset
+#' data("butyrate", package = "ariadne")
 #' 
 #' # Weave path starting from initial values
-#' tax2bugsig <- weavePath(graph, taxname ~ bugsig, init = tax.labs)
+#' tax2bugsig <- weavePath(graph, taxid ~ bugsig, init = butyrate$taxid)
 #' 
 #' # Weave 3-rd path
-#' tax2bugsig <- weavePath(graph, taxname ~ bugsig, init = tax.labs, k = 3)
+#' tax2bugsig <- weavePath(graph, taxid ~ bugsig, init = butyrate$taxid, k = 3)
 #' 
 #' # Weave path including taxid
 #' tax2bugsig <- weavePath(
-#'     graph, taxname ~ bugsig, include = "taxid", init = tax.labs
+#'     graph, taxid ~ bugsig, include = "taxid", init = butyrate$taxid
 #' )
 NULL
 
