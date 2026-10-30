@@ -36,6 +36,7 @@ Imports:
     BiocParallel,
     data.table,
     dplyr,
+    enviPathR,
     ggplot2,
     grid,
     httr2,

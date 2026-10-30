@@ -59,10 +59,12 @@ graph <- ariadne()
 
 # Functional annotation
 
+
+
 ```{r}
 # Load gene family experiment
 genes <- curatedMetagenomicData(
-    "SankaranarayananK_2015.gene_families", dryrun = FALSE
+    "Castro-NallarE_2015.gene_families", dryrun = FALSE
 )
 
 # Extract experiment from list
