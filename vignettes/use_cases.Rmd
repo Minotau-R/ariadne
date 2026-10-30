@@ -323,6 +323,8 @@ datatable(ec2path)
 
 # Knowledge-driven association analysis
 
+
+
 ```{r}
 # Import dataset
 data("HintikkaXOData", package = "mia")
@@ -335,34 +337,34 @@ mae
 ```
 
 ```{r}
+# Agglomerate microbiome experiment by Genus
 mae[["microbiota"]] <- agglomerateByRank(mae[["microbiota"]], rank = "Genus")
 
-# Retrieve taxon names
-genus.labs <- rowData(mae[["microbiota"]])$Genus |>
-    str_remove(fixed("D_5__")) |>
-    unique()
-```
+# Remove rank prefix from taxon names
+rownames(mae[["microbiota"]]) <- mae[["microbiota"]] |>
+    rownames() |>
+    str_remove(fixed("D_5__"))
 
+# Link taxon names to OTT ids
+name2tax <- linkNames(graph, "ott", names = rownames(mae[["microbiota"]]))
 
-```{r}
-name2ott <- linkNames(graph, "ott", names = tax.labs)
-
+# View linkmap
 datatable(name2tax)
 ```
 
 ```{r}
-cpd.names <- rownames(mae[["metabolites"]])
+# Link metabolite names to KEGG compound ids
+name2cpd <- linkNames(graph, "kegg_cpd", names = rownames(mae[["metabolites"]]))
 
-name2cpd <- linkNames(graph, "kegg_cpd", names = cpd.names)
-
+# View linkmap
 datatable(name2cpd)
 ```
 
 ```{r}
-# 
+# Weave path from OTT ids to KEGG compound ids
 tax2cpd <- weavePath(
     graph,
-    ott ~ kegg_cpd,
+    ott.name ~ kegg_cpd,
     init = name2tax$ott,
     res.name = c("WoL", "KEGG")
 )
@@ -370,17 +372,22 @@ tax2cpd <- weavePath(
 # Rename linkmap variables
 names(tax2cpd) <- c("microbiota", "metabolites")
 
+# View linkmap
 datatable(tax2cpd)
 ```
 
 
+
 ```{r}
+# Create anansi web object
 web <- weaveWeb(mae, microbiota ~ metabolites, link = tax2cpd)
 
+# Perform association analysis
 out <- anansi(web)
 ```
 
 ```{r}
+# Visualise associations
 plotAnansi(out)
 ```
 
