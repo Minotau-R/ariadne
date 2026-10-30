@@ -23,90 +23,126 @@ exportMethods(plotPath)
 exportMethods(searchPath)
 exportMethods(weaveComplex)
 exportMethods(weavePath)
-importFrom(BiocFileCache,BiocFileCache)
-importFrom(BiocFileCache,bfcadd)
-importFrom(BiocFileCache,bfccache)
-importFrom(BiocFileCache,bfcquery)
-importFrom(BiocParallel,bplapply)
-importFrom(BiocParallel,bpmapply)
-importFrom(BiocParallel,bpworkers)
-importFrom(KEGGREST,keggConv)
-importFrom(KEGGREST,keggLink)
-importFrom(KEGGREST,keggList)
-importFrom(KEGGREST,listDatabases)
-importFrom(Matrix,colSums)
-importFrom(Matrix,crossprod)
-importFrom(Matrix,summary)
-importFrom(SummarizedExperiment,"colData<-")
-importFrom(SummarizedExperiment,"rowData<-")
-importFrom(SummarizedExperiment,colData)
-importFrom(SummarizedExperiment,rowData)
-importFrom(arrow,open_dataset)
-importFrom(arrow,read_parquet)
-importFrom(arrow,write_parquet)
-importFrom(data.table,as.data.table)
-importFrom(data.table,dcast)
-importFrom(data.table,fread)
-importFrom(data.table,melt)
-importFrom(data.table,rbindlist)
-importFrom(data.table,set)
-importFrom(dplyr,bind_rows)
-importFrom(dplyr,collect)
-importFrom(dplyr,filter)
-importFrom(dplyr,select)
-importFrom(enviPathR,epLink)
-importFrom(enviPathR,epList)
-importFrom(ggplot2,aes)
-importFrom(ggplot2,guide_legend)
-importFrom(ggplot2,guides)
-importFrom(ggplot2,scale_colour_manual)
-importFrom(ggplot2,theme)
-importFrom(ggplot2,theme_void)
-importFrom(ggraph,geom_node_point)
-importFrom(ggraph,geom_node_text)
-importFrom(ggraph,ggraph)
-importFrom(ggraph,scale_edge_alpha_manual)
-importFrom(ggraph,scale_edge_colour_gradient2)
-importFrom(ggraph,scale_edge_colour_manual)
-importFrom(httr2,req_body_form)
-importFrom(httr2,req_body_json)
-importFrom(httr2,req_headers)
-importFrom(httr2,req_method)
-importFrom(httr2,req_perform)
-importFrom(httr2,req_timeout)
-importFrom(httr2,request)
-importFrom(httr2,resp_body_json)
-importFrom(httr2,resp_body_string)
-importFrom(igraph,"E<-")
-importFrom(igraph,"V<-")
-importFrom(igraph,E)
-importFrom(igraph,V)
-importFrom(igraph,as_data_frame)
-importFrom(igraph,ends)
-importFrom(igraph,graph_from_data_frame)
-importFrom(igraph,k_shortest_paths)
-importFrom(igraph,read_graph)
-importFrom(igraph,subgraph_from_edges)
-importFrom(multifactor,linkmap)
-importFrom(multifactor,multifactor)
-importFrom(multifactor,weave)
+importFrom(BiocFileCache,
+  BiocFileCache,
+  bfcadd,
+  bfccache,
+  bfcquery
+)
+importFrom(BiocParallel,
+  bplapply,
+  bpmapply,
+  bpworkers
+)
+importFrom(KEGGREST,
+  keggConv,
+  keggLink,
+  keggList,
+  listDatabases
+)
+importFrom(Matrix,
+  colSums,
+  crossprod,
+  summary
+)
+importFrom(SummarizedExperiment,
+  "colData<-",
+  "rowData<-",
+  colData,
+  rowData
+)
+importFrom(arrow,
+  open_dataset,
+  read_parquet,
+  write_parquet
+)
+importFrom(data.table,
+  as.data.table,
+  dcast,
+  fread,
+  melt,
+  rbindlist,
+  set
+)
+importFrom(dplyr,
+  bind_rows,
+  collect,
+  filter,
+  select
+)
+importFrom(enviPathR,
+  epLink,
+  epList
+)
+importFrom(ggplot2,
+  aes,
+  guide_legend,
+  guides,
+  scale_colour_manual,
+  theme,
+  theme_void
+)
+importFrom(ggraph,
+  geom_node_point,
+  geom_node_text,
+  ggraph,
+  scale_edge_alpha_manual,
+  scale_edge_colour_gradient2,
+  scale_edge_colour_manual
+)
+importFrom(httr2,
+  req_body_form,
+  req_body_json,
+  req_headers,
+  req_method,
+  req_perform,
+  req_timeout,
+  request,
+  resp_body_json,
+  resp_body_string
+)
+importFrom(igraph,
+  "E<-",
+  "V<-",
+  E,
+  V,
+  as_data_frame,
+  ends,
+  graph_from_data_frame,
+  k_shortest_paths,
+  read_graph,
+  subgraph_from_edges
+)
+importFrom(multifactor,
+  linkmap,
+  multifactor,
+  weave
+)
 importFrom(readr,read_lines)
 importFrom(rlang,sym)
-importFrom(rotl,tax_sources)
-importFrom(rotl,tnrs_match_names)
-importFrom(stats,as.formula)
-importFrom(stats,na.omit)
-importFrom(stats,reformulate)
-importFrom(stats,setNames)
-importFrom(stringr,fixed)
-importFrom(stringr,regex)
-importFrom(stringr,str_detect)
-importFrom(stringr,str_remove)
-importFrom(stringr,str_replace)
-importFrom(stringr,str_split)
-importFrom(stringr,str_subset)
+importFrom(rotl,
+  tax_sources,
+  tnrs_match_names
+)
+importFrom(stats,
+  as.formula,
+  na.omit,
+  reformulate,
+  setNames
+)
+importFrom(stringr,
+  fixed,
+  regex,
+  str_detect,
+  str_remove,
+  str_replace,
+  str_split,
+  str_subset
+)
 importFrom(tidyselect,all_of)
 importFrom(tools,R_user_dir)
-importFrom(utils,data)
-importFrom(utils,download.file)
-importFrom(utils,unzip)
+importFrom(utils,
+  data,
+  download.file,
+  unzip
+)
