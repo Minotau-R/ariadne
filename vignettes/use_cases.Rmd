@@ -304,7 +304,7 @@ We weave a path from OTT taxon names to BugSig sets via OTT IDs, yielding a
 linkmap directly compatible with our experiment object.
 
 ```{r}
-# Weave path from taxname to bugsig
+# Weave path from OTT taxon names to bugsig
 tax2bugsig <- weavePath(graph, ott.name ~ bugsig, init = rev(name2tax))
 
 # View linkmap
