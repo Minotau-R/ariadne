@@ -33,6 +33,12 @@ knitr::opts_chunk$set(
 options(DT.options = list(pageLength = 5))
 ```
 
+ariadne integrates multiple biological resources related to various omics
+modalities, and thus it is applicable to several scenarios in omics data
+science, where the main goal is to enrich analyses with meaningful knowledge
+from publicly available resources. This tutorial demonstrates the following
+applications of ariadne:
+
 | **Use case** | **Resources** | **Objective** |
 |--------------|---------------|---------------|
 | Functional annotation | ChocoPhlAn, WoL | Annotate microbial or gene features (UniRef) with sequence-based related functional information (KO, EC, pfam, etc.) |
@@ -41,6 +47,7 @@ options(DT.options = list(pageLength = 5))
 | Pathway enrichment analysis | KEGG, Rhea, WoL | Test for enriched or depleted metabolic pathways linked to features between conditions |
 | Knowledge-driven association analysis | KEGG, UniProt | Test previously reported associations between different omics layers (microbes, metabolites, genes, etc.) |
 
+First, we load ariadne and additional libraries used across the tutorial.
 
 ```{r lib, message = FALSE, warning = FALSE}
 library(ariadne)
@@ -52,6 +59,9 @@ library(stringr)
 library(DT)
 ```
 
+We also import the ariadne resource graph that will be used to link resources
+in the tutorial.
+
 ```{r}
 # Import resource graph
 graph <- ariadne()
@@ -59,7 +69,13 @@ graph <- ariadne()
 
 # Functional annotation
 
+Castro-NallarE_2015 dataset from a 
 
+For users familiar with the bioBakery tool HUMAaN, the first step is equivalent
+to [humann_regroup_table](https://github.com/biobakery/humann#humann_regroup_table).
+However, ariadne automatically concatenates it with previous and subsequent
+mappings to return links between the features of interest (e.g., microbes ->
+uniref -> ko -> gmm).
 
 ```{r}
 # Load gene family experiment
@@ -78,6 +94,7 @@ genes
 ```
 
 ```{r}
+# Search first three paths
 searchPath(graph, uniref90 ~ gmm, k = 3)
 ```
 
@@ -121,7 +138,8 @@ mod.se
 ```
 
 ```{r}
-plotHeatmap(mod.se, assay.type = "counts")
+# Visualise per-sample module abundances
+plotHeatmap(mod.se, assay.type = "gene_families")
 ```
 
 # Taxonomic translation
@@ -197,7 +215,10 @@ datatable(gg2tax)
 
 # Set enrichment analysis
 
-## BugSigDB
+Based on prior functional or phenotypic knowledge, it is possible to test
+whether sets of related features (e.g., genes, microbes or metabolites) are
+enriched or depleted. Common resources for gene and microbe-set enrichment
+analyses include MSigDB and BugSigDB, respectively.
 
 ```{r}
 # Import experiment object
@@ -214,13 +235,16 @@ tse
 ```
 
 ```{r}
-# Search for path from taxname to bugsig
-searchPath(graph, taxname ~ bugsig)
+# Link taxon names to OTT ids
+name2tax <- linkNames(graph, "ott", names = rowData(tse)$Genus)
+
+# View linkmap
+datatable(name2tax)
 ```
 
 ```{r}
 # Weave path from taxname to bugsig
-tax2bugsig <- weavePath(graph, taxname ~ bugsig, init = rowData(tse)$Genus)
+tax2bugsig <- weavePath(graph, ott.name ~ bugsig, init = rev(name2tax))
 
 # View linkmap
 datatable(tax2bugsig)
@@ -231,7 +255,7 @@ datatable(tax2bugsig)
 mod.names <- levels(tax2bugsig$bugsig.name)
 
 # Extract modules related to ADHD
-adhd.mods <- grepv("ADHD", mod.names)
+adhd.mods <- str_subset(mod.names, fixed("ADHD"))
 
 # View modules of interest
 knitr::kable(adhd.mods, col.names = "Modules of interest")
@@ -239,20 +263,24 @@ knitr::kable(adhd.mods, col.names = "Modules of interest")
 
 
 ```{r}
+# Add modules information to experiment
 tse <- addModules(tse, tax2bugsig, key = "Genus", as = "names")
 
+# Agglomerate experiment by module
 mod.se <- agglomerateByModule(tse, by = "rows", group = adhd.mods)
 
+# View results
 mod.se
 ```
 
 ```{r}
+# Visualise per-sample module abundance
 plotHeatmap(mod.se, assay.type = "relabundance", col.var = "patient_status")
 ```
 
 # Pathway enrichment analysis
 
-## KEGG
+KEGG, MetaCyc or case-specific like enviPath
 
 ```{r}
 # Search paths from ec to kegg pathways
@@ -274,8 +302,6 @@ ec2path <- weaveComplex(
 datatable(ec2path)
 ```
 
-## MetaCyc
-
 The MetaCyc pathways are provided from WoL2. However, this corresponds to
 an older version of MetaCyc before it changed to a license scheme.
 
@@ -295,7 +321,6 @@ ec2path <- weaveComplex(graph, ec ~ metacyc_path)
 datatable(ec2path)
 ```
 
-
 # Knowledge-driven association analysis
 
 ```{r}
@@ -313,16 +338,14 @@ mae
 mae[["microbiota"]] <- agglomerateByRank(mae[["microbiota"]], rank = "Genus")
 
 # Retrieve taxon names
-tax.labs <- rowData(mae[["microbiota"]])$Genus
-
-tax.labs <- unique(sub("D_5__", "", tax.labs))
+genus.labs <- rowData(mae[["microbiota"]])$Genus |>
+    str_remove(fixed("D_5__")) |>
+    unique()
 ```
 
 
 ```{r}
 name2ott <- linkNames(graph, "ott", names = tax.labs)
-
-name2tax <- weavePath(graph, ott.name ~ taxid, init = rev(name2ott))
 
 datatable(name2tax)
 ```
@@ -334,14 +357,17 @@ name2cpd <- linkNames(graph, "kegg_cpd", names = cpd.names)
 
 datatable(name2cpd)
 ```
+
 ```{r}
+# 
 tax2cpd <- weavePath(
     graph,
-    taxid ~ kegg_cpd,
-    init = name2tax$taxid,
+    ott ~ kegg_cpd,
+    init = name2tax$ott,
     res.name = c("WoL", "KEGG")
 )
 
+# Rename linkmap variables
 names(tax2cpd) <- c("microbiota", "metabolites")
 
 datatable(tax2cpd)
@@ -350,12 +376,9 @@ datatable(tax2cpd)
 
 ```{r}
 web <- weaveWeb(mae, microbiota ~ metabolites, link = tax2cpd)
-```
 
-```{r}
 out <- anansi(web)
 ```
-
 
 ```{r}
 plotAnansi(out)
