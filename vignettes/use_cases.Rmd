@@ -69,13 +69,16 @@ graph <- ariadne()
 
 # Functional annotation
 
-Castro-NallarE_2015 dataset from a 
+Resources such as ChocoPhlAn and Web of Life (WoL) have been developed to
+annotate microbial features and gene families with relevant functional
+information, including KEGG Orthogroups (KOs), Pfam domains, enzyme commission
+(EC) numbers and Gene Ontology (GO). This allows to derive actionable insight
+directly from biological assays.
 
-For users familiar with the bioBakery tool HUMAaN, the first step is equivalent
-to [humann_regroup_table](https://github.com/biobakery/humann#humann_regroup_table).
-However, ariadne automatically concatenates it with previous and subsequent
-mappings to return links between the features of interest (e.g., microbes ->
-uniref -> ko -> gmm).
+We import and process the Castro-NallarE_2015 dataset from
+[curatedMetagenomicData](https://doi.org/10.18129/B9.bioc.curatedMetagenomicData),
+which entails 32 oral cavity microbiome samples from individuals with Chron's
+Disease, Type-2 Diabetes and schizophrenia.
 
 ```{r}
 # Load gene family experiment
@@ -93,10 +96,18 @@ genes <- genes[str_detect(rownames(genes), fixed("|"), negate = TRUE), ]
 genes
 ```
 
+We search the three shortest pathways connecting UniRef90 to Gut Metabolic
+Modules (GMMs). We will choose the first option using the ChocoPhlAn resource.
+
 ```{r}
 # Search first three paths
 searchPath(graph, uniref90 ~ gmm, k = 3)
 ```
+For users familiar with the bioBakery tool HUMAnN, the first step is equivalent
+to [humann_regroup_table](https://github.com/biobakery/humann#humann_regroup_table).
+However, ariadne automatically concatenates it with previous and subsequent
+mappings to return links between the features of interest (e.g., microbes ->
+uniref -> ko -> modules).
 
 ```{r}
 # Weave bindings between taxa and GMMs
@@ -123,6 +134,8 @@ uniref2gmm <- weaveComplex(
 )
 ```
 
+Then, we incorporate the results in the experiment object and agglomerate it
+based on the modules information.
 
 ```{r}
 # Add modules to experiment side information
@@ -137,12 +150,16 @@ mod.se <- agglomerateByModule(
 mod.se
 ```
 
+Finally, the per-sample module loads can be visualised using a heatmap.
+
 ```{r}
 # Visualise per-sample module abundances
 plotHeatmap(mod.se, assay.type = "gene_families")
 ```
 
 # Taxonomic translation
+
+It 
 
 First, we load the butyrate linkmap from the ariadne package, which contains
 microbial features known for butyrate production.
@@ -280,12 +297,21 @@ plotHeatmap(mod.se, assay.type = "relabundance", col.var = "patient_status")
 
 # Pathway enrichment analysis
 
-KEGG, MetaCyc or case-specific like enviPath
+Similar to set enrichment, pathway enrichment analysis tests whether certain
+metabolic pathways are enriched or depleted based on how much they are covered
+by the observed features (microbes, genes, metabolites). Typical resources
+include KEGG and MetaCyc for coprehensive microbial metabolism, or
+domain-specific databases such as enviPath (xenochemical biotransformation).
+
+KEGG pathways can be mapped from KOs or ECs, ideally going through KEGG
+reactions.
 
 ```{r}
 # Search paths from ec to kegg pathways
 searchPath(graph, ec ~ kegg_path, include = "kegg_rxn", k = 3)
 ```
+
+We can link ECs to KEGG pathways while specifying a coverage threshold.
 
 ```{r}
 # Weave path from ec to kegg pathways
@@ -295,14 +321,12 @@ ec2path <- weaveComplex(
     include = "kegg_rxn",
     threshold = 0.5
 )
-```
 
-```{r}
 # View linkmap
 datatable(ec2path)
 ```
 
-The MetaCyc pathways are provided from WoL2. However, this corresponds to
+The MetaCyc pathways are provided from WoL2. However, they correspond to
 an older version of MetaCyc before it changed to a license scheme.
 
 ```{r}
@@ -310,20 +334,27 @@ an older version of MetaCyc before it changed to a license scheme.
 searchPath(graph, ec ~ metacyc_path, k = 3)
 ```
 
+ECs can be linked to related MetaCyc pathways and their corresponding coverage
+is estimated.
+
 ```{r}
 # Weave path from ec to metacyc pathways
 ec2path <- weaveComplex(graph, ec ~ metacyc_path)
-```
 
-
-```{r}
 # View linkmap
 datatable(ec2path)
 ```
 
 # Knowledge-driven association analysis
 
+[anansi](https://doi.org/10.18129/B9.bioc.anansi) provides a way to test
+associations between two omics modalities (e.g., microbiome and metabolites)
+from the same experiment, while restricting the comparisons to only relevant
+or previously reported relations. In this context, ariadne can provide
+meaningful links to perform the association analysis.
 
+We load the HintikkaXOData experiment, which includes metabolome and microbiome
+from stool samples of humanised ADHD mice.
 
 ```{r}
 # Import dataset
@@ -376,7 +407,7 @@ names(tax2cpd) <- c("microbiota", "metabolites")
 datatable(tax2cpd)
 ```
 
-
+Then, we
 
 ```{r}
 # Create anansi web object
