@@ -14,7 +14,6 @@ output:
         number_sections: true
         self_contained: true
         code_folding: show
-# bibliography: ../inst/REFERENCES.bib
 date: "`r doc_date()`"
 package: "`r pkg_ver('ariadne')`"
 vignette: >
@@ -33,21 +32,20 @@ knitr::opts_chunk$set(
 options(DT.options = list(pageLength = 5))
 ```
 
-ariadne integrates multiple biological resources related to various omics
-modalities, and thus it is applicable to several scenarios in omics data
-science, where the main goal is to enrich analyses with meaningful knowledge
-from publicly available resources. This tutorial demonstrates the following
-applications of ariadne:
+`ariadne` integrates diverse biological resources spanning multiple omics
+modalities, making it applicable to various omics data science scenarios focused
+on enriching analyses with curated knowledge from public databases. This
+tutorial demonstrates the following core applications of `ariadne`:
 
 | **Use case** | **Resources** | **Objective** |
 |--------------|---------------|---------------|
-| Functional annotation | ChocoPhlAn, WoL | Annotate microbial or gene features (UniRef) with sequence-based related functional information (KO, EC, pfam, etc.) |
+| Functional annotation | ChocoPhlAn, WoL | Annotate microbial or gene features (UniRef) with sequence-based related functional information (e.g., KO, EC, and Pfam) |
 | Taxonomic translation | OTT, UniProt | Convert taxonomic names and ids across taxonomies (NCBI, SILVA, OTT, etc.) |
 | Set enrichment analysis | BugSigDB, GM, GO, MSigDB | Test for enriched or depleted functional sets of features between conditions |
 | Pathway enrichment analysis | KEGG, Rhea, WoL | Test for enriched or depleted metabolic pathways linked to features between conditions |
-| Knowledge-driven association analysis | KEGG, UniProt | Test previously reported associations between different omics layers (microbes, metabolites, genes, etc.) |
+| Knowledge-driven association analysis | KEGG, UniProt | Test previously reported associations between different omics layers (e.g., microbes, metabolites and genes) |
 
-First, we load ariadne and additional libraries used across the tutorial.
+First, we load `ariadne` and additional libraries used across this tutorial.
 
 ```{r lib, message = FALSE, warning = FALSE}
 library(ariadne)
@@ -59,8 +57,8 @@ library(stringr)
 library(DT)
 ```
 
-We also import the ariadne resource graph that will be used to link resources
-in the tutorial.
+We also import the `ariadne` resource graph that will be used to link resources
+throughout this tutorial.
 
 ```{r}
 # Import resource graph
@@ -75,10 +73,20 @@ information, including KEGG Orthogroups (KOs), Pfam domains, enzyme commission
 (EC) numbers and Gene Ontology (GO). This allows to derive actionable insight
 directly from biological assays.
 
+Resources such as ChocoPhlAn and the Web of Life (WoL) annotate microbial
+features and gene families with functional metadata—such as KEGG Orthogroups
+(KOs), Pfam domains, Enzyme Commission (EC) numbers and Gene Ontology (GO)
+terms—enabling the derivation of biological insights directly from omics
+datasets.
+
 We import and process the Castro-NallarE_2015 dataset from
 [curatedMetagenomicData](https://doi.org/10.18129/B9.bioc.curatedMetagenomicData),
 which entails 32 oral cavity microbiome samples from individuals with Chron's
 Disease, Type-2 Diabetes and schizophrenia.
+
+We import and preprocess the `Castro-NallarE_2015` dataset from
+[curatedMetagenomicData](https://doi.org/10.18129/B9.bioc.curatedMetagenomicData), comprising 32 oral cavity microbiome samples from individuals with Crohn's
+disease, Type 2 diabetes and schizophrenia.
 
 ```{r}
 # Load gene family experiment
@@ -92,33 +100,34 @@ genes <- genes[[1]]
 # Keep only unstratified gene families
 genes <- genes[str_detect(rownames(genes), fixed("|"), negate = TRUE), ]
 
-# Print experiment
+# View experiment
 genes
 ```
 
-We search the three shortest pathways connecting UniRef90 to Gut Metabolic
-Modules (GMMs). We will choose the first option using the ChocoPhlAn resource.
+We query the three shortest paths connecting UniRef90 gene families to Gut
+Metabolic Modules (GMMs), selecting the primary path mediated by ChocoPhlAn.
 
 ```{r}
 # Search first three paths
 searchPath(graph, uniref90 ~ gmm, k = 3)
 ```
-For users familiar with the bioBakery tool HUMAnN, the first step is equivalent
-to [humann_regroup_table](https://github.com/biobakery/humann#humann_regroup_table).
-However, ariadne automatically concatenates it with previous and subsequent
-mappings to return links between the features of interest (e.g., microbes ->
-uniref -> ko -> modules).
+
+For users familiar with the bioBakery suite, this operation corresponds to
+`humann_regroup_table` from [HUMAnN](https://github.com/biobakery/humann).
+However, ariadne seamlessly concatenates preliminary and successive mapping
+steps to directly link distinct feature spaces (e.g., microbes $\rightarrow$
+UniRef $\rightarrow$ KOs $\rightarrow$ modules).
 
 ```{r}
 # Weave bindings between taxa and GMMs
 uniref2gmm <- weaveComplex(graph, uniref90 ~ gmm, init = rownames(genes))
 
-# Print some results
+# View linkmap
 datatable(uniref2gmm)
 ```
 
-Alternatively, WoL can be used instead, but only its older version provides
-uniref to ko bindings, so we need to import a past release of the resource
+Alternatively, WoL can be utilized. Because UniRef-to-KO bindings are exclusive
+to earlier releases, we explicitly import a previous version of the resource
 graph.
 
 ```{r}
@@ -134,8 +143,9 @@ uniref2gmm <- weaveComplex(
 )
 ```
 
-Then, we incorporate the results in the experiment object and agglomerate it
-based on the modules information.
+Next, we incorporate these mappings into the experiment object and agglomerate
+the features by module.
+
 
 ```{r}
 # Add modules to experiment side information
@@ -150,7 +160,7 @@ mod.se <- agglomerateByModule(
 mod.se
 ```
 
-Finally, the per-sample module loads can be visualised using a heatmap.
+Finally, per-sample module abundances are visualised using a heatmap.
 
 ```{r}
 # Visualise per-sample module abundances
@@ -159,10 +169,13 @@ plotHeatmap(mod.se, assay.type = "gene_families")
 
 # Taxonomic translation
 
-It 
+Taxonomic harmonization and cross-referencing across nomenclature systems are
+frequent bottlenecks in integrative multi-omics analyses. ariadne facilitates
+robust ID translation and name resolution across diverse taxonomies (e.g., NCBI,
+SILVA, OTT and Greengenes).
 
-First, we load the butyrate linkmap from the ariadne package, which contains
-microbial features known for butyrate production.
+First, we load the built-in butyrate linkmap containing microbial features
+associated with butyrate biosynthesis.
 
 ```{r}
 # Import butyrate linkmap
@@ -172,7 +185,7 @@ data("butyrate", package = "ariadne")
 datatable(butyrate)
 ```
 
-We can find the NCBI taxon names starting from the corresponding NCBI taxon ids.
+We map NCBI taxon identifiers to their corresponding binomial names.
 
 ```{r}
 # Link taxon ids to names
@@ -182,8 +195,8 @@ tax2name <- linkNames(graph, "taxid", ids = butyrate$taxid)
 datatable(tax2name)
 ```
 
-Reversely, NCBI taxon ids can be derived from the corresponding taxon names,
-with the downside that names must be exact.
+Conversely, NCBI taxon IDs can be retrieved from taxon names, which need to be
+exact.
 
 ```{r}
 # Link taxon names to ids
@@ -193,9 +206,9 @@ name2tax <- linkNames(graph, "taxid", names = butyrate$taxid.name)
 datatable(name2tax)
 ```
 
-Alternatively, we can use the resource Open Tree of Life Taxonomy (OTT) to match
-taxon names to the corresponding OTT taxon ids using a fuzzy strategy, so that
-partial matches are also successful.
+Alternatively, we can query the Open Tree of Life Taxonomy (OTT) to resolve
+taxon names using approximate string matching, accommodating partial or
+imprecise entries.
 
 ```{r}
 # Link taxon names to OTT ids
@@ -208,9 +221,8 @@ name2tax <- weavePath(graph, ott.name ~ taxid, init = rev(name2ott))
 datatable(name2tax)
 ```
 
-OTT can also be used to link NCBI taxon ids to other taxonomies, such as SILVA,
-OTT, etc. We link NCBI taxon ids to the corresponding SILVA ids starting from
-the taxon ids found in the butyrate linkmap.
+OTT also bridges disparate taxonomies. Here, we translate NCBI taxon IDs from
+the butyrate linkmap to corresponding SILVA SSU identifiers.
 
 ```{r}
 # Convert taxid to silva
@@ -225,7 +237,8 @@ tax2silva <- weavePath(
 datatable(tax2silva)
 ```
 
-Using WoL, Greengenes ids can also be translated to NCBI taxon ids.
+Similarly, WoL enables the translation of Greengenes identifiers to NCBI taxon
+IDs.
 
 ```{r}
 # Convert greengenes to taxid
@@ -237,14 +250,14 @@ datatable(gg2tax)
 
 # Set enrichment analysis
 
-Based on prior functional or phenotypic knowledge, it is possible to test
-whether sets of related features (e.g., genes, microbes or metabolites) are
-enriched or depleted. Common resources for gene and microbe-set enrichment
-analyses include MSigDB and BugSigDB, respectively.
+Leveraging prior functional or phenotypic annotations, set enrichment analysis
+tests whether predefined feature sets (genes, taxa, or metabolites) are over-
+or under-represented. Common repositories include GO or MSigDB for genes and
+BugSigDB for microbial signatures.
 
-Certain sets of interest can be obtained by searching for keywords in their
-descriptive names. For example, we can select ADHD-related sets from BugSig
-through the ariadne graph.
+Feature sets of interest can be queried via keyword matching against descriptive
+names. For instance, we extract attention deficit hyperactivity disorder
+(ADHD)-related microbial signatures from BugSigDB via the ariadne graph.
 
 ```{r}
 # Retrieve all unique BugSig sets
@@ -257,10 +270,10 @@ adhd.sets <- bugsig2name[str_detect(bugsig2name$bugsig.name, fixed("ADHD")), ]
 datatable(adhd.sets)
 ```
 
-We load and process the
+We load and preprocess the
 [Tengeler2020](https://microbiome.github.io/mia/reference/Tengeler2020.html)
-experiment, which includes metabolome and microbiome from stool samples of
-humanised ADHD mice. 
+dataset, comprising stool metagenomic and metabolomic profiles from humanised
+ADHD mice.
 
 ```{r}
 # Import experiment object
@@ -276,9 +289,9 @@ tse <- transformAssay(tse, method = "relabundance")
 tse
 ```
 
-The next step is to link the microbial features at the Genus level to their
-corresponding OTT taxon ids, which we can use as initial values for the
-weave.
+We map microbial features at the genus level to their corresponding OTT taxon
+IDs to establish initial values for graph traversal.
+
 
 ```{r}
 # Link taxon names to OTT ids
@@ -287,10 +300,8 @@ name2tax <- linkNames(graph, "ott", names = rowData(tse)$Genus)
 # View linkmap
 datatable(name2tax)
 ```
-
-We weave the pathway from OTT taxon **names** to BugSig sets going through
-OTT ids. This way, the output linkmap can be directly linked to the original
-experiment.
+We weave a path from OTT taxon names to BugSig sets via OTT IDs, yielding a
+linkmap directly compatible with our experiment object.
 
 ```{r}
 # Weave path from taxname to bugsig
@@ -300,6 +311,8 @@ tax2bugsig <- weavePath(graph, ott.name ~ bugsig, init = rev(name2tax))
 datatable(tax2bugsig)
 ```
 
+This can be added to the experiment object and used to agglomerate the assay
+by set, which returns the per-sample abundance for each set.
 
 ```{r warning = FALSE}
 # Add modules information to experiment
@@ -315,7 +328,7 @@ adhd.se <- agglomerateByModule(tse, by = "rows", group = adhd.sets$bugsig.name)
 adhd.se
 ```
 
-Finally, we can visualise the per-sample set abundance with a heatmap.
+Finally, we visualise per-sample set abundances using a heatmap.
 
 ```{r}
 # Visualise per-sample module abundance
@@ -324,21 +337,19 @@ plotHeatmap(adhd.se, assay.type = "relabundance", col.var = "patient_status")
 
 # Pathway enrichment analysis
 
-Similar to set enrichment, pathway enrichment analysis tests whether certain
-metabolic pathways are enriched or depleted based on how much they are covered
-by the observed features (microbes, genes, metabolites). Typical resources
-include KEGG and MetaCyc for coprehensive microbial metabolism, or
-domain-specific databases such as enviPath (xenochemical biotransformation).
+Analogous to set enrichment, pathway enrichment analysis tests for enriched or
+depleted metabolic pathways based on feature coverage. Representative resources
+include KEGG and MetaCyc for comprehensive microbial metabolism, alongside specialised databases like enviPath for xenobiotic biotransformation.
 
-KEGG pathways can be mapped from KOs or ECs, ideally going through KEGG
-reactions.
+KEGG pathways can be mapped from KOs or ECs, ideally via KEGG reactions.
 
 ```{r}
 # Search paths from ec to kegg pathways
 searchPath(graph, ec ~ kegg_path, include = "kegg_rxn", k = 3)
 ```
 
-We can link ECs to KEGG pathways while specifying a coverage threshold.
+We link EC numbers to KEGG pathways while specifying a custom coverage
+threshold.
 
 ```{r}
 # Weave path from ec to kegg pathways
@@ -353,16 +364,16 @@ ec2path <- weaveComplex(
 datatable(ec2path)
 ```
 
-The MetaCyc pathways are provided from WoL2. However, they correspond to
-an older version of MetaCyc before it changed to a license scheme.
+The MetaCyc pathways are provided by WoL2. However, they correspond to
+an earlier version of MetaCyc before it became commercially available.
 
 ```{r}
 # Search paths from ec to metacyc pathways
 searchPath(graph, ec ~ metacyc_path, k = 3)
 ```
 
-ECs can be linked to related MetaCyc pathways and their corresponding coverage
-is estimated.
+Similarly, EC numbers are linked to associated MetaCyc pathways while also
+estimating pathway coverage by feature.
 
 ```{r}
 # Weave path from ec to metacyc pathways
@@ -374,16 +385,16 @@ datatable(ec2path)
 
 # Knowledge-driven association analysis
 
-[anansi](https://doi.org/10.18129/B9.bioc.anansi) provides a way to test
-associations between two omics modalities (e.g., microbiome and metabolites)
-from the same experiment, while restricting the comparisons to only relevant
-or previously reported relations. In this context, ariadne can provide
-meaningful links to perform the association analysis.
+[anansi](https://doi.org/10.18129/B9.bioc.anansi) evaluates pairwise
+associations between dual-omics modalities (e.g., microbiome and metabolome)
+within a unified experiment, restricting statistical comparisons to prior
+biologically relevant or documented interactions. ariadne supplies the necessary
+relational mappings to constrain this search space.
 
 We load the
 [HintikkaXOData](https://microbiome.github.io/mia/reference/HintikkaXOData.html)
-experiment, which includes metabolome and microbiome from stool samples of
-mice following a low-fat or high-fat diet.
+dataset, including stool metabolomic and metagenomic profiles from mice
+subjected to low and high-fat dietary regimes.
 
 ```{r}
 # Import dataset
@@ -396,8 +407,8 @@ mae <- HintikkaXOData
 mae
 ```
 
-We agglomerate the microbiome experiment by Genus and clean the feature names
-to find more matches for their corresponding OTT taxon ids.
+We agglomerate the microbiome experiment by Genus and sanitise feature names
+to maximise their successful conversion to OTT taxon ids.
 
 ```{r}
 # Agglomerate microbiome experiment by Genus
@@ -415,8 +426,8 @@ name2tax <- linkNames(graph, "ott", names = rownames(mae[["microbiota"]]))
 datatable(name2tax)
 ```
 
-We also link the metabolite names to the corresponding KEGG compound ids. In
-practice, unmatched entries would need to be manually annotated.
+We map metabolite identifiers to corresponding KEGG compound IDs. In practice,
+unmatched entries typically require manual curation.
 
 ```{r}
 # Link metabolite names to KEGG compound ids
@@ -426,7 +437,7 @@ name2cpd <- linkNames(graph, "kegg_cpd", names = rownames(mae[["metabolites"]]))
 datatable(name2cpd)
 ```
 
-Then, we weave the pathway between taxon names and KEGG compound ids.
+We then weave the path linking taxon names to KEGG compound IDs.
 
 ```{r}
 # Weave path from taxon names to KEGG compound ids
@@ -447,7 +458,7 @@ names(tax2cpd) <- c("microbiota", "metabolites")
 datatable(tax2cpd)
 ```
 
-Then, we create a Web object and pass it to anansi for the association analysis.
+Finally, we construct an anansi Web object and execute the association analysis.
 
 ```{r}
 # Create anansi web object
@@ -457,7 +468,7 @@ web <- weaveWeb(mae, microbiota ~ metabolites, link = tax2cpd)
 out <- anansi(web)
 ```
 
-We can visualise the results of association analysis with a forest plot.
+Resulting associations are visualised via a forest plot.
 
 ```{r}
 # Visualise associations

@@ -24,7 +24,7 @@ Description:
 biocViews:
     Software, DataImport, Metabolomics, Metagenomics, Microbiome, Annotation,
     Pathways, Visualization, Network, GraphAndNetwork
-License: Artistic-2.0
+License: Artistic-2.0 | file LICENSE
 Encoding: UTF-8
 Depends:
     R (>= 4.1),
@@ -38,11 +38,9 @@ Imports:
     dplyr,
     enviPathR,
     ggplot2,
-    grid,
     httr2,
     KEGGREST,
     Matrix,
-    methods,
     multifactor,
     readr,
     rlang,
@@ -58,6 +56,7 @@ Suggests:
     BiocStyle,
     curatedMetagenomicData,
     knitr,
+    methods,
     mia,
     miaViz,
     rmarkdown,
