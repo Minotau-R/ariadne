@@ -172,6 +172,8 @@ data("butyrate", package = "ariadne")
 datatable(butyrate)
 ```
 
+We can find the NCBI taxon names starting from the corresponding NCBI taxon ids.
+
 ```{r}
 # Link taxon ids to names
 tax2name <- linkNames(graph, "taxid", ids = butyrate$taxid)
@@ -179,6 +181,9 @@ tax2name <- linkNames(graph, "taxid", ids = butyrate$taxid)
 # View linkmap
 datatable(tax2name)
 ```
+
+Reversely, NCBI taxon ids can be derived from the corresponding taxon names,
+with the downside that names must be exact.
 
 ```{r}
 # Link taxon names to ids
@@ -188,9 +193,9 @@ name2tax <- linkNames(graph, "taxid", names = butyrate$taxid.name)
 datatable(name2tax)
 ```
 
-Additionally, we can use OTT to match taxon names to the corresponding NCBI or
-OTT taxon ids using a fuzzy strategy, so that partial matches are also
-successful.
+Alternatively, we can use the resource Open Tree of Life Taxonomy (OTT) to match
+taxon names to the corresponding OTT taxon ids using a fuzzy strategy, so that
+partial matches are also successful.
 
 ```{r}
 # Link taxon names to OTT ids
@@ -203,9 +208,9 @@ name2tax <- weavePath(graph, ott.name ~ taxid, init = rev(name2ott))
 datatable(name2tax)
 ```
 
-The resource OTT can also be used to link NCBI taxon ids to other taxonomies,
-such as SILVA, OTT, etc. We link NCBI taxon ids to the corresponding SILVA ids
-starting from the taxon ids found in the butyrate linkmap.
+OTT can also be used to link NCBI taxon ids to other taxonomies, such as SILVA,
+OTT, etc. We link NCBI taxon ids to the corresponding SILVA ids starting from
+the taxon ids found in the butyrate linkmap.
 
 ```{r}
 # Convert taxid to silva
@@ -220,7 +225,7 @@ tax2silva <- weavePath(
 datatable(tax2silva)
 ```
 
-Using WoL, GreenGenes ids can also be translated to NCBI taxon ids.
+Using WoL, Greengenes ids can also be translated to NCBI taxon ids.
 
 ```{r}
 # Convert greengenes to taxid
@@ -237,6 +242,26 @@ whether sets of related features (e.g., genes, microbes or metabolites) are
 enriched or depleted. Common resources for gene and microbe-set enrichment
 analyses include MSigDB and BugSigDB, respectively.
 
+Certain sets of interest can be obtained by searching for keywords in their
+descriptive names. For example, we can select ADHD-related sets from BugSig
+through the ariadne graph.
+
+```{r}
+# Retrieve all unique BugSig sets
+bugsig2name <- linkNames(graph, "bugsig")
+
+# Extract sets related to ADHD
+adhd.sets <- bugsig2name[str_detect(bugsig2name$bugsig.name, fixed("ADHD")), ]
+
+# View sets of interest
+datatable(adhd.sets)
+```
+
+We load and process the
+[Tengeler2020](https://microbiome.github.io/mia/reference/Tengeler2020.html)
+experiment, which includes metabolome and microbiome from stool samples of
+humanised ADHD mice. 
+
 ```{r}
 # Import experiment object
 data("Tengeler2020", package = "mia")
@@ -251,6 +276,10 @@ tse <- transformAssay(tse, method = "relabundance")
 tse
 ```
 
+The next step is to link the microbial features at the Genus level to their
+corresponding OTT taxon ids, which we can use as initial values for the
+weave.
+
 ```{r}
 # Link taxon names to OTT ids
 name2tax <- linkNames(graph, "ott", names = rowData(tse)$Genus)
@@ -258,6 +287,10 @@ name2tax <- linkNames(graph, "ott", names = rowData(tse)$Genus)
 # View linkmap
 datatable(name2tax)
 ```
+
+We weave the pathway from OTT taxon **names** to BugSig sets going through
+OTT ids. This way, the output linkmap can be directly linked to the original
+experiment.
 
 ```{r}
 # Weave path from taxname to bugsig
@@ -267,32 +300,26 @@ tax2bugsig <- weavePath(graph, ott.name ~ bugsig, init = rev(name2tax))
 datatable(tax2bugsig)
 ```
 
-```{r}
-# Retrieve all unique modules
-mod.names <- levels(tax2bugsig$bugsig.name)
 
-# Extract modules related to ADHD
-adhd.mods <- str_subset(mod.names, fixed("ADHD"))
-
-# View modules of interest
-knitr::kable(adhd.mods, col.names = "Modules of interest")
-```
-
-
-```{r}
+```{r warning = FALSE}
 # Add modules information to experiment
 tse <- addModules(tse, tax2bugsig, key = "Genus", as = "names")
 
+# Limit sets to those found by weave (add support to agglomerateByModule)
+adhd.sets <- adhd.sets[adhd.sets$bugsig %in% levels(tax2bugsig$bugsig), ]
+
 # Agglomerate experiment by module
-mod.se <- agglomerateByModule(tse, by = "rows", group = adhd.mods)
+adhd.se <- agglomerateByModule(tse, by = "rows", group = adhd.sets$bugsig.name)
 
 # View results
-mod.se
+adhd.se
 ```
+
+Finally, we can visualise the per-sample set abundance with a heatmap.
 
 ```{r}
 # Visualise per-sample module abundance
-plotHeatmap(mod.se, assay.type = "relabundance", col.var = "patient_status")
+plotHeatmap(adhd.se, assay.type = "relabundance", col.var = "patient_status")
 ```
 
 # Pathway enrichment analysis
@@ -353,8 +380,10 @@ from the same experiment, while restricting the comparisons to only relevant
 or previously reported relations. In this context, ariadne can provide
 meaningful links to perform the association analysis.
 
-We load the HintikkaXOData experiment, which includes metabolome and microbiome
-from stool samples of humanised ADHD mice.
+We load the
+[HintikkaXOData](https://microbiome.github.io/mia/reference/HintikkaXOData.html)
+experiment, which includes metabolome and microbiome from stool samples of
+mice following a low-fat or high-fat diet.
 
 ```{r}
 # Import dataset
@@ -366,6 +395,9 @@ mae <- HintikkaXOData
 # View multi-assay experiment
 mae
 ```
+
+We agglomerate the microbiome experiment by Genus and clean the feature names
+to find more matches for their corresponding OTT taxon ids.
 
 ```{r}
 # Agglomerate microbiome experiment by Genus
@@ -383,6 +415,9 @@ name2tax <- linkNames(graph, "ott", names = rownames(mae[["microbiota"]]))
 datatable(name2tax)
 ```
 
+We also link the metabolite names to the corresponding KEGG compound ids. In
+practice, unmatched entries would need to be manually annotated.
+
 ```{r}
 # Link metabolite names to KEGG compound ids
 name2cpd <- linkNames(graph, "kegg_cpd", names = rownames(mae[["metabolites"]]))
@@ -391,14 +426,19 @@ name2cpd <- linkNames(graph, "kegg_cpd", names = rownames(mae[["metabolites"]]))
 datatable(name2cpd)
 ```
 
+Then, we weave the pathway between taxon names and KEGG compound ids.
+
 ```{r}
-# Weave path from OTT ids to KEGG compound ids
+# Weave path from taxon names to KEGG compound ids
 tax2cpd <- weavePath(
     graph,
     ott.name ~ kegg_cpd,
-    init = name2tax$ott,
+    init = rev(name2tax),
     res.name = c("WoL", "KEGG")
 )
+
+# Remove KEGG compound id column
+tax2cpd$kegg_cpd <- NULL
 
 # Rename linkmap variables
 names(tax2cpd) <- c("microbiota", "metabolites")
@@ -407,7 +447,7 @@ names(tax2cpd) <- c("microbiota", "metabolites")
 datatable(tax2cpd)
 ```
 
-Then, we
+Then, we create a Web object and pass it to anansi for the association analysis.
 
 ```{r}
 # Create anansi web object
@@ -416,6 +456,8 @@ web <- weaveWeb(mae, microbiota ~ metabolites, link = tax2cpd)
 # Perform association analysis
 out <- anansi(web)
 ```
+
+We can visualise the results of association analysis with a forest plot.
 
 ```{r}
 # Visualise associations
