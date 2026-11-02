@@ -96,7 +96,7 @@ tse <- addSets(tse, butyrate, key = "Genus", names = TRUE)
 tse <- transformAssay(tse, method = "relabundance")
 
 # Agglomerate features by membership to butyrate-producer set
-set.se <- agglomerateByModule(tse, by = "rows", group = "butyrate")
+set.se <- agglomerateByModule(tse, by = "rows", group = "Butanoic acid")
 
 # Plot relative abundance of butyrate producers
 plotAbundance(set.se, assay.type = "relabundance")
