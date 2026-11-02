@@ -69,10 +69,13 @@
 #' # Load resource graph
 #' graph <- ariadne()
 #' 
-#' # Weave simple path from KEGG diseases to gut metabolic modules
+#' # Weave simple path from KEGG diseases to Gut Metabolic Modules (GMMs)
 #' dis2gmm <- weavePath(graph, kegg_disease ~ gmm)
 #' 
-#' # Weave complex path from KEGG diseases to gut metabolic modules
+#' # Weave 3rd path from KEGG diseases to GMMs (through KEGG drugs)
+#' dis2gmm <- weavePath(graph, kegg_disease ~ gmm, k = 4)
+#' 
+#' # Weave complex path from KEGG diseases to GMMs
 #' dis2gmm <- weaveComplex(graph, kegg_disease ~ gmm)
 #' 
 #' # Specify coverage threshold
@@ -82,7 +85,7 @@
 #' # Load example pathway dataframe
 #' data("pathMeta", package = "ariadne")
 #' 
-#' # Weave pathway from chebi to gmm with three initial chebi ids
+#' # Weave pathway from chebi to GMMs with three initial chebi IDs
 #' chebi2gmm <- weavePath(pathMeta, init = c(15377, 30616, 4167))
 #' 
 #' 
@@ -92,10 +95,7 @@
 #' # Weave path starting from initial values
 #' tax2bugsig <- weavePath(graph, taxid ~ bugsig, init = butyrate$taxid)
 #' 
-#' # Weave 3-rd path
-#' tax2bugsig <- weavePath(graph, taxid ~ bugsig, init = butyrate$taxid, k = 3)
-#' 
-#' # Weave path including taxid
+#' # Weave path including TaxID
 #' tax2bugsig <- weavePath(
 #'     graph, taxid ~ bugsig, include = "taxid", init = butyrate$taxid
 #' )
