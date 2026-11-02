@@ -199,10 +199,10 @@ url <- paste0(url, "genotype.csv.gz")
 # Add resource to ariadne graph
 graph <- addResource(
     graph,
+    taxid ~ aro,
     url,
     res.name = "AMR",
-    select = c("taxon_id", "antibiotic_ontology"),
-    col.names = c("taxid", "aro")
+    select = c("taxon_id", "antibiotic_ontology")
 )
 
 # Search for newly added path
@@ -384,16 +384,16 @@ set.se <- agglomerateByModule(tse, by = "rows", group = "Butanoic acid")
 plotAbundance(set.se)
 ```
 
-Additionally, `applyBySet()` enables arbitrary set-wise computations on an
+Additionally, `applyByModule()` enables arbitrary set-wise computations on an
 SE object. For example, it is possible to estimate alpha diversity for each
 module (only one in this case), which is sometimes called _functional diversity_.
 
 ```{r}
 # Estimate alpha diversity for each module
-tse <- applyBySet(
+tse <- applyByModule(
     tse,
     .by = "rows",
-    .group = "butyrate",
+    .group = "Butanoic acid",
     FUN = getAlpha,
     index = c("shannon", "faith"),
     min.group.size = 2

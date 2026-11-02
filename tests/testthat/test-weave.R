@@ -11,13 +11,16 @@ test_that("weave", {
     )
     
     ko2gmm <- weavePath(graph, ko ~ gmm, use.names = TRUE)
-    expect_equal(ncol(ko2gmm), 3L)
+    expect_equal(ncol(ko2gmm), 4L)
     
     ko2gmm <- weavePath(graph, ko ~ gmm, use.names = FALSE)
     expect_identical(ncol(ko2gmm), 2L)
     
     ec2gmm <- weaveComplex(graph, ec ~ gmm)
-    expect_identical(colnames(ec2gmm), c("ec", "gmm", "cov", "gmm.name"))
+    expect_identical(
+        colnames(ec2gmm),
+        c("ec", "gmm", "cov", "ec.name", "gmm.name")
+    )
     
     data("pathMeta", package = "ariadne")
     chebi_ids <- c(15377, 30616, 4167)
@@ -26,5 +29,5 @@ test_that("weave", {
     
     expect_s3_class(chebi2gmm, "data.frame")
     expect_s3_class(chebi2gmm$gmm, "factor")
-    expect_contains(levels(chebi2gmm$chebi), chebi_ids)
+    expect_in(levels(chebi2gmm$chebi), chebi_ids)
 })

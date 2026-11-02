@@ -13,10 +13,10 @@
 #' \code{taxid ~ kegg_cpd}, containing the following variables:
 #' 
 #' \itemize{
-#'   \item taxid: NCBI taxon identifiers
+#'   \item taxid: NCBI taxon identifiers (genus or species)
 #'   \item kegg_cpd: KEGG compound identifiers (butyrate) 
-#'   \item taxid.name: Organism names associated with the taxon identifiers
-#'   \item kegg_cpd.name: Compound names associated with the KEGG identifiers
+#'   \item taxid.name: organism names associated with the taxon identifiers
+#'   \item kegg_cpd.name: compound names associated with the KEGG identifiers
 #' }
 #' 
 #' @references 

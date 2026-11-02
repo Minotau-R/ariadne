@@ -176,11 +176,13 @@ setMethod("weavePath", signature = c(graph = "igraph"),
 #' @importFrom stats na.omit reformulate
 .build_path_mf <- function(graph, by, k, include, exclude, res.name, init,
     prune, prune.last, verbose, timeout, ...){
-    # Check shared numeric args
-    if( !is.numeric(timeout) || length(timeout) != 1L || timeout <= 0 ){
-        stop("'timeout' must be a positive number", call. = FALSE)
+    # Check shared args
+    if( !inherits(by, "formula") || !all(lengths(as.list(by)) == 1L ) ){
+        stop("'by' must be a formula with one var per side.", call. = FALSE)
     }
-    # Check shared logical args
+    if( !is.numeric(timeout) || length(timeout) != 1L || timeout <= 0 ){
+        stop("'timeout' must be a positive number.", call. = FALSE)
+    }
     if( length(prune) != 1L || !is.logical(prune) || is.na(prune) ){
         stop("'prune' must be TRUE or FALSE.", call. = FALSE)
     }

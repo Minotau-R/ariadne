@@ -144,20 +144,19 @@ uniref2gmm <- weaveComplex(
 ```
 
 Next, we incorporate these mappings into the experiment object and agglomerate
-the features by module.
-
+the features by set.
 
 ```{r}
-# Add modules to experiment side information
-genes <- addModules(genes, uniref2gmm, as = "names")
+# Add sets to experiment side information
+genes <- addSets(genes, uniref2gmm, y.names = TRUE)
 
-# Agglomerate experiment by modules
-mod.se <- agglomerateByModule(
+# Agglomerate experiment by set
+set.se <- agglomerateByModule(
     genes, by = "rows", group = levels(uniref2gmm$gmm.name)
 )
 
 # View experiment object
-mod.se
+set.se
 ```
 
 Finally, per-sample module abundances are visualised using a heatmap.
@@ -315,13 +314,13 @@ This can be added to the experiment object and used to agglomerate the assay
 by set, which returns the per-sample abundance for each set.
 
 ```{r warning = FALSE}
-# Add modules information to experiment
-tse <- addModules(tse, tax2bugsig, key = "Genus", as = "names")
+# Add set information to experiment
+tse <- addSets(tse, tax2bugsig, key = "Genus", y.names = TRUE)
 
 # Limit sets to those found by weave (add support to agglomerateByModule)
 adhd.sets <- adhd.sets[adhd.sets$bugsig %in% levels(tax2bugsig$bugsig), ]
 
-# Agglomerate experiment by module
+# Agglomerate experiment by set
 adhd.se <- agglomerateByModule(tse, by = "rows", group = adhd.sets$bugsig.name)
 
 # View results
@@ -331,7 +330,7 @@ adhd.se
 Finally, we visualise per-sample set abundances using a heatmap.
 
 ```{r}
-# Visualise per-sample module abundance
+# Visualise per-sample set abundance
 plotHeatmap(adhd.se, assay.type = "relabundance", col.var = "patient_status")
 ```
 

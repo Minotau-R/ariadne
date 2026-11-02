@@ -7,9 +7,12 @@
 #' 
 #' @param graph An igraph object.
 #' 
+#' @param by A formula specifying the custom path to add.
+#' 
 #' @param file \code{Character scalar}. The path to a local or remote file that
-#'   stores the linkmap between two features. It must be a table with two named
-#'   columns (features) and each row representing a binding between features.
+#'   stores the linkmap between two features types corresponding \code{by}. It
+#'   must be a table with two columns and each row representing a binding
+#'   between features.
 #' 
 #' @param res.name \code{Character scalar}. The name of the resource that will
 #'   appear in the output graph. (Default: \code{"Custom"})
@@ -32,10 +35,10 @@
 #' # Add resource to ariadne graph
 #' graph <- addResource(
 #'     graph,
+#'     taxid ~ aro,
 #'     url,
 #'     res.name = "AMR",
-#'     select = c("taxon_id", "antibiotic_ontology"),
-#'     col.names = c("taxid", "aro")
+#'     select = c("taxon_id", "antibiotic_ontology")
 #' )
 #' 
 #' # Search for newly added path
@@ -55,15 +58,36 @@ NULL
 #' @importFrom dplyr bind_rows
 #' @importFrom data.table fread
 setMethod("addResource", signature = c(graph = "igraph"),
-    function(graph, file, res.name = "Custom", force = FALSE, ...){
+    function(graph, by, file, res.name = "Custom", force = FALSE, ...){
+    # Check args
+    if( !inherits(by, "formula") || !all(lengths(as.list(by)) == 1L ) ){
+        stop("'by' must be a formula with one var per side.", call. = FALSE)
+    }
+    if( !is.character(file) || length(file) != 1L ){
+        stop("'file' must be a single string.", call. = FALSE)
+    }
+    if( !is.character(res.name) || length(res.name) != 1L ){
+        stop("'res.name' must be a single string.", call. = FALSE)
+    }
+    if( length(force) != 1L || !is.logical(force) || is.na(force) ){
+        stop("'force' must be TRUE or FALSE.", call. = FALSE)
+    }
     # Break graph into edges and nodes
     graph_df <- as_data_frame(graph, what = "both")
     edge_df <- graph_df$edges
     node_df <- graph_df$vertices
+    # Retrieve feature names from by
+    cus_vars <- all.vars(by)
+    # Find if some variables are new
+    new_vars <- setdiff(cus_vars, node_df$name)
+    # Check that at least one feature is known
+    if( length(new_vars) == 2L ){
+        stop("At least one feature must be in 'graph'.", call. = FALSE)
+    }
     # Initialise cache
     bfc <- .init_cache()
     # Build resource name
-    rname <- file.path(res.name, basename(file))
+    rname <- file.path(res.name, paste(cus_vars, collapse = "2"))
     # Check if preprocessed file is cached
     cached <- bfcquery(bfc, rname)$rpath
     # Return preprocessed file if available
@@ -73,17 +97,11 @@ setMethod("addResource", signature = c(graph = "igraph"),
     }
     # Import linkmap
     linkmap <- fread(file, ...)
+    # Add column names to linkmap
+    colnames(linkmap) <- cus_vars
     # Check that linkmap has two columns
     if( ncol(linkmap) != 2L ){
         stop("'file' must point to a two-column linkmap.", call. = FALSE)
-    }
-    # Retrieve feature names from colnames
-    cus_vars <- colnames(linkmap)
-    # Find if some variables are new
-    new_vars <- setdiff(cus_vars, node_df$name)
-    # Check that at least one feature is known
-    if( length(new_vars) == 2L ){
-        stop("At least one feature must be in 'graph'.", call. = FALSE)
     }
     # Add new edge for user-defined linkmap
     edge_df <- rbind(edge_df, data.frame(

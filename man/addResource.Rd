@@ -7,16 +7,19 @@
 \usage{
 addResource(graph, ...)
 
-\S4method{addResource}{igraph}(graph, file, res.name = "Custom", force = FALSE, ...)
+\S4method{addResource}{igraph}(graph, by, file, res.name = "Custom", force = FALSE, ...)
 }
 \arguments{
 \item{graph}{An igraph object.}
 
 \item{...}{Additional arguments passed to \code{\link[data.table:fread]{fread}}.}
 
+\item{by}{A formula specifying the custom path to add.}
+
 \item{file}{\code{Character scalar}. The path to a local or remote file that
-stores the linkmap between two features. It must be a table with two named
-columns (features) and each row representing a binding between features.}
+stores the linkmap between two features types corresponding \code{by}. It
+must be a table with two columns and each row representing a binding
+between features.}
 
 \item{res.name}{\code{Character scalar}. The name of the resource that will
 appear in the output graph. (Default: \code{"Custom"})}
@@ -41,10 +44,10 @@ url <- paste0(url, "genotype.csv.gz")
 # Add resource to ariadne graph
 graph <- addResource(
     graph,
+    taxid ~ aro,
     url,
     res.name = "AMR",
-    select = c("taxon_id", "antibiotic_ontology"),
-    col.names = c("taxid", "aro")
+    select = c("taxon_id", "antibiotic_ontology")
 )
 
 # Search for newly added path

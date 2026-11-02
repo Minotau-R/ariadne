@@ -193,9 +193,12 @@ setMethod("linkNames", signature = c(graph = "igraph"),
 .add_names <- function(graph, x, verbose){
     # Fetch origin names
     origin <- colnames(x)[1L]
-    x[[paste0(origin, ".name")]] <- linkNames(
-        graph, origin, x[[1L]], verbose = verbose
-    )[[2L]]
+    # If origin in graph nodes
+    if( origin %in% V(graph)$name ){
+        x[[paste0(origin, ".name")]] <- linkNames(
+           graph, origin, x[[1L]], verbose = verbose
+        )[[2L]]
+    }
     # Fetch target names
     target <- colnames(x)[2L]
     x[[paste0(target, ".name")]] <- linkNames(
