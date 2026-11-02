@@ -84,7 +84,7 @@ into a single igraph object.
 graph <- ariadne()
 
 # Plot resource graph
-plotPath(graph, layout = "stress")
+plotPath(graph)
 ```
 
 Some resources have multiple versions, which can be selected through the

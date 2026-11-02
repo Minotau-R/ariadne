@@ -13,11 +13,11 @@ reference:
   - linkNames
   - drawPath
   - listResourceVersions
-- title: Work with output modules
+- title: Work with output sets
 - contents:
-  - addModules
-  - getModules
-  - plotModules
+  - addSets
+  - getSets
+  - plotSets
   - processGeneFamilies
 - title: Import package datasets
 - contents:

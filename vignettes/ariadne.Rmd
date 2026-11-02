@@ -60,9 +60,9 @@ in [this vignette](https://minotau-r.github.io/ariadne/articles/use_cases.html))
 # Tutorial
 
 This tutorial demonstrates the programmatic usage of ariadne within R/RStudio.
-For extensions in other environments, refer to [ariadnePy](https://github.com/Minotau-R/ariadnePy) for Python and
-[ariadneApp](https://github.com/Minotau-R/ariadneApp) for the Shiny web
-application.
+For extensions in other environments, refer to
+[ariadnePy](https://github.com/Minotau-R/ariadnePy) for Python and
+[ariadneApp](https://github.com/Minotau-R/ariadneApp) for the Shiny app.
 
 ## Installation
 
@@ -102,6 +102,7 @@ hosted on Zenodo.
 library(ariadne)
 library(mia)
 library(miaViz)
+library(igraph)
 library(DT)
 ```
 
@@ -146,13 +147,14 @@ according to their degree (total adjacent edges):
 # Find and sort node degrees
 node_degrees <- graph |>
     degree(mode = "all") |>
-    sort(decreasing = TRUE)
+    sort(decreasing = TRUE) |>
+    as.data.frame()
 
-# Select nodes above degree threshold
-node_degrees <- node_degrees[node_degrees >= 10]
+# Name degree variable
+names(node_degrees) <- "degree"
 
 # View node degrees
-kable(node_degrees, col.names = "degree")
+datatable(node_degrees)
 ```
 
 We can also compute local neighborhood sizes for specific feature types:
@@ -242,7 +244,7 @@ ko.ids <- c("K00665", "K05913", "K11533")
 ko2ec <- weavePath(graph, ko ~ ec, init = ko.ids)
 
 # View links
-knitr::kable(ko2ec)
+datatable(ko2ec)
 ```
 
 Sometimes, we would like to know how much each origin id covers each target id
@@ -265,7 +267,7 @@ ec2path <- weaveComplex(
 )
 
 # View some links
-knitr::kable(ec2path)
+datatable(ec2path)
 ```
 
 The resulting mapping can be visualised with the `plotModules()` function.
@@ -345,24 +347,29 @@ data("butyrate", package = "ariadne")
 datatable(butyrate)
 ```
 
-The `getModules()` function maps features to the specified annotation `keys`
+The `getSets()` function maps features to the specified annotation `keys`
 (such as Genus or Family), returning a module membership matrix indicating
 presence/absence or coverage fractions.
 
 ```{r}
-# Get butyrate-producer module membership
-modules <- getModules(tse, butyrate, key = c("Genus", "Family"))
+# Get butyrate-producer set membership
+sets <- getSets(
+    tse,
+    butyrate,
+    key = c("Genus", "Family"),
+    names = TRUE
+)
 
 # View modules table
-datatable(modules)
+datatable(sets)
 ```
 
-Using `addModules()`, this module membership table is incorporated directly into
+Using `addSets()`, this module membership table is incorporated directly into
 the experiment side information that can be accessed in downstream analyses.
 
 ```{r}
 # Add modules to experiment as names instead of ids
-tse <- addModules(tse, butyrate, key = "Genus", as = "names")
+tse <- addSets(tse, butyrate, key = "Genus", names = TRUE)
 ```
 
 The `mia` package provides specialised methods for set-aware operations. The
@@ -371,19 +378,19 @@ features belonging to specific sets.
 
 ```{r}
 # Agglomerate features by membership to butyrate-producer set
-mod.se <- agglomerateByModule(tse, by = "rows", group = "butyrate")
+set.se <- agglomerateByModule(tse, by = "rows", group = "Butanoic acid")
 
 # Plot abundance of butyrate producers
-plotAbundance(mod.se)
+plotAbundance(set.se)
 ```
 
-Additionally, `applyByModule()` enables arbitrary set-wise computations on an
+Additionally, `applyBySet()` enables arbitrary set-wise computations on an
 SE object. For example, it is possible to estimate alpha diversity for each
 module (only one in this case), which is sometimes called _functional diversity_.
 
 ```{r}
 # Estimate alpha diversity for each module
-tse <- applyByModule(
+tse <- applyBySet(
     tse,
     .by = "rows",
     .group = "butyrate",

@@ -87,8 +87,8 @@ mapping step. (Default: \code{NULL})}
 \item{prune}{\code{Logical scalar}. Should the values from each step be used
 prune the following step. (Default: \code{TRUE})}
 
-\item{use.names}{\code{Logical scalar}. Should feature names be used in the
-output instead of feature identifiers. either (Default: \code{TRUE})}
+\item{use.names}{\code{Logical scalar}. Should feature names be provided in
+the output in addition to feature identifiers. (Default: \code{TRUE})}
 
 \item{verbose}{\code{Logical scalar}. Should messages be printed in the
 console. (Default: \code{TRUE})}

@@ -36,8 +36,8 @@
 #' @param prune \code{Logical scalar}. Should the values from each step be used
 #'   prune the following step. (Default: \code{TRUE})
 #' 
-#' @param use.names \code{Logical scalar}. Should feature names be used in the
-#'   output instead of feature identifiers. either (Default: \code{TRUE})
+#' @param use.names \code{Logical scalar}. Should feature names be provided in
+#'   the output in addition to feature identifiers. (Default: \code{TRUE})
 #' 
 #' @param threshold \code{Numeric scalar}. Only for \code{weaveComplex}. The
 #'   coverage threshold above which to include links, between 0 and 1. If
@@ -166,11 +166,7 @@ setMethod("weavePath", signature = c(graph = "igraph"),
     # Weave desired linkmap from multifactor
     out <- weave(mf, by) |> as.data.frame()
     # Add feature names
-    if( use.names ){
-        target <- colnames(out)[2L]
-        name_links <- linkNames(graph, target, out[[2L]], verbose = verbose)
-        out[paste0(target, ".name")] <- name_links[[2L]]
-    }
+    if( use.names ) out <- .add_names(graph, out, verbose)
     return(out)
 })
 
