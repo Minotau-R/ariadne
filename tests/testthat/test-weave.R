@@ -1,9 +1,9 @@
 test_that("weave", {
     
-    path_df <- drawPath(graph, bugsig ~ ko, 1, "uniref90", "taxid")
+    path_df <- drawPath(graph, bugsig ~ ko, 1, "uniref90", "uniref50")
     
-    expect_false("taxid" %in% path_df$from || "taxid" %in% path_df$to)
-    expect_true("uniref90" %in% path_df$from || "taxid" %in% path_df$to)
+    expect_true("uniref90" %in% path_df$from || "uniref90" %in% path_df$to)
+    expect_false("uniref50" %in% path_df$from || "uniref50" %in% path_df$to)
     
     expect_error(
         drawPath(graph, bugsig ~ ko, 1, "uniref90", "uniref90"),
