@@ -187,3 +187,22 @@ setMethod("linkNames", signature = c(graph = "igraph"),
     linkmap <- order_fun(linkmap)
     return(linkmap)
 }
+
+
+# Define function to add names to linkmap from weave
+.add_names <- function(graph, x, verbose){
+    # Fetch origin names
+    origin <- colnames(x)[1L]
+    # If origin in graph nodes
+    if( origin %in% V(graph)$name ){
+        x[[paste0(origin, ".name")]] <- linkNames(
+           graph, origin, x[[1L]], verbose = verbose
+        )[[2L]]
+    }
+    # Fetch target names
+    target <- colnames(x)[2L]
+    x[[paste0(target, ".name")]] <- linkNames(
+        graph, target, x[[2L]], verbose = verbose
+    )[[2L]]
+    return(x)
+}

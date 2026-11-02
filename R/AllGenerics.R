@@ -37,17 +37,16 @@ setGeneric("weaveComplex", signature = c("graph"), function(graph, ...)
     standardGeneric("weaveComplex"))
 
 #' @export
-#' @rdname addModules
-setGeneric("getModules", signature = c("x"), function(x, ...)
-    standardGeneric("getModules"))
+#' @rdname addSets
+setGeneric("getSets", signature = c("x"), function(x, ...)
+    standardGeneric("getSets"))
 
 #' @export
-#' @rdname addModules
-setGeneric("addModules", signature = c("x"), function(x, ...)
-    standardGeneric("addModules"))
+#' @rdname addSets
+setGeneric("addSets", signature = c("x"), function(x, ...)
+    standardGeneric("addSets"))
 
 #' @export
-#' @rdname plotModules
-setGeneric("plotModules", signature = c("modules"), function(modules, ...)
-    standardGeneric("plotModules"))
-
+#' @rdname plotSets
+setGeneric("plotSets", signature = c("sets"), function(sets, ...)
+    standardGeneric("plotSets"))

@@ -59,6 +59,16 @@ setMethod("drawPath", signature = c(graph = "igraph"),
     if( !is.numeric(k) || length(k) != 1L || k <= 0 ){
         stop("'k' must be a positive integer.", call. = FALSE)
     }
+    if( !is.null(res.name) &&
+        (!is.character(res.name) || length(res.name) != 1L) ){
+        stop("'res.name' must be a single string.", call. = FALSE)
+    }
+    if( !is.null(include) && !is.character(include) ){
+        stop("'include' must be a character vector.", call. = FALSE)
+    }
+    if( !is.null(exclude) && !is.character(exclude) ){
+        stop("'exclude' must be a character vector.", call. = FALSE)
+    }
     if( length(intersect(include, exclude)) != 0L ){
         stop("'include' and 'exclude' cannot overlap.", call. = FALSE)
     }

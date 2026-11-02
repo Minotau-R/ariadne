@@ -36,8 +36,8 @@
 #' @param prune \code{Logical scalar}. Should the values from each step be used
 #'   prune the following step. (Default: \code{TRUE})
 #' 
-#' @param use.names \code{Logical scalar}. Should feature names be used in the
-#'   output instead of feature identifiers. either (Default: \code{TRUE})
+#' @param use.names \code{Logical scalar}. Should feature names be provided in
+#'   the output in addition to feature identifiers. (Default: \code{TRUE})
 #' 
 #' @param threshold \code{Numeric scalar}. Only for \code{weaveComplex}. The
 #'   coverage threshold above which to include links, between 0 and 1. If
@@ -69,10 +69,13 @@
 #' # Load resource graph
 #' graph <- ariadne()
 #' 
-#' # Weave simple path from KEGG diseases to gut metabolic modules
+#' # Weave simple path from KEGG diseases to Gut Metabolic Modules (GMMs)
 #' dis2gmm <- weavePath(graph, kegg_disease ~ gmm)
 #' 
-#' # Weave complex path from KEGG diseases to gut metabolic modules
+#' # Weave 3rd path from KEGG diseases to GMMs (through KEGG drugs)
+#' dis2gmm <- weavePath(graph, kegg_disease ~ gmm, k = 4)
+#' 
+#' # Weave complex path from KEGG diseases to GMMs
 #' dis2gmm <- weaveComplex(graph, kegg_disease ~ gmm)
 #' 
 #' # Specify coverage threshold
@@ -82,30 +85,19 @@
 #' # Load example pathway dataframe
 #' data("pathMeta", package = "ariadne")
 #' 
-#' # Weave pathway from chebi to gmm with three initial chebi ids
+#' # Weave pathway from chebi to GMMs with three initial chebi IDs
 #' chebi2gmm <- weavePath(pathMeta, init = c(15377, 30616, 4167))
 #' 
 #' 
-#' # Import mia package
-#' library(mia)
-#' 
-#' # Import dataset
-#' data("Tengeler2020", package = "mia")
-#' tse <- Tengeler2020
-#' 
-#' # Retrieve taxon names
-#' tax.labs <- getTaxonomyLabels(tse, make.unique = FALSE)
-#' tax.labs <- sub("^.+:", "", tax.labs)
+#' # Import butyrate dataset
+#' data("butyrate", package = "ariadne")
 #' 
 #' # Weave path starting from initial values
-#' tax2bugsig <- weavePath(graph, taxname ~ bugsig, init = tax.labs)
+#' tax2bugsig <- weavePath(graph, taxid ~ bugsig, init = butyrate$taxid)
 #' 
-#' # Weave 3-rd path
-#' tax2bugsig <- weavePath(graph, taxname ~ bugsig, init = tax.labs, k = 3)
-#' 
-#' # Weave path including taxid
+#' # Weave path including TaxID
 #' tax2bugsig <- weavePath(
-#'     graph, taxname ~ bugsig, include = "taxid", init = tax.labs
+#'     graph, taxid ~ bugsig, include = "taxid", init = butyrate$taxid
 #' )
 NULL
 
@@ -174,11 +166,7 @@ setMethod("weavePath", signature = c(graph = "igraph"),
     # Weave desired linkmap from multifactor
     out <- weave(mf, by) |> as.data.frame()
     # Add feature names
-    if( use.names ){
-        target <- colnames(out)[2L]
-        name_links <- linkNames(graph, target, out[[2L]], verbose = verbose)
-        out[paste0(target, ".name")] <- name_links[[2L]]
-    }
+    if( use.names ) out <- .add_names(graph, out, verbose)
     return(out)
 })
 
@@ -188,11 +176,13 @@ setMethod("weavePath", signature = c(graph = "igraph"),
 #' @importFrom stats na.omit reformulate
 .build_path_mf <- function(graph, by, k, include, exclude, res.name, init,
     prune, prune.last, verbose, timeout, ...){
-    # Check shared numeric args
-    if( !is.numeric(timeout) || length(timeout) != 1L || timeout <= 0 ){
-        stop("'timeout' must be a positive number", call. = FALSE)
+    # Check shared args
+    if( !inherits(by, "formula") || !all(lengths(as.list(by)) == 1L ) ){
+        stop("'by' must be a formula with one var per side.", call. = FALSE)
     }
-    # Check shared logical args
+    if( !is.numeric(timeout) || length(timeout) != 1L || timeout <= 0 ){
+        stop("'timeout' must be a positive number.", call. = FALSE)
+    }
     if( length(prune) != 1L || !is.logical(prune) || is.na(prune) ){
         stop("'prune' must be TRUE or FALSE.", call. = FALSE)
     }

@@ -35,10 +35,10 @@
 #' searchPath(graph, ko ~ ec, k = 5)
 #' 
 #' # Search first path including uniref90
-#' searchPath(graph, taxname ~ ko, include = "uniref90")
+#' searchPath(graph, taxid ~ ko, include = "uniref90")
 #' 
 #' # Search first 5 paths excluding uniref50 and uniref100
-#' searchPath(graph, taxname ~ ko, k = 5, exclude = "uniref50")
+#' searchPath(graph, taxid ~ ko, k = 5, exclude = "uniref50")
 #' 
 #' # Search path for a subset of resources
 #' searchPath(graph, uniref90 ~ eggnog, k = 3, res.name = "ChocoPhlAn")

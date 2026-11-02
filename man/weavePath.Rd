@@ -87,8 +87,8 @@ mapping step. (Default: \code{NULL})}
 \item{prune}{\code{Logical scalar}. Should the values from each step be used
 prune the following step. (Default: \code{TRUE})}
 
-\item{use.names}{\code{Logical scalar}. Should feature names be used in the
-output instead of feature identifiers. either (Default: \code{TRUE})}
+\item{use.names}{\code{Logical scalar}. Should feature names be provided in
+the output in addition to feature identifiers. (Default: \code{TRUE})}
 
 \item{verbose}{\code{Logical scalar}. Should messages be printed in the
 console. (Default: \code{TRUE})}
@@ -132,10 +132,13 @@ of several indispensable components.
 # Load resource graph
 graph <- ariadne()
 
-# Weave simple path from KEGG diseases to gut metabolic modules
+# Weave simple path from KEGG diseases to Gut Metabolic Modules (GMMs)
 dis2gmm <- weavePath(graph, kegg_disease ~ gmm)
 
-# Weave complex path from KEGG diseases to gut metabolic modules
+# Weave 3rd path from KEGG diseases to GMMs (through KEGG drugs)
+dis2gmm <- weavePath(graph, kegg_disease ~ gmm, k = 4)
+
+# Weave complex path from KEGG diseases to GMMs
 dis2gmm <- weaveComplex(graph, kegg_disease ~ gmm)
 
 # Specify coverage threshold
@@ -145,29 +148,18 @@ dis2gmm <- weaveComplex(graph, kegg_disease ~ gmm, threshold = 0.8)
 # Load example pathway dataframe
 data("pathMeta", package = "ariadne")
 
-# Weave pathway from chebi to gmm with three initial chebi ids
+# Weave pathway from chebi to GMMs with three initial chebi IDs
 chebi2gmm <- weavePath(pathMeta, init = c(15377, 30616, 4167))
 
 
-# Import mia package
-library(mia)
-
-# Import dataset
-data("Tengeler2020", package = "mia")
-tse <- Tengeler2020
-
-# Retrieve taxon names
-tax.labs <- getTaxonomyLabels(tse, make.unique = FALSE)
-tax.labs <- sub("^.+:", "", tax.labs)
+# Import butyrate dataset
+data("butyrate", package = "ariadne")
 
 # Weave path starting from initial values
-tax2bugsig <- weavePath(graph, taxname ~ bugsig, init = tax.labs)
+tax2bugsig <- weavePath(graph, taxid ~ bugsig, init = butyrate$taxid)
 
-# Weave 3-rd path
-tax2bugsig <- weavePath(graph, taxname ~ bugsig, init = tax.labs, k = 3)
-
-# Weave path including taxid
+# Weave path including TaxID
 tax2bugsig <- weavePath(
-    graph, taxname ~ bugsig, include = "taxid", init = tax.labs
+    graph, taxid ~ bugsig, include = "taxid", init = butyrate$taxid
 )
 }

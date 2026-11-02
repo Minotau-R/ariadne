@@ -66,8 +66,8 @@ plotPath(graph, res.name = c("KEGG", "WoL"))
 plotPath(graph, ko ~ ec, k = 5)
 
 # Plot first path including uniref90
-plotPath(graph, taxname ~ ko, include = "uniref90")
+plotPath(graph, taxid ~ ko, include = "uniref90")
 
 # Plot first 5 paths excluding uniref50 and uniref100
-plotPath(graph, taxname ~ ko, k = 5, exclude = "uniref50")
+plotPath(graph, taxid ~ ko, k = 5, exclude = "uniref50")
 }

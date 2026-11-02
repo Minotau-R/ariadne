@@ -1,5 +1,5 @@
 Package: ariadne
-Version: 0.2.9
+Version: 0.2.10
 Authors@R: 
     c(person(given = "Giulio", family = "Benedetti", role = c("aut", "cre"),
           email = "giulio.benedetti@utu.fi",
@@ -24,7 +24,7 @@ Description:
 biocViews:
     Software, DataImport, Metabolomics, Metagenomics, Microbiome, Annotation,
     Pathways, Visualization, Network, GraphAndNetwork
-License: Artistic-2.0
+License: Artistic-2.0 | file LICENSE
 Encoding: UTF-8
 Depends:
     R (>= 4.1),
@@ -36,8 +36,8 @@ Imports:
     BiocParallel,
     data.table,
     dplyr,
+    enviPathR,
     ggplot2,
-    grid,
     httr2,
     KEGGREST,
     Matrix,
@@ -70,6 +70,5 @@ BugReports: https://codeberg.org/Minotau-R/ariadne/issues
 Config/testthat/parallel: true
 Roxygen: list(markdown = TRUE)
 VignetteBuilder: knitr
-Config/roxygen2/version: 8.0.0
-RoxygenNote: 7.3.3
+Config/roxygen2/version: 8.1.1
 LazyData: true

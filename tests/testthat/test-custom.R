@@ -3,21 +3,21 @@ test_that("custom", {
     
     url <- "https://ftp.expasy.org/databases/rhea/tsv/rhea2ec.tsv"
     
-    expect_error(addResource(graph, url, select = c("RHEA_ID", "ID"),
-        col.names = c("x", "y")),
+    expect_error(
+        addResource(graph, x ~ y, url, select = c("RHEA_ID", "ID")),
         "At least one feature must be in 'graph'.", fixed = TRUE
     )
     
-    expect_error(addResource(graph, url, res.name = "Rhea",
-        select = c("RHEA_ID", "ID"), col.names = c("rhea", "ec")),
+    expect_error(addResource(graph, rhea ~ ec, url, res.name = "Rhea",
+        select = c("RHEA_ID", "ID")),
         "This link for Rhea already exists. Set 'force' to TRUE to overwrite it.",
         fixed = TRUE
     )
     
     edge_df <- graph |>
         addResource(
-            url, res.name = "Rhea", force = TRUE,
-            select = c("RHEA_ID", "ID"), col.names = c("rhea", "ec")
+            rhea ~ ec, url, res.name = "Rhea", force = TRUE,
+            select = c("RHEA_ID", "ID")
         ) |>
         igraph::as_data_frame(what = "edges")
     

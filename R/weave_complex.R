@@ -102,10 +102,7 @@ setMethod("weaveComplex", signature = c(graph = "igraph"),
     # Add colnames
     colnames(out) <- c(origin, target, "cov")
     # Add feature names
-    if( use.names ){
-        name_links <- linkNames(graph, target, out[[2L]], verbose = verbose)
-        out[paste0(target, ".name")] <- name_links[[2L]]
-    }
+    if( use.names ) out <- .add_names(graph, out, verbose)
     return(out)
 })
 

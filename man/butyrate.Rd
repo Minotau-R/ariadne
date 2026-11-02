@@ -5,13 +5,15 @@
 \title{Dataset of butyrate producers}
 \value{
 A linkmap with 16 butyrate-producing microbial features characterised at the
-genus or species level based on the NCBI taxonomy. Its format reflects the
-output of \code{\link{weavePath}} and contains the following variables:
+genus or species level based on the NCBI taxonomy. Its format represents a
+hypothetical output for \code{\link{weavePath}} with \code{by} set to
+\code{taxid ~ kegg_cpd}, containing the following variables:
 
 \itemize{
+\item taxid: NCBI taxon identifiers (genus or species)
 \item kegg_cpd: KEGG compound identifiers (butyrate)
-\item taxid: NCBI taxon identifiers
-\item taxid.name: Organism names associated with the taxon identifiers
+\item taxid.name: organism names associated with the taxon identifiers
+\item kegg_cpd.name: compound names associated with the KEGG identifiers
 }
 }
 \description{
