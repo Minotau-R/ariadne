@@ -132,6 +132,7 @@ setMethod("weaveComplex", signature = c(graph = "igraph"),
 
 
 #' @importFrom readr read_lines
+#' @importFrom stringr str_remove_all str_split fixed
 #' @importFrom multifactor multifactor weave
 .process_complex_modules <- function(
     x, br = "///", AND = ",", OR = "\t", output.format = "linkmap", ...){
@@ -146,20 +147,23 @@ setMethod("weaveComplex", signature = c(graph = "igraph"),
     # Extract values (all lines except first in each block)
     values <- lapply(line_content, `[`, -1L)
     # Replace tabs with spaces in keys, repeated for each value line
-    module <- gsub("\t.*", "", rep(keys, lengths(values, use.names = FALSE)))
+    module <- keys |>
+        rep(lengths(values, use.names = FALSE)) |>
+        str_remove_all("\t.*")
     # Create unique module_component identifiers
     module_component <- paste0(
         module, "_part_",
         unlist(lapply(rle(module)$lengths, seq), use.names = FALSE)
     )
     # Split feature list by tab character
-    feature_list <- strsplit(
-        unlist(values, recursive = TRUE, use.names = FALSE), "\t", fixed = TRUE
-    )
+    feature_list <- values |>
+        unlist(recursive = TRUE, use.names = FALSE) |>
+        str_split(fixed("\t"))
+    # Name feature list with corresponding module components
     names(feature_list) <- module_component
     # Flatten feature complex list and split by comma to get individual features
     feature_complex <- unlist(feature_list, use.names = FALSE)
-    feature <- strsplit(feature_complex, ",", fixed = TRUE)
+    feature <- str_split(feature_complex, fixed(","))
     # Create and return structured list of data frames
     out <- list(
         module2component = data.frame(module, component = module_component),

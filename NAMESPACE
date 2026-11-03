@@ -135,6 +135,7 @@ importFrom(stringr,
   regex,
   str_detect,
   str_remove,
+  str_remove_all,
   str_replace,
   str_split,
   str_subset
