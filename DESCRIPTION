@@ -56,6 +56,7 @@ Suggests:
     anansi,
     BiocStyle,
     curatedMetagenomicData,
+    DT,
     knitr,
     mia,
     miaViz,

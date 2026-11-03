@@ -103,6 +103,7 @@ library(ariadne)
 library(mia)
 library(miaViz)
 library(igraph)
+library(ggplot2)
 library(DT)
 ```
 
@@ -259,15 +260,16 @@ estimates feature coverage percentages and allows filtering based on
 user-defined thresholds.
 
 ```{r}
-# Find complex links between ko and kegg pathways
-ec2path <- weaveComplex(
+# Find complex links between KO and KEGG pathways via reactions
+ko2path <- weaveComplex(
     graph,
-    ec ~ kegg_path,
-    threshold = 0.5
+    ko ~ kegg_path,
+    threshold = 0.5,
+    include = "kegg_rxn"
 )
 
-# View some links
-datatable(ec2path)
+# View linkmap
+datatable(ko2path)
 ```
 
 The resulting mapping can be visualised with the `plotModules()` function.
@@ -295,17 +297,21 @@ The `drawPath()` function generates a corresponding path table for any valid
 traversal query.
 
 ```{r draw}
-# Draw path table from ko to ec
+# Draw path table from KO to EC
 path_df <- drawPath(graph, ko ~ ec, k = 1)
 
+# View path table
 datatable(path_df)
 ```
+
 The resulting path table can be directly supplied to `weavePath()` to reproduce
 the workflow.
 
 ```{r weave-drawn}
+# Reproduce simple workflow from path table
 ko2ec.simple <- weavePath(path_df)
 
+# View linkmap
 datatable(ko2ec.simple)
 ```
 
@@ -313,8 +319,10 @@ Similarly, path tables are compatible with `weaveComplex()` for coverage-based
 analyses.
 
 ```{r complex-drawn}
+# Reproduce complex workflow from path table
 ko2ec.complex <- weaveComplex(path_df)
 
+# View linkmap
 datatable(ko2ec.complex)
 ```
 

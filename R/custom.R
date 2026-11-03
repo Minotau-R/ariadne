@@ -20,6 +20,9 @@
 #' @param force \code{Logical scalar}. Whether \code{file} should overwrite any
 #'   previously cached files with the same name. (Default: \code{FALSE})
 #' 
+#' @param timeout \code{Numeric scalar}. The timeout for downloading resources.
+#'   (Default: \code{1e6})
+#' 
 #' @param ... Additional arguments passed to \code{\link[data.table:fread]{fread}}.
 #' 
 #' @returns An igraph object.
@@ -58,7 +61,8 @@ NULL
 #' @importFrom dplyr bind_rows
 #' @importFrom data.table fread
 setMethod("addResource", signature = c(graph = "igraph"),
-    function(graph, by, file, res.name = "Custom", force = FALSE, ...){
+    function(graph, by, file, res.name = "Custom", force = FALSE,
+    timeout = 1e6, ...){
     # Check args
     if( !inherits(by, "formula") || !all(lengths(as.list(by)) == 1L ) ){
         stop("'by' must be a formula with one var per side.", call. = FALSE)
@@ -72,6 +76,11 @@ setMethod("addResource", signature = c(graph = "igraph"),
     if( length(force) != 1L || !is.logical(force) || is.na(force) ){
         stop("'force' must be TRUE or FALSE.", call. = FALSE)
     }
+    if( !is.numeric(timeout) || length(timeout) != 1L || timeout <= 0 ){
+        stop("'timeout' must be a positive number.", call. = FALSE)
+    }
+    # Set timeout for downloads
+    options(timeout = timeout)
     # Break graph into edges and nodes
     graph_df <- as_data_frame(graph, what = "both")
     edge_df <- graph_df$edges

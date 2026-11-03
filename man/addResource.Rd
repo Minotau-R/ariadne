@@ -7,7 +7,15 @@
 \usage{
 addResource(graph, ...)
 
-\S4method{addResource}{igraph}(graph, by, file, res.name = "Custom", force = FALSE, ...)
+\S4method{addResource}{igraph}(
+  graph,
+  by,
+  file,
+  res.name = "Custom",
+  force = FALSE,
+  timeout = 1e+06,
+  ...
+)
 }
 \arguments{
 \item{graph}{An igraph object.}
@@ -26,6 +34,9 @@ appear in the output graph. (Default: \code{"Custom"})}
 
 \item{force}{\code{Logical scalar}. Whether \code{file} should overwrite any
 previously cached files with the same name. (Default: \code{FALSE})}
+
+\item{timeout}{\code{Numeric scalar}. The timeout for downloading resources.
+(Default: \code{1e6})}
 }
 \value{
 An igraph object.
