@@ -272,11 +272,11 @@ ko2path <- weaveComplex(
 datatable(ko2path)
 ```
 
-The resulting mapping can be visualised with the `plotModules()` function.
+The resulting mapping can be visualised with the `plotSets()` function.
 
 ```{r}
 # Visualise links
-plotModules(ko2path, layout = "sugiyama") + coord_flip()
+plotSets(ko2path, layout = "sugiyama") + coord_flip()
 ```
 
 ## Ensure reproducibility of the ariadne workflow
@@ -297,8 +297,12 @@ The `drawPath()` function generates a corresponding path table for any valid
 traversal query.
 
 ```{r draw}
-# Draw path table from KO to EC
-path_df <- drawPath(graph, ko ~ ec, k = 1)
+# Draw path table from KO to KEGG pathways
+path_df <- drawPath(
+    graph,
+    ko ~ kegg_path,
+    include = "kegg_rxn"
+)
 
 # View path table
 datatable(path_df)
