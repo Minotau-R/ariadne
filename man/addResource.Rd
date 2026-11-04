@@ -50,7 +50,7 @@ graph <- ariadne()
 
 # Set URL to custom resource
 url <- "https://ftp.ebi.ac.uk/pub/databases/amr_portal/releases/2025-12/"
-url <- paste0(url, "genotype.csv.gz")
+url <- paste0(url, "phenotype_genotype_merged.csv.gz")
 
 # Add resource to ariadne graph
 graph <- addResource(
@@ -64,7 +64,7 @@ graph <- addResource(
 # Search for newly added path
 searchPath(graph, taxid ~ aro)
 
-# Plot first 5 paths excluding uniref50 and uniref100
+# Plot newly added path
 plotPath(graph, taxid ~ aro, focus = TRUE)
 
 # Find antibiotics related to E. coli (NCBI 562)

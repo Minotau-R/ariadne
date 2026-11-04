@@ -190,24 +190,24 @@ graph <- ariadne(versions = versions)
 
 Custom resources (including local files) can be integrated into the `ariadne`
 graph via `addResource()`. For example, we can incorporate
-taxid-to-antimicrobial resistance mappings from the EMBL AMR Portal:
+gene-to-antimicrobial resistance mappings from the EMBL AMR Portal:
 
 ```{r}
 # Set URL to custom resource
 url <- "https://ftp.ebi.ac.uk/pub/databases/amr_portal/releases/2025-12/"
-url <- paste0(url, "genotype.csv.gz")
+url <- paste0(url, "phenotype_genotype_merged.csv.gz")
 
 # Add resource to ariadne graph
 graph <- addResource(
     graph,
-    taxid ~ aro,
+    genesym ~ aro,
     url,
     res.name = "AMR",
-    select = c("taxon_id", "antibiotic_ontology")
+    select = c("gene_symbol", "antibiotic_ontology")
 )
 
 # Search for newly added path
-searchPath(graph, taxid ~ aro)
+searchPath(graph, genesym ~ aro)
 ```
 
 ## Cross the graph to link biological entities
