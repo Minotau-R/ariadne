@@ -159,11 +159,11 @@ set.se <- agglomerateByModule(
 set.se
 ```
 
-Finally, per-sample module abundances are visualised using a heatmap.
+Finally, per-sample set abundances are visualised using a heatmap.
 
 ```{r}
-# Visualise per-sample module abundances
-plotHeatmap(mod.se, assay.type = "gene_families")
+# Visualise per-sample set abundances
+plotHeatmap(set.se, assay.type = "gene_families")
 ```
 
 # Taxonomic translation
@@ -430,7 +430,11 @@ unmatched entries typically require manual curation.
 
 ```{r}
 # Link metabolite names to KEGG compound ids
-name2cpd <- linkNames(graph, "kegg_cpd", names = rownames(mae[["metabolites"]]))
+name2cpd <- linkNames(
+    graph,
+    "kegg_cpd",
+    names = rownames(mae[["metabolites"]])
+)
 
 # View linkmap
 datatable(name2cpd)
@@ -461,17 +465,36 @@ Finally, we construct an anansi Web object and execute the association analysis.
 
 ```{r}
 # Create anansi web object
-web <- weaveWeb(mae, microbiota ~ metabolites, link = tax2cpd)
+web <- weaveWeb(
+    mae,
+    tableX = "microbiota",
+    tableY = "metabolites",
+    link = tax2cpd
+)
 
 # Perform association analysis
-out <- anansi(web)
+out <- anansi(
+    web = web,
+    formula = ~ Diet,
+    adjust.method = "BH"
+)
+
+# Sort results by p-value
+out <- out[order(out$full_p.values), ]
+
+# View results
+datatable(out)
 ```
 
 Resulting associations are visualised via a forest plot.
 
 ```{r}
 # Visualise associations
-plotAnansi(out)
+plotAnansi(
+    out,
+    association.type = "disjointed",
+    model.var = "Diet"
+)
 ```
 
 # Reproducibility
