@@ -448,7 +448,7 @@ tax2cpd <- weavePath(
     graph,
     ott.name ~ kegg_cpd,
     init = rev(name2tax),
-    res.name = c("WoL", "KEGG")
+    res.name = c("OTT", "WoL", "KEGG")
 )
 
 # Remove KEGG compound id column
