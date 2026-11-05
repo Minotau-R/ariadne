@@ -7,10 +7,14 @@ test_that("weave", {
     
     expect_error(
         drawPath(graph, bugsig ~ ko, 1, "uniref90", "uniref90"),
-        "'include' and 'exclude' cannot overlap."
+        "'include' and 'exclude' cannot overlap.", fixed = TRUE
     )
     
-    ko2gmm <- weavePath(graph, ko ~ gmm, use.names = TRUE)
+    expect_warning(
+        ko2gmm <- weavePath(graph, ko ~ gmm, use.names = TRUE),
+        "names for 4 ko ids not found.", fixed = TRUE
+    )
+    
     expect_equal(ncol(ko2gmm), 4L)
     
     ko2gmm <- weavePath(graph, ko ~ gmm, use.names = FALSE)

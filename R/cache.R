@@ -89,16 +89,10 @@
 
 
 #' @importFrom arrow write_parquet
-#' @importFrom BiocFileCache bfccache bfcadd
+#' @importFrom BiocFileCache bfcadd
 .add2cache <- function(x, rname, bfc){
     # Find path for cache subdir
-    fpath <- bfc |>
-        bfccache() |>
-        file.path(rname)
-    # Define resource subdir of cache dir
-    subdir <- dirname(fpath)
-    # Create subdir if absent
-    if( !dir.exists(subdir) ) dir.create(subdir, recursive = TRUE)
+    fpath <- .init_fpath(bfc, rname)
     # Store preprocessed data
     write_parquet(x, fpath)
     # Cache the preprocessed file using URL as resource name
@@ -108,7 +102,20 @@
 }
 
 
-# from to args?
+#' @importFrom BiocFileCache bfccache
+.init_fpath <- function(bfc, rname){
+    # Find path for cache subdir
+    fpath <- bfc |>
+        bfccache() |>
+        file.path(rname)
+    # Define resource subdir of cache dir
+    subdir <- dirname(fpath)
+    # Create subdir if absent
+    if( !dir.exists(subdir) ) dir.create(subdir, recursive = TRUE)
+    return(fpath)
+}
+
+
 #' @importFrom data.table fread
 #' @importFrom stringr str_remove fixed
 .process_one2one <- function(x, key.FUN = identity, val.FUN = identity, ...){

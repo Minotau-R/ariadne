@@ -3,8 +3,8 @@
 #' @rdname weavePath
 #' @importFrom stats reformulate
 setMethod("weaveComplex", signature = c(graph = "data.frame"),
-    function(graph, init = NULL, threshold = NULL, prune = TRUE,
-    use.names = TRUE, verbose = TRUE, timeout = 1e6, ...){
+    function(graph, init = NULL, threshold = 0, prune = TRUE, use.names = TRUE,
+    verbose = TRUE, timeout = 1e6, ...){
     # Derive formula from pathway dataframe
     by <- reformulate(graph$to[nrow(graph)], graph$from[1L])
     # Retrieve minimal graph for the pathway
@@ -25,12 +25,12 @@ setMethod("weaveComplex", signature = c(graph = "data.frame"),
 #' @importFrom Matrix summary
 setMethod("weaveComplex", signature = c(graph = "igraph"),
     function(graph, by, k = 1, include = NULL, exclude = NULL, res.name = NULL,
-    init = NULL, threshold = NULL, prune = TRUE, use.names = TRUE,
-    verbose = TRUE, timeout = 1e6, ...){
+    init = NULL, threshold = 0, prune = TRUE, use.names = TRUE, verbose = TRUE,
+    timeout = 1e6, ...){
     # Check threshold
-    if( !is.null(threshold) && (!is.numeric(threshold) ||
-        length(threshold) != 1L || threshold <= 0 || threshold > 1) ){
-        stop("'threshold' must be a number between 0 and 1.", call. = FALSE)
+    if( !is.numeric(threshold) || length(threshold) != 1L ||
+        threshold < 0 || threshold > 1 ){
+        stop("'threshold' must be a number from 0 to 1.", call. = FALSE)
     }
     # Extract formula vars
     by.vars <- all.vars(by)
@@ -92,7 +92,7 @@ setMethod("weaveComplex", signature = c(graph = "igraph"),
     # Convert to matrix object
     out <- summary(mat)
     # If defined, subset values above threshold
-    if( !is.null(threshold) ) out <- out[out$x >= threshold, ]
+    if( threshold != 0L ) out <- out[out$x >= threshold, ]
     # Convert to linkmap
     out <- data.frame(
         x = as.factor(colnames(mat)[out$j]),

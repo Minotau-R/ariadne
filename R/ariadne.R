@@ -69,7 +69,9 @@ ariadne <- function(versions = NULL){
     )
     # Fetch individual resource graphs
     graph_dfs <- bpmapply(
-        .fetch_graph, meta$key, urls, SIMPLIFY = FALSE, USE.NAMES = FALSE
+        .fetch_graph,
+        meta$graph, meta$source, meta$key, urls,
+        SIMPLIFY = FALSE, USE.NAMES = FALSE
     )
     # Name each graph by corresponding resource
     names(graph_dfs) <- meta$source
@@ -100,13 +102,42 @@ ariadne <- function(versions = NULL){
 
 
 #' @importFrom igraph read_graph as_data_frame
-.fetch_graph <- function(key, url){
-    # Fetch graph from ariadne.db
-    graph <- read_graph(url, format = "gml")
+.fetch_graph <- function(gver, res.name, key, url){
+    # Cache graph from ariadneDB
+    cached <- .cache_graph(url, gver, res.name)
+    # Read graph from cache
+    graph <- read_graph(cached, format = "gml")
+    # Retrieve nodes and edges tables
     graph_df <- as_data_frame(graph, what = "both")
     # Add version to edge and node urls
     graph_df <- .insert_version(graph_df, key)
     return(graph_df)
+}
+
+
+#' @importFrom httr2 request req_perform
+#' @importFrom BiocFileCache bfcquery bfcadd
+.cache_graph <- function(url, gver, res.name){
+    # Initialise cache
+    bfc <- .init_cache()
+    # Build resource name
+    rname <- file.path("ariadneDB", gver, res.name)
+    # Check if preprocessed file is cached
+    cached <- bfcquery(bfc, rname)$rpath
+    # Return preprocessed file if available
+    if( length(cached) > 0L ) return(cached[1])
+    # Find path for cache subdir
+    fpath <- .init_fpath(bfc, rname)
+    # Download resource graph
+    url |>
+        request() |>
+        req_perform(fpath)
+    # Cache the preprocessed file using URL as resource name
+    bfcadd(
+        bfc, rname = rname, fpath = fpath, fname = "exact", action = "asis"
+    )
+    # Return path to cached preprocessed file
+    cached <- bfcquery(bfc, rname)$rpath
 }
 
 

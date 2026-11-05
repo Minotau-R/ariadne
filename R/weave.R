@@ -40,8 +40,9 @@
 #'   the output in addition to feature identifiers. (Default: \code{TRUE})
 #' 
 #' @param threshold \code{Numeric scalar}. Only for \code{weaveComplex}. The
-#'   coverage threshold above which to include links, between 0 and 1. If
-#'   \code{NULL}, all non-zero links are returned. (Default: \code{NULL})
+#'   coverage threshold equal or above which to return links, between 0 and 1
+#'   (including the limit). If \code{0}, all links are returned.
+#'   (Default: \code{0})
 #' 
 #' @param verbose \code{Logical scalar}. Should messages be printed in the
 #'   console. (Default: \code{TRUE})

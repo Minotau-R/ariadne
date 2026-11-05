@@ -41,7 +41,7 @@ weaveComplex(graph, ...)
 \S4method{weaveComplex}{data.frame}(
   graph,
   init = NULL,
-  threshold = NULL,
+  threshold = 0,
   prune = TRUE,
   use.names = TRUE,
   verbose = TRUE,
@@ -57,7 +57,7 @@ weaveComplex(graph, ...)
   exclude = NULL,
   res.name = NULL,
   init = NULL,
-  threshold = NULL,
+  threshold = 0,
   prune = TRUE,
   use.names = TRUE,
   verbose = TRUE,
@@ -111,8 +111,9 @@ console. (Default: \code{TRUE})}
 the graph. (Default: \code{NULL})}
 
 \item{threshold}{\code{Numeric scalar}. Only for \code{weaveComplex}. The
-coverage threshold above which to include links, between 0 and 1. If
-\code{NULL}, all non-zero links are returned. (Default: \code{NULL})}
+coverage threshold equal or above which to return links, between 0 and 1
+(including the limit). If \code{0}, all links are returned.
+(Default: \code{0})}
 }
 \value{
 A two-column data.frame (x-to-y linkmap), with optional names as a third
