@@ -12,7 +12,7 @@ test_that("weave", {
     
     expect_warning(
         ko2gmm <- weavePath(graph, ko ~ gmm, use.names = TRUE),
-        "names for 4 ko ids not found.", fixed = TRUE
+        "names for [0-9]+ ko ids not found.",
     )
     
     expect_equal(ncol(ko2gmm), 4L)

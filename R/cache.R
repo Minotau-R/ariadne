@@ -116,7 +116,7 @@
 }
 
 
-#' @importFrom data.table fread
+#' @importFrom data.table fread `:=`
 #' @importFrom stringr str_remove fixed
 .process_one2one <- function(x, key.FUN = identity, val.FUN = identity, ...){
     # Read linkmap
@@ -129,15 +129,16 @@
     # Add temporary colnames
     colnames(linkmap) <- c("V1", "V2")
     # Process keys with custom function
-    linkmap$V1 <- key.FUN(linkmap$V1)
+    linkmap[ , V1 := key.FUN(V1)]
     # Process values with custom function
-    linkmap$V2 <- val.FUN(linkmap$V2)
+    linkmap[ , V2 := val.FUN(V2)]
     return(linkmap)
 }
 
 
 #' @importFrom readr read_lines
 #' @importFrom stringr str_split fixed
+#' @importFrom data.table data.table `:=`
 .process_one2many <- function(x, key.col = 1L, val.cols = -key.col,
     key.FUN = identity, val.FUN = identity, ...){
     # Read file content
@@ -151,25 +152,30 @@
     # Apply custom processing function to keys
     keys <- key.FUN(keys)
     # Create linkmap
-    linkmap <- data.frame(
+    linkmap <- data.table(
         x = rep(keys, lengths(values, use.names = FALSE)),
         y = unlist(values, recursive = TRUE, use.names = FALSE)
     )
     # Apply custom processing function to values
-    linkmap$y <- val.FUN(linkmap$y)
+    linkmap[ , y := val.FUN(y)]
     return(linkmap)
 }
 
 
+#' @importFrom httr2 request req_perform
 #' @importFrom BiocParallel bplapply
 #' @importFrom data.table rbindlist
-#' @importFrom utils download.file unzip
+#' @importFrom stringr str_subset
+#' @importFrom utils unzip
 .process_rdslist <- function(x){
     # Prepare temporary file and directory
     temp_file <- tempfile(fileext = ".zip")
     temp_dir <- tempfile("dir")
     # Download file archive from Zenodo resource
-    download.file(x, temp_file)
+    x |>
+        request() |>
+        req_perform(temp_file)
+    # Unzip Zenodo record
     unzip(temp_file, exdir = temp_dir)
     # List files from zipped file
     files <- list.files(temp_dir, full.names = TRUE)
@@ -178,8 +184,9 @@
         unzip(files, exdir = temp_dir)
     }
     # List relevant unzipped files
-    files <- list.files(temp_dir, full.names = TRUE)
-    files <- grepv("zip|summary", files, invert = TRUE)
+    files <- temp_dir |>
+        list.files(full.names = TRUE) |>
+        str_subset("zip|summary", negate = TRUE)
     # Import and bind linkmaps
     linkmaps <- bplapply(files, readRDS)
     linkmap <- rbindlist(linkmaps)
