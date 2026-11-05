@@ -27,7 +27,7 @@
                     val.FUN = ifelse(is_uniref,
                         function(vals) paste0("UniRef90_", vals), identity))
             }else{
-                .process_one2many(x, n_max = 1000000,
+                .process_one2many(x,
                     key.FUN = switch(from,
                         wol = function(keys) str_remove(keys, "_.*"),
                         uniref90 = function(keys) paste0("UniRef90_", keys),
