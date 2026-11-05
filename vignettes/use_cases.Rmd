@@ -132,11 +132,11 @@ graph.
 
 ```{r}
 # Import past release of the resource graph
-graph <- ariadne(versions = list(WoL = "v20April2021"))
+graph.old <- ariadne(versions = list(WoL = "v20April2021"))
 
 # Weave path through WoL
 uniref2gmm <- weaveComplex(
-    graph,
+    graph.old,
     uniref90 ~ gmm,
     init = rownames(genes),
     res.name = c("WoL", "GM")
