@@ -457,6 +457,11 @@ tax2cpd$kegg_cpd <- NULL
 # Rename linkmap variables
 names(tax2cpd) <- c("microbiota", "metabolites")
 
+# Fix this behaviour in anansi
+tax2cpd <- tax2cpd[tax2cpd$microbiota %in% rownames(mae[["microbiota"]]), ]
+tax2cpd <- tax2cpd[tax2cpd$metabolites %in% rownames(mae[["metabolites"]]), ]
+tax2cpd[] <- lapply(tax2cpd, factor)
+
 # View linkmap
 datatable(tax2cpd)
 ```
@@ -489,12 +494,13 @@ datatable(out)
 Resulting associations are visualised via a forest plot.
 
 ```{r}
+# Fix this behaviour in anansi
 # Visualise associations
-plotAnansi(
-    out,
-    association.type = "disjointed",
-    model.var = "Diet"
-)
+# plotAnansi(
+#     out,
+#     association.type = "disjointed",
+#     model.var = "Diet"
+# )
 ```
 
 # Reproducibility
