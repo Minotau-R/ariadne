@@ -90,19 +90,19 @@ NULL
 #' @export
 #' @rdname processGeneFamilies
 #' @importFrom SummarizedExperiment rowData rowData<-
-#' @importFrom stringr fixed str_detect str_split
+#' @importFrom stringi stri_detect_fixed stri_split_fixed
 processGeneFamilies <- function(x){
     # Select rows with non-null taxa
-    x <- x[str_detect(rownames(x), fixed("|")), ]
-    x <- x[str_detect(rownames(x), "unclassified", negate = TRUE), ]
+    x <- x[stri_detect_fixed(rownames(x), "|"), ]
+    x <- x[stri_detect_fixed(rownames(x), "unclassified", negate = TRUE), ]
     # Split gene and taxonomy
     gene.linkmap <- as.data.frame(
-        str_split(rownames(x), fixed("|"), n = 2, simplify = TRUE)
+        stri_split_fixed(rownames(x), "|", n = 2, simplify = TRUE)
     )
     names(gene.linkmap) <- c("uniref90", "taxname")
     # Split genus and species
     tax.linkmap <- as.data.frame(
-        str_split(gene.linkmap$taxname, fixed("."), n = 2, simplify = TRUE),
+        stri_split_fixed(gene.linkmap$taxname, ".", n = 2, simplify = TRUE),
     )
     names(tax.linkmap) <- c("genus", "species")
     # Bind gene and tax linkmaps

@@ -77,7 +77,7 @@ setMethod("linkNames", signature = c(graph = "igraph"),
     return(name_links)
 })
 
-#' @importFrom stringr str_split str_remove fixed
+#' @importFrom stringi stri_replace_first_fixed stri_replace_all_regex stri_detect_fixed
 #' @importFrom KEGGREST listDatabases keggList
 #' @importFrom arrow read_parquet open_dataset
 #' @importFrom dplyr select filter collect
@@ -101,7 +101,11 @@ setMethod("linkNames", signature = c(graph = "igraph"),
     if( !is.na(g$url) ){
         # Build name colname
         name_col <-  paste0(g$spec, "_name")
-        if( g$name == "msig" ) name_col <- str_remove(name_col, fixed("_id"))
+        # If feature is msig
+        if( g$name == "msig" ){
+            # Remove id suffix
+            name_col <- stri_replace_first_fixed(name_col, "_id", "")
+        }
         # Get file path to cached resource
         cached <- .cache_resource(g$url, g$source, g$spec, name_col)
         # If initial values are given
@@ -126,12 +130,13 @@ setMethod("linkNames", signature = c(graph = "igraph"),
         name_vec <- keggList(init)
         # Keep only first name (and last for ko)
         to_remove <- ifelse(g$KEGG == "ko", ".*;", ";.*")
-        name_vec <- str_remove(name_vec, to_remove)
         # Convert to linkmap
         name_links <- data.frame(
-            x = names(name_vec), y = name_vec, row.names = NULL
+            x = names(name_vec),
+            y = stri_replace_first_regex(name_vec, to_remove, ""),
+            row.names = NULL
         )
-    }else if( str_detect(g$name, fixed("envipath")) ){
+    }else if( stri_detect_fixed(g$name, "envipath") ){
         # List available objects
         name_links <- epList(g$enviPath)
         # Select columns of interest

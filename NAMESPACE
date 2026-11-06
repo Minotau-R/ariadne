@@ -132,15 +132,17 @@ importFrom(stats,
   reformulate,
   setNames
 )
-importFrom(stringr,
-  fixed,
-  regex,
-  str_detect,
-  str_remove,
-  str_remove_all,
-  str_replace,
-  str_split,
-  str_subset
+importFrom(stringi,
+  stri_c,
+  stri_detect_fixed,
+  stri_detect_regex,
+  stri_opts_regex,
+  stri_replace_all_regex,
+  stri_replace_first_fixed,
+  stri_replace_first_regex,
+  stri_split_fixed,
+  stri_subset,
+  stri_subset_fixed
 )
 importFrom(tidyselect,all_of)
 importFrom(tools,R_user_dir)

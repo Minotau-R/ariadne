@@ -333,6 +333,7 @@ setMethod("weavePath", signature = c(graph = "igraph"),
 }
 
 
+#' @importFrom stringi stri_c
 .add_iri <- function(x, repo, from){
     if( from %in% c("ecocyc", "metacyc") ){
         prefix <- ifelse(
@@ -340,21 +341,23 @@ setMethod("weavePath", signature = c(graph = "igraph"),
             switch(from, metacyc = "MetaCyc", ecocyc = "EcoCyc"),
             toupper(from)
         )
-        x <- paste0(prefix, ":", x)
+        x <- stri_c(prefix, ":", x)
     }else if( from %in% c("chebi", "go") ){
-        x <- paste0(toupper(from), "_", x)
+        x <- stri_c(toupper(from), "_", x)
     }
     return(x)
 }
 
-#' @importFrom stringr str_remove str_detect regex
+#' @importFrom stringi stri_replace_first_regex stri_detect_regex stri_opts_regex
 .strip_iri <- function(x, name){
     
-    y <- str_remove(x, "http.+/")
+    y <- stri_replace_first_regex(x, "http.+/", "")
     
-    if( !str_detect(name, "^genes$|^uniref") ){
-        y <- str_remove(y, regex(paste0("^", name, "[:_]"), ignore_case = TRUE))
+    if( !stri_detect_regex(name, "^genes$|^uniref") ){
+        opts_regex <- stri_opts_regex(case_insensitive = TRUE)
+        y <- stri_replace_first_regex(
+            y, paste0("^", name, "[:_]"), "", opts_regex = opts_regex
+        )
     }
-    
     return(y)
 }

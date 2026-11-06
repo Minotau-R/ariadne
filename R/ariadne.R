@@ -141,12 +141,14 @@ ariadne <- function(versions = NULL){
 }
 
 
-#' @importFrom stringr str_replace fixed
+#' @importFrom stringi stri_replace_first_fixed
 .insert_version <- function(graph_df, key){
     # For both edges and nodes data
     graph_df <- lapply(graph_df, function(x){
         # Replace version placeholders with actual versions
-        if(!is.null(x$url)) x$url <- str_replace(x$url, fixed("{version}"), key)
+        if( !is.null(x$url) ){
+            x$url <- stri_replace_first_fixed(x$url, "{version}", key)
+        }
         return(x)
     })
     return(graph_df)
