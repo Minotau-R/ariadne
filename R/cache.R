@@ -16,7 +16,8 @@
         res.name,
         ChocoPhlAn = function(x) .process_one2many(x,
             key.FUN = ifelse(from == "go",
-                function(keys) stri_replace_first_fixed(keys, "GO:", ""))
+                function(keys) stri_replace_first_fixed(keys, "GO:", ""),
+                identity)
         ),
         WoL = function(x){
             if( from == "wol" && to != "protein" ){
