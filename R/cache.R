@@ -1,7 +1,7 @@
 
 #' @importFrom BiocFileCache bfcquery
 #' @importFrom arrow write_parquet
-#' @importFrom stringr str_remove fixed
+#' @importFrom stringi stri_c stri_replace_first_fixed stri_replace_first_regex
 .cache_resource <- function(url, res.name, from, to){
     # Initialise cache
     bfc <- .init_cache()
@@ -14,8 +14,9 @@
     # Select function based on resource
     FUN <- switch(
         res.name,
-        ChocoPhlAn = function(x) .process_one2many(
-            x, key.FUN = function(keys) str_remove(keys, fixed("GO:"))
+        ChocoPhlAn = function(x) .process_one2many(x,
+            key.FUN = ifelse(from == "go",
+                function(keys) stri_replace_first_fixed(keys, "GO:", ""))
         ),
         WoL = function(x){
             if( from == "wol" && to != "protein" ){
@@ -23,17 +24,18 @@
                 is_uniref <- to == "uniref90"
                 
                 .process_one2one(x, select = c(1L, 2L), header = !is_uniref,
-                    key.FUN = function(keys) str_remove(keys, "_.*"),
+                    key.FUN = function(keys) stri_replace_first_regex(keys, "_.*", ""),
                     val.FUN = ifelse(is_uniref,
-                        function(vals) paste0("UniRef90_", vals), identity))
+                        function(vals) stri_c("UniRef90_", vals), identity))
             }else{
                 .process_one2many(x,
                     key.FUN = switch(from,
-                        wol = function(keys) str_remove(keys, "_.*"),
-                        uniref90 = function(keys) paste0("UniRef90_", keys),
+                        wol = function(keys) stri_replace_first_regex(keys, "_.*", ""),
+                        uniref90 = function(keys) stri_c("UniRef90_", keys),
                         identity),
                     val.FUN = ifelse(to == "ec",
-                        function(vals) str_remove(vals, fixed("EC-")), identity))
+                        function(vals) stri_replace_first_fixed(vals, "EC-", ""),
+                        identity))
             }
         },
         BugSigDB = function(x){
@@ -44,20 +46,23 @@
                key.FUN = function(keys){
                    # Remove module prefix and description
                    keys <- keys |>
-                       str_remove(fixed("bsdb:")) |>
-                       str_remove("_.*$")},
+                       stri_replace_first_fixed("bsdb:", "") |>
+                       stri_replace_first_regex("_.*$", "")},
                val.FUN = ifelse(is_name,
-                   function(vals) str_remove(vals, "^.+:"), identity))
+                   function(vals) stri_replace_first_regex(vals, "^.+:", ""),
+                   identity))
         },
         TIGRFAMs = function(x) .process_one2one(
             x, header = FALSE, select = c(1L, 2L),
-            val.FUN = function(vals) str_remove(vals, fixed("GO:"))
+            val.FUN = ifelse(from == "GO",
+                function(vals) stri_replace_first_fixed(vals, "GO:", ""),
+                identity)
         ),
         GO = function(x) .process_one2one(
             x, header = FALSE, key.FUN = function(keys){
                 keys <- keys |>
-                    str_remove(" >.*") |>
-                    str_remove("^[^:]*:")
+                    stri_replace_first_regex(" >.*", "") |>
+                    stri_replace_firxt_regex("^[^:]*:", "")
             }
         ),
         GM = ifelse(to == "ko", .process_complex_modules,
@@ -117,7 +122,6 @@
 
 
 #' @importFrom data.table fread `:=`
-#' @importFrom stringr str_remove fixed
 .process_one2one <- function(x, key.FUN = identity, val.FUN = identity, ...){
     # Read linkmap
     linkmap <- fread(x, ...)
@@ -127,24 +131,26 @@
             "not equal to two.", call. = FALSE)
     }
     # Add temporary colnames
-    colnames(linkmap) <- c("V1", "V2")
+    colnames(linkmap) <- c("x", "y")
     # Process keys with custom function
-    linkmap[ , V1 := key.FUN(V1)]
+    linkmap[ , x := key.FUN(x)]
     # Process values with custom function
-    linkmap[ , V2 := val.FUN(V2)]
+    linkmap[ , y := val.FUN(y)]
     return(linkmap)
 }
 
 
 #' @importFrom readr read_lines
-#' @importFrom stringr str_split fixed
+#' @importFrom stringi stri_split_fixed
 #' @importFrom data.table data.table `:=`
 .process_one2many <- function(x, key.col = 1L, val.cols = -key.col,
     key.FUN = identity, val.FUN = identity, ...){
-    # Read file content
-    x <- read_lines(x, ...)
-    # Split elements in each line by tab
-    line_content <- str_split(x, fixed("\t"))
+    # Preprocess file
+    line_content <- x |>
+        # Read file content
+        read_lines(...) |>
+        # Split elements in each line by tab
+        stri_split_fixed("\t")
     # Extract keys
     keys <- vapply(line_content, `[`, key.col, FUN.VALUE = character(1L))
     # Extract values
@@ -165,7 +171,7 @@
 #' @importFrom httr2 request req_perform
 #' @importFrom BiocParallel bplapply
 #' @importFrom data.table rbindlist
-#' @importFrom stringr str_subset
+#' @importFrom stringi stri_subset
 #' @importFrom utils unzip
 .process_rdslist <- function(x){
     # Prepare temporary file and directory
@@ -186,7 +192,7 @@
     # List relevant unzipped files
     files <- temp_dir |>
         list.files(full.names = TRUE) |>
-        str_subset("zip|summary", negate = TRUE)
+        stri_subset("zip|summary", negate = TRUE)
     # Import and bind linkmaps
     linkmaps <- bplapply(files, readRDS)
     linkmap <- rbindlist(linkmaps)

@@ -1,6 +1,6 @@
 
 #' @importFrom stats na.omit
-#' @importFrom stringr str_remove
+#' @importFrom stringi stri_replace_first_regex
 #' @importFrom BiocParallel bplapply
 .queryOTT <- function(from, to, init, timeout, flip = FALSE, ...){
     # Unfactorise init
@@ -45,14 +45,14 @@
     # Omit rows with missing values
     linkmap <- na.omit(linkmap)
     # Strip source prefix
-    linkmap$y <- str_remove(linkmap$y, "^.+:")
+    linkmap$y <- stri_replace_first_regex(linkmap$y, "^.+:", "")
     # Revert columns if flipped
     if( flip ) linkmap <- rev(linkmap)
     return(linkmap)
 }
 
 
-#' @importFrom stringr str_subset fixed
+#' @importFrom stringi stri_subset_fixed
 #' @importFrom httr2 request req_method req_body_json req_perform resp_body_json
 .queryTaxonInfo <- function(x, to, prefix, timeout){
     
@@ -80,7 +80,7 @@
         y <- resp$unique_name
     }else{
         tax_sources <- unlist(resp$tax_sources)
-        y <- str_subset(tax_sources, fixed(to))
+        y <- stri_subset_fixed(tax_sources, to)
     }
     return(y)
 }
@@ -100,7 +100,7 @@
 
 
 #' @importFrom rotl tnrs_match_names tax_sources
-#' @importFrom stringr str_subset fixed
+#' @importFrom stringi stri_subset_fixed
 .subqueryTNRS <- function(x, to){
     # Match input names
     res <- tnrs_match_names(x)
@@ -110,7 +110,7 @@
         y <- res$ott_id
     }else{
         # Find ids for each input
-        y <- lapply(tax_sources(res), str_subset, pattern = fixed(to))
+        y <- lapply(tax_sources(res), stri_subset_fixed, pattern = to)
         # Match ids to input names
         y <- y[res$unique_name]
     }
