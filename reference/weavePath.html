@@ -23,7 +23,7 @@ of several indispensable components."><!-- mathjax --><script src="https://cdnjs
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ariadne</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.8</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.12</span>
       </span>
     </div>
 
@@ -41,24 +41,21 @@ of several indispensable components."><!-- mathjax --><script src="https://cdnjs
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
-      <a href="../articles/comparison.html">Predicting functional modules: gene families vs taxa</a>
+      <a href="../articles/app.html">ariadneApp: interactively explore the ariadne resource graph</a>
     </li>
     <li>
-      <a href="../articles/database.html">A quick intro to the ariadne database</a>
+      <a href="../articles/methods.html">ariadne definitions and technical details</a>
     </li>
     <li>
-      <a href="../articles/gsea.html">Gene-Set Enrichment Analysis</a>
+      <a href="../articles/resources.html">ariadneDB: a harmonised graph of biological databases and relations</a>
     </li>
     <li>
-      <a href="../articles/msea.html">Microbe-Set Enrichment Analysis</a>
-    </li>
-    <li>
-      <a href="../articles/pathway.html">Metabolic Pathway Enrichment Analysis</a>
+      <a href="../articles/use_cases.html">ariadne in action: common use cases in omics research</a>
     </li>
   </ul></li>
       </ul><ul class="nav navbar-nav navbar-right"><li>
-  <a href="https://github.com/Minotau-R/ariadne/" class="external-link">
-    <span class="fab fa-github fa-lg"></span>
+  <a href="https://codeberg.org/Minotau-R/ariadne/" class="external-link">
+    <span class="fas fa-code fa-lg"></span>
 
   </a>
 </li>
@@ -72,7 +69,7 @@ of several indispensable components."><!-- mathjax --><script src="https://cdnjs
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Weave paths between resources</h1>
-    <small class="dont-index">Source: <a href="https://github.com/Minotau-R/ariadne/blob/devel/R/AllGenerics.R" class="external-link"><code>R/AllGenerics.R</code></a>, <a href="https://github.com/Minotau-R/ariadne/blob/devel/R/weave.R" class="external-link"><code>R/weave.R</code></a>, <a href="https://github.com/Minotau-R/ariadne/blob/devel/R/weave_complex.R" class="external-link"><code>R/weave_complex.R</code></a></small>
+    <small class="dont-index">Source: <a href="https://codeberg.org/Minotau-R/ariadne/src/branch/devel/R/AllGenerics.R" class="external-link"><code>R/AllGenerics.R</code></a>, <a href="https://codeberg.org/Minotau-R/ariadne/src/branch/devel/R/weave.R" class="external-link"><code>R/weave.R</code></a>, <a href="https://codeberg.org/Minotau-R/ariadne/src/branch/devel/R/weave_complex.R" class="external-link"><code>R/weave_complex.R</code></a></small>
     <div class="hidden name"><code>weavePath.Rd</code></div>
     </div>
 
@@ -122,7 +119,7 @@ of several indispensable components.</p>
 <span><span class="fu">weaveComplex</span><span class="op">(</span></span>
 <span>  <span class="va">graph</span>,</span>
 <span>  init <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  threshold <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  threshold <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  prune <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  use.names <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -139,7 +136,7 @@ of several indispensable components.</p>
 <span>  exclude <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  res.name <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  init <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  threshold <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  threshold <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  prune <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  use.names <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -178,8 +175,8 @@ prune the following step. (Default: <code>TRUE</code>)</p></dd>
 
 
 <dt id="arg-use-names">use.names<a class="anchor" aria-label="anchor" href="#arg-use-names"></a></dt>
-<dd><p><code>Logical scalar</code>. Should feature names be used in the
-output instead of feature identifiers. either (Default: <code>TRUE</code>)</p></dd>
+<dd><p><code>Logical scalar</code>. Should feature names be provided in
+the output in addition to feature identifiers. (Default: <code>TRUE</code>)</p></dd>
 
 
 <dt id="arg-verbose">verbose<a class="anchor" aria-label="anchor" href="#arg-verbose"></a></dt>
@@ -218,8 +215,9 @@ the graph. (Default: <code>NULL</code>)</p></dd>
 
 <dt id="arg-threshold">threshold<a class="anchor" aria-label="anchor" href="#arg-threshold"></a></dt>
 <dd><p><code>Numeric scalar</code>. Only for <code>weaveComplex</code>. The
-coverage threshold above which to include links, between 0 and 1. If
-<code>NULL</code>, all non-zero links are returned. (Default: <code>NULL</code>)</p></dd>
+coverage threshold equal or above which to return links, between 0 and 1
+(including the limit). If <code>0</code>, all links are returned.
+(Default: <code>0</code>)</p></dd>
 
 </dl></div>
     <div id="value">
@@ -233,12 +231,18 @@ column.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Load resource graph</span></span></span>
 <span class="r-in"><span><span class="va">graph</span> <span class="op">&lt;-</span> <span class="fu"><a href="ariadne.html">ariadne</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Weave simple path from KEGG diseases to gut metabolic modules</span></span></span>
+<span class="r-in"><span><span class="co"># Weave simple path from KEGG diseases to Gut Metabolic Modules (GMMs)</span></span></span>
 <span class="r-in"><span><span class="va">dis2gmm</span> <span class="op">&lt;-</span> <span class="fu">weavePath</span><span class="op">(</span><span class="va">graph</span>, <span class="va">kegg_disease</span> <span class="op">~</span> <span class="va">gmm</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> kegg_disease -(KEGG)-&gt; ko</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> ko -(GM)-&gt; gmm</span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Weave complex path from KEGG diseases to gut metabolic modules</span></span></span>
+<span class="r-in"><span><span class="co"># Weave 3rd path from KEGG diseases to GMMs (through KEGG drugs)</span></span></span>
+<span class="r-in"><span><span class="va">dis2gmm</span> <span class="op">&lt;-</span> <span class="fu">weavePath</span><span class="op">(</span><span class="va">graph</span>, <span class="va">kegg_disease</span> <span class="op">~</span> <span class="va">gmm</span>, k <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> kegg_disease -(KEGG)-&gt; kegg_drug</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> kegg_drug -(KEGG)-&gt; ko</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ko -(GM)-&gt; gmm</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Weave complex path from KEGG diseases to GMMs</span></span></span>
 <span class="r-in"><span><span class="va">dis2gmm</span> <span class="op">&lt;-</span> <span class="fu">weaveComplex</span><span class="op">(</span><span class="va">graph</span>, <span class="va">kegg_disease</span> <span class="op">~</span> <span class="va">gmm</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> kegg_disease -(KEGG)-&gt; ko</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> ko -(GM)-&gt; gmm</span>
@@ -252,7 +256,7 @@ column.</p>
 <span class="r-in"><span><span class="co"># Load example pathway dataframe</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"pathMeta"</span>, package <span class="op">=</span> <span class="st">"ariadne"</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Weave pathway from chebi to gmm with three initial chebi ids</span></span></span>
+<span class="r-in"><span><span class="co"># Weave pathway from chebi to GMMs with three initial chebi IDs</span></span></span>
 <span class="r-in"><span><span class="va">chebi2gmm</span> <span class="op">&lt;-</span> <span class="fu">weavePath</span><span class="op">(</span><span class="va">pathMeta</span>, init <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">15377</span>, <span class="fl">30616</span>, <span class="fl">4167</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> chebi -(Rhea)-&gt; rhea</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> rhea -(Rhea)-&gt; ec</span>
@@ -260,35 +264,18 @@ column.</p>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> ko -(GM)-&gt; gmm</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Import mia package</span></span></span>
-<span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://microbiome.github.io/mia/" class="external-link">mia</a></span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Import dataset</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"Tengeler2020"</span>, package <span class="op">=</span> <span class="st">"mia"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">tse</span> <span class="op">&lt;-</span> <span class="va">Tengeler2020</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Retrieve taxon names</span></span></span>
-<span class="r-in"><span><span class="va">tax.labs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://microbiome.github.io/mia/reference/taxonomy-methods.html" class="external-link">getTaxonomyLabels</a></span><span class="op">(</span><span class="va">tse</span>, make.unique <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">tax.labs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">sub</a></span><span class="op">(</span><span class="st">"^.+:"</span>, <span class="st">""</span>, <span class="va">tax.labs</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># Import butyrate dataset</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"butyrate"</span>, package <span class="op">=</span> <span class="st">"ariadne"</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Weave path starting from initial values</span></span></span>
-<span class="r-in"><span><span class="va">tax2bugsig</span> <span class="op">&lt;-</span> <span class="fu">weavePath</span><span class="op">(</span><span class="va">graph</span>, <span class="va">taxname</span> <span class="op">~</span> <span class="va">bugsig</span>, init <span class="op">=</span> <span class="va">tax.labs</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> taxname -(BugSigDB)-&gt; bugsig</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>names for 1103 bugsig ids not found.</span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Weave 3-rd path</span></span></span>
-<span class="r-in"><span><span class="va">tax2bugsig</span> <span class="op">&lt;-</span> <span class="fu">weavePath</span><span class="op">(</span><span class="va">graph</span>, <span class="va">taxname</span> <span class="op">~</span> <span class="va">bugsig</span>, init <span class="op">=</span> <span class="va">tax.labs</span>, k <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> taxname -(OTT)-&gt; taxid</span>
+<span class="r-in"><span><span class="va">tax2bugsig</span> <span class="op">&lt;-</span> <span class="fu">weavePath</span><span class="op">(</span><span class="va">graph</span>, <span class="va">taxid</span> <span class="op">~</span> <span class="va">bugsig</span>, init <span class="op">=</span> <span class="va">butyrate</span><span class="op">$</span><span class="va">taxid</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> taxid -(BugSigDB)-&gt; bugsig</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>names for 1390 bugsig ids not found.</span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Weave path including taxid</span></span></span>
+<span class="r-in"><span><span class="co"># Weave path including TaxID</span></span></span>
 <span class="r-in"><span><span class="va">tax2bugsig</span> <span class="op">&lt;-</span> <span class="fu">weavePath</span><span class="op">(</span></span></span>
-<span class="r-in"><span>    <span class="va">graph</span>, <span class="va">taxname</span> <span class="op">~</span> <span class="va">bugsig</span>, include <span class="op">=</span> <span class="st">"taxid"</span>, init <span class="op">=</span> <span class="va">tax.labs</span></span></span>
+<span class="r-in"><span>    <span class="va">graph</span>, <span class="va">taxid</span> <span class="op">~</span> <span class="va">bugsig</span>, include <span class="op">=</span> <span class="st">"taxid"</span>, init <span class="op">=</span> <span class="va">butyrate</span><span class="op">$</span><span class="va">taxid</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> taxname -(UniProt)-&gt; taxid</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> taxid -(BugSigDB)-&gt; bugsig</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>names for 1103 bugsig ids not found.</span>
 </code></pre></div>
     </div>
   </div>

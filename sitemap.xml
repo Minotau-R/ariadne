@@ -1,16 +1,16 @@
 <urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
 <url><loc>/404.html</loc></url>
+<url><loc>/LICENSE-text.html</loc></url>
+<url><loc>/articles/app.html</loc></url>
 <url><loc>/articles/ariadne.html</loc></url>
-<url><loc>/articles/comparison.html</loc></url>
-<url><loc>/articles/database.html</loc></url>
-<url><loc>/articles/gsea.html</loc></url>
 <url><loc>/articles/index.html</loc></url>
-<url><loc>/articles/msea.html</loc></url>
-<url><loc>/articles/pathway.html</loc></url>
+<url><loc>/articles/methods.html</loc></url>
+<url><loc>/articles/resources.html</loc></url>
+<url><loc>/articles/use_cases.html</loc></url>
 <url><loc>/authors.html</loc></url>
 <url><loc>/index.html</loc></url>
-<url><loc>/reference/addModules.html</loc></url>
 <url><loc>/reference/addResource.html</loc></url>
+<url><loc>/reference/addSets.html</loc></url>
 <url><loc>/reference/ariadne.html</loc></url>
 <url><loc>/reference/butyrate.html</loc></url>
 <url><loc>/reference/drawPath.html</loc></url>
@@ -18,8 +18,8 @@
 <url><loc>/reference/linkNames.html</loc></url>
 <url><loc>/reference/listResourceVersions.html</loc></url>
 <url><loc>/reference/pathMeta.html</loc></url>
-<url><loc>/reference/plotModules.html</loc></url>
 <url><loc>/reference/plotPath.html</loc></url>
+<url><loc>/reference/plotSets.html</loc></url>
 <url><loc>/reference/processGeneFamilies.html</loc></url>
 <url><loc>/reference/searchPath.html</loc></url>
 <url><loc>/reference/weavePath.html</loc></url>

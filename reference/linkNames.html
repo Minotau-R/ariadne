@@ -19,7 +19,7 @@ passed to weavePath and weaveComplex."><!-- mathjax --><script src="https://cdnj
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ariadne</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.8</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.12</span>
       </span>
     </div>
 
@@ -37,24 +37,21 @@ passed to weavePath and weaveComplex."><!-- mathjax --><script src="https://cdnj
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
-      <a href="../articles/comparison.html">Predicting functional modules: gene families vs taxa</a>
+      <a href="../articles/app.html">ariadneApp: interactively explore the ariadne resource graph</a>
     </li>
     <li>
-      <a href="../articles/database.html">A quick intro to the ariadne database</a>
+      <a href="../articles/methods.html">ariadne definitions and technical details</a>
     </li>
     <li>
-      <a href="../articles/gsea.html">Gene-Set Enrichment Analysis</a>
+      <a href="../articles/resources.html">ariadneDB: a harmonised graph of biological databases and relations</a>
     </li>
     <li>
-      <a href="../articles/msea.html">Microbe-Set Enrichment Analysis</a>
-    </li>
-    <li>
-      <a href="../articles/pathway.html">Metabolic Pathway Enrichment Analysis</a>
+      <a href="../articles/use_cases.html">ariadne in action: common use cases in omics research</a>
     </li>
   </ul></li>
       </ul><ul class="nav navbar-nav navbar-right"><li>
-  <a href="https://github.com/Minotau-R/ariadne/" class="external-link">
-    <span class="fab fa-github fa-lg"></span>
+  <a href="https://codeberg.org/Minotau-R/ariadne/" class="external-link">
+    <span class="fas fa-code fa-lg"></span>
 
   </a>
 </li>
@@ -68,7 +65,7 @@ passed to weavePath and weaveComplex."><!-- mathjax --><script src="https://cdnj
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Link ids to names and vice versa</h1>
-    <small class="dont-index">Source: <a href="https://github.com/Minotau-R/ariadne/blob/devel/R/AllGenerics.R" class="external-link"><code>R/AllGenerics.R</code></a>, <a href="https://github.com/Minotau-R/ariadne/blob/devel/R/names.R" class="external-link"><code>R/names.R</code></a></small>
+    <small class="dont-index">Source: <a href="https://codeberg.org/Minotau-R/ariadne/src/branch/devel/R/AllGenerics.R" class="external-link"><code>R/AllGenerics.R</code></a>, <a href="https://codeberg.org/Minotau-R/ariadne/src/branch/devel/R/names.R" class="external-link"><code>R/names.R</code></a></small>
     <div class="hidden name"><code>linkNames.Rd</code></div>
     </div>
 
@@ -119,7 +116,7 @@ console. (Default: <code>TRUE</code>)</p></dd>
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A <code><a href="https://minotau-r.github.io/MultiFactor/reference/LinkMap-class.html" class="external-link">LinkMap</a></code> with ids and names in the first
+    <p>A <code><a href="https://minotau-r.github.io/multifactor/reference/linkmap-class.html" class="external-link">linkmap</a></code> with ids and names in the first
 and second column, respectively.</p>
     </div>
 
@@ -130,110 +127,19 @@ and second column, respectively.</p>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Fetch names for all Gut Metabolic modules</span></span></span>
 <span class="r-in"><span><span class="fu">linkNames</span><span class="op">(</span><span class="va">graph</span>, <span class="st">"gmm"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        gmm                                         gmm.name</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1   MF0001                         arabinoxylan degradation</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2   MF0002                              fructan degradation</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3   MF0003                             pectin degradation I</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4   MF0004                           pectine degradation II</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5   MF0005                               starch degradation</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6   MF0006                              lactose degradation</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7   MF0007                lactose and galactose degradation</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8   MF0008                              maltose degradation</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 9   MF0009                            melibiose degradation</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10  MF0010                            sucrose degradation I</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 11  MF0011                           sucrose degradation II</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 12  MF0012                            trehalose degradation</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 13  MF0013                               allose degradation</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 14  MF0014                            arabinose degradation</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 15  MF0015                             fructose degradation</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 16  MF0016                               fucose degradation</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 17  MF0017                            galactose degradation</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 18  MF0018                              mannose degradation</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 19  MF0019                             rhamnose degradation</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 20  MF0020                               ribose degradation</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 21  MF0021                               xylose degradation</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 22  MF0022                      galacturonate degradation I</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 23  MF0023                     galacturonate degradation II</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 24  MF0024                        phenylalanine degradation</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 25  MF0025                           tryptophan degradation</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 26  MF0026                           tyrosine degradation I</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 27  MF0027                          tyrosine degradation II</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 28  MF0028                          aspartate degradation I</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 29  MF0029                         aspartate degradation II</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 30  MF0030                          glutamate degradation I</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 31  MF0031                         glutamate degradation II</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 32  MF0032                        glutamate degradation III</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 33  MF0033                            alanine degradation I</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 34  MF0034                           alanine degradation II</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 35  MF0035                              glycine degradation</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 36  MF0036                           isoleucine degradation</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 37  MF0037                              leucine degradation</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 38  MF0038                         methionine degradation I</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 39  MF0039                        methionine degradation II</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 40  MF0040                              proline degradation</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 41  MF0041                             valine degradation I</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 42  MF0042                           asparagine degradation</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 43  MF0043   cysteine biosynthesis/homocysteine degradation</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 44  MF0044                           cysteine degradation I</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 45  MF0045                          cysteine degradation II</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 46  MF0046                          glutamine degradation I</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 47  MF0047                         glutamine degradation II</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 48  MF0048                               serine degradation</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 49  MF0049                          threonine degradation I</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 50  MF0050                         threonine degradation II</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 51  MF0051                           arginine degradation I</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 52  MF0052                          arginine degradation II</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 53  MF0053                         arginine degradation III</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 54  MF0054                          arginine degradation IV</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 55  MF0055                           arginine degradation V</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 56  MF0056                            histidine degradation</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 57  MF0057                             lysine degradation I</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 58  MF0058                            lysine degradation II</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 59  MF0059              anaerobic fatty acid beta-oxidation</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 60  MF0060                           glycerol degradation I</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 61  MF0061                          glycerol degradation II</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 62  MF0062                         glycerol degradation III</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 63  MF0063                                glyoxylate bypass</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 64  MF0064                      triacylglycerol degradation</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 65  MF0065                            Bifidobacterium shunt</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 66  MF0066                         Entner-Doudoroff pathway</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 67  MF0067                   glycolysis (preparatory phase)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 68  MF0068                       glycolysis (pay-off phase)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 69  MF0069                   NADH:ferredoxin oxidoreductase</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 70  MF0070      pentose phosphate pathway (oxidative phase)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 71  MF0071 pentose phosphate pathway (non-oxidative branch)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 72  MF0072                   pyruvate dehydrogenase complex</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 73  MF0073               pyruvate:ferredoxin oxidoreductase</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 74  MF0074                           pyruvate:formate lyase</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 75  MF0075                            acetate to acetyl-CoA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 76  MF0076                      4-aminobutyrate degradation</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 77  MF0077                               formate conversion</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 78  MF0078                         lactaldehyde degradation</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 79  MF0079                            lactate consumption I</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 80  MF0080                           lactate consumption II</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 81  MF0081                              methanol conversion</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 82  MF0082                           putrescine degradation</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 83  MF0083                            succinate consumption</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 84  MF0084               succinate conversion to propionate</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 85  MF0085                                 urea degradation</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 86  MF0086                            acetyl-CoA to acetate</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 87  MF0087                       acetyl-CoA to crotonyl-CoA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 88  MF0088                            butyrate production I</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 89  MF0089                           butyrate production II</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 90  MF0090                             ethanol production I</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 91  MF0091                            ethanol production II</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 92  MF0092                               lactate production</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 93  MF0093                          propionate production I</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 94  MF0094                         propionate production II</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 95  MF0095                        propionate production III</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 96  MF0096                             succinate production</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 97  MF0097                                 homoacetogenesis</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 98  MF0098                              hydrogen metabolism</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 99  MF0099                      methanogenesis - methyl-coM</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 100 MF0100               methanogenesis from carbon dioxide</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 101 MF0101                nitrate reduction (dissimilatory)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 102 MF0102                sulfate reduction (dissimilatory)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 103 MF0103                                mucin degradation</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         gmm                           gmm.name</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      &lt;fctr&gt;                             &lt;fctr&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   1: MF0001           arabinoxylan degradation</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   2: MF0002                fructan degradation</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   3: MF0003               pectin degradation I</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   4: MF0004             pectine degradation II</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   5: MF0005                 starch degradation</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  ---                                          </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  99: MF0099        methanogenesis - methyl-coM</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 100: MF0100 methanogenesis from carbon dioxide</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 101: MF0101  nitrate reduction (dissimilatory)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 102: MF0102  sulfate reduction (dissimilatory)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 103: MF0103                  mucin degradation</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Fetch names for a set of KO ids</span></span></span>
 <span class="r-in"><span><span class="fu">linkNames</span><span class="op">(</span><span class="va">graph</span>, <span class="st">"ko"</span>, ids <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"K00001"</span>, <span class="st">"K00844"</span>, <span class="st">"K03455"</span><span class="op">)</span><span class="op">)</span></span></span>
