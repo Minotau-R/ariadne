@@ -1,11 +1,9 @@
 <urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
 <url><loc>/404.html</loc></url>
 <url><loc>/LICENSE-text.html</loc></url>
-<url><loc>/articles/app.html</loc></url>
 <url><loc>/articles/ariadne.html</loc></url>
 <url><loc>/articles/index.html</loc></url>
 <url><loc>/articles/methods.html</loc></url>
-<url><loc>/articles/resources.html</loc></url>
 <url><loc>/articles/use_cases.html</loc></url>
 <url><loc>/authors.html</loc></url>
 <url><loc>/index.html</loc></url>
