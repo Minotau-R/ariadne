@@ -59,7 +59,7 @@ While ariadne itself is openly available under an Artistic 2.0 license, the
 resources included in the ariadne database come with their respective licenses
 that must be carefully observed. Find more about the resources accessible via
 ariadne in
-[this vignette](https://minotau-r.github.io/ariadne/articles/resources.html).
+[this vignette](https://minotau-r.github.io/ariadneDB/articles/ariadneDB.html).
 
 ## Code of Conduct
 

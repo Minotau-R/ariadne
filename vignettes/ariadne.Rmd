@@ -93,7 +93,7 @@ BiocManager::install("ariadne")
 `ariadne` combines various databases into a unified graph structure providing
 links between biological entities. The mechanism of retrieving and combining
 relational data is detailed in
-[this vignette](https://minotau-r.github.io/ariadne/articles/resources.html).
+[this vignette](https://minotau-r.github.io/ariadneDB/articles/ariadneDB.html).
 In a nutshell, the companion data package `ariadneDB` defines feature types and
 houses cross-database mappings formatted as graph objects that are reproducibly
 hosted on Zenodo.

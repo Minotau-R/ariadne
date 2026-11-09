@@ -63,7 +63,7 @@
             x, header = FALSE, key.FUN = function(keys){
                 keys <- keys |>
                     stri_replace_first_regex(" >.*", "") |>
-                    stri_replace_firxt_regex("^[^:]*:", "")
+                    stri_replace_first_regex("^[^:]*:", "")
             }
         ),
         GM = ifelse(to == "ko", .process_complex_modules,
