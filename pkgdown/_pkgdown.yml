@@ -1,9 +1,5 @@
 destination: docs
-articles:
-  - contents:
-    - use_cases
-    - methods
-    - logo
+url: https://minotau-r.github.io/ariadne/
 reference:
   - title: Work with the resource graph
     contents:
