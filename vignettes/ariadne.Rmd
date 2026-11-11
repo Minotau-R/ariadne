@@ -14,7 +14,7 @@ output:
         number_sections: true
         self_contained: true
         code_folding: show
-# bibliography: ../inst/REFERENCES.bib
+bibliography: ../inst/REFERENCES.bib
 date: "`r doc_date()`"
 package: "`r pkg_ver('ariadne')`"
 vignette: >

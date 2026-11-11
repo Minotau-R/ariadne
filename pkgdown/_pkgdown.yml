@@ -1,25 +1,32 @@
 destination: docs
+articles:
+  - contents:
+      - use_cases
+  - contents:
+      - methods
+  - contents:
+      - logo
 reference:
-- title: Work with the resource graph
-- contents:
-  - ariadne
-  - addResource
-  - searchPath
-  - plotPath
-  - weavePath
-  - weaveComplex
-- title: Access resource graph metadata
-- contents:
-  - linkNames
-  - drawPath
-  - listResourceVersions
-- title: Work with output sets
-- contents:
-  - addSets
-  - getSets
-  - plotSets
-  - processGeneFamilies
-- title: Import package datasets
-- contents:
-  - butyrate
-  - pathMeta
+  - title: Work with the resource graph
+    contents:
+      - ariadne
+      - addResource
+      - searchPath
+      - plotPath
+      - weavePath
+      - weaveComplex
+  - title: Access resource graph metadata
+    contents:
+      - linkNames
+      - drawPath
+      - listResourceVersions
+  - title: Work with output sets
+    contents:
+      - addSets
+      - getSets
+      - plotSets
+      - processGeneFamilies
+  - title: Import package datasets
+    contents:
+      - butyrate
+      - pathMeta
