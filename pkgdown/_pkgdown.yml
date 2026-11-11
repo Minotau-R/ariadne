@@ -1,11 +1,9 @@
 destination: docs
 articles:
   - contents:
-      - use_cases
-  - contents:
-      - methods
-  - contents:
-      - logo
+    - use_cases
+    - methods
+    - logo
 reference:
   - title: Work with the resource graph
     contents:

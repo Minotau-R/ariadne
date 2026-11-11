@@ -67,7 +67,7 @@ Suggests:
     testthat (>= 3.0.0)
 Remotes:
     github::Minotau-R/multifactor
-URL: https://codeberg.org/Minotau-R/ariadne
+URL: https://codeberg.org/Minotau-R/ariadne, https://minotau-r.github.io/ariadne
 BugReports: https://codeberg.org/Minotau-R/ariadne/issues
 Config/testthat/parallel: true
 Roxygen: list(markdown = TRUE)
