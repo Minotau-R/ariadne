@@ -26,11 +26,10 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-![ariadne logo](man/figures/ariadne_logo.png)
-
 > If you're going to decipher a hidden code from a complex set of different
 > mazes, I'm pretty sure you need a girl's brain running the show.
-> ― James Dashner, The Maze Runner
+>
+> ― James Dashner, *The Maze Runner*
 
 Inspired by the legend of Theseus and the Minotaur, the ever-changing (yet
 reproducible) ariadne logo reflects the variable nature of the Labyrinth of
@@ -48,5 +47,7 @@ Dancing Font as provided by the
 
 There is no single solution to the ariadne logo, but you have until next
 Wednesday to find all connections between the feature emojis.
+
+![](https://raw.githubusercontent.com/Minotau-R/ariadne/devel/man/figures/ariadne_logo.png)
 
 # References

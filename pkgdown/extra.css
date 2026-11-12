@@ -4,124 +4,35 @@ Developed and maintained by Giulio Benedetti (@RiboRings)
 
 /* ariadne colour palette */
 :root {
-  --primary-orange: #F57C00;
-  --secondary-orange: #FF9800;
-  --dark-red: #8B0000;
+  --dark-orange: #F57C00;
+  --bright-orange: #FE9929;
   --white: #FFFFFF;
-  --light-gray: #F5F5F5;
 }
 
-/* Header and Navigation */
-.headroom {
-  background-color: var(--dark-red);
+/* Bright Mode Headings */
+h1, h2, h3 {
+  color: var(--dark-orange) !important;
 }
 
-.navbar-default .navbar-link {
-  color: var(--white);
+/* Dark Mode Headings */
+[data-bs-theme="dark"] h1, 
+[data-bs-theme="dark"] h2, 
+[data-bs-theme="dark"] h3 {
+  color: var(--bright-orange) !important;
 }
 
-.navbar-default .navbar-link:hover {
-  color: var(--secondary-orange);
+/* Copy to Clipboard Buttons in Code Blocks */
+.btn-copy-ex,
+.clipboard-btn {
+  background-color: var(--bright-orange) !important;
+  border-color: var(--bright-orange) !important;
+  color: var(--white) !important;
 }
 
-.navbar-default .navbar-nav>.active>a,
-.navbar-default .navbar-nav>.active>a:hover,
-.navbar-default .navbar-nav>.active>a:focus {
-  color: var(--secondary-orange);
-  background-color: var(--dark-red);
-}
-
-.navbar-default .navbar-nav>.open>a,
-.navbar-default .navbar-nav>.open>a:hover,
-.navbar-default .navbar-nav>.open>a:focus {
-  color: var(--secondary-orange);
-  background-color: var(--dark-red);
-}
-
-.dropdown-menu>.active>a,
-.dropdown-menu>.active>a:hover,
-.dropdown-menu>.active>a:focus {
-  color: var(--secondary-orange);
-  background-color: var(--dark-red);
-}
-
-.navbar-default .navbar-nav>li>a:hover,
-.navbar-default .navbar-nav>li>a:focus {
-  color: var(--secondary-orange);
-}
-
-.dropdown-menu>li>a:hover {
-  color: var(--white);
-  background-color: var(--primary-orange);
-}
-
-.navbar-default .navbar-nav>li>a {
-  color: var(--white);
-}
-
-/* Headings */
-h1 {
-  color: var(--primary-orange);
-}
-
-h2 {
-  color: var(--secondary-orange);
-}
-
-h3 {
-  color: var(--secondary-orange);
-}
-
-/* Buttons */
-.btn-copy-ex {
-  color: var(--white);
-  background-color: var(--primary-orange);
-  border-color: var(--primary-orange);
-}
-
-.btn-copy-ex:hover {
-  color: var(--white);
-  background-color: var(--dark-red);
-  border-color: var(--dark-red);
-}
-
-.btn-copy-ex:active:focus {
-  color: var(--white);
-  background-color: var(--dark-red);
-  border-color: var(--primary-orange);
-}
-
-/* Icons */
-p>.fa,
-p>.fas {
-  color: var(--primary-orange);
-}
-
-/* Images */
-img {
-  width: auto;
-}
-
-/* Additional refinements for a modern look */
-body {
-  background-color: var(--light-gray);
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
-.navbar-default {
-  border: none;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.dropdown-menu {
-  background-color: var(--dark-red);
-  border: none;
-}
-
-.dropdown-menu>li>a {
-  color: var(--white);
-}
-
-.dropdown-menu>li>a:hover {
-  background-color: var(--primary-orange);
+/* Hover state for contrast */
+.btn-copy-ex:hover,
+.clipboard-btn:hover {
+  background-color: var(--dark-orange) !important;
+  border-color: var(--dark-orange) !important;
+  color: var(--white) !important;
 }

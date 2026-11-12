@@ -1,5 +1,40 @@
+url: https://minotau-r.github.io/ariadne
 destination: docs
-url: https://minotau-r.github.io/ariadne/
+
+template:
+  bootstrap: 5
+  light-switch: true
+  css: extra.css
+  bslib:
+    navbar-bg: "#8B0000"
+
+articles:
+  - title: "ariadne in action: common use cases in omics research"
+    navbar: ~
+    contents: use_cases
+  - title: ariadneDB
+    navbar: ~
+    contents: ariadneDB
+  - title: ariadneApp
+    navbar: ~
+    contents: ariadneApp
+  - title: "ariadne definitions and technical details"
+    navbar: ~
+    contents: methods
+  - title: "ariadne logo: the Labyrinth of Biology"
+    navbar: ~
+    contents: logo
+
+external-articles:
+  - name: ariadneDB
+    title: "ariadneDB: a harmonised graph of biological databases and relations"
+    description: a harmonised graph of biological databases and relations
+    href: https://minotau-r.github.io/ariadneDB/articles/ariadneDB.html
+  - name: ariadneApp
+    title: "ariadneApp: interactively explore the ariadne resource graph"
+    description: interactively explore the ariadne resource graph
+    href: https://minotau-r.github.io/ariadneApp/articles/ariadneApp.html
+
 reference:
   - title: Work with the resource graph
     contents:
