@@ -1,5 +1,46 @@
 #' List resource versions registered in the ariadne database
 #' 
+#' @name listResourceMetadata
+#' 
+#' @description
+#' listResourceVersions shows the available versions for the different resources
+#' registered in the ariadne database. Any of those versions can be passed to
+#' \code{\link{ariadne}}. Resources labelled with \code{"latest"} cannot be
+#' versioned as they are dynamically accessed via their API or SPARQL endpoint.
+#' 
+#' @returns A data.frame with information on registered resource versions.
+#' 
+#' @seealso \code{\link{ariadne}}
+#' 
+#' @examples
+#' # View all available resource versions
+#' listResourceMetadata()
+NULL
+
+#' @export
+#' @rdname listResourceMetadata
+#' @importFrom stringi stri_split_regex
+listResourceMetadata <- function(){
+    
+    url <- "https://zenodo.org/records/23584782/files/metadata.csv"
+    
+    meta <- fread(url)
+    
+    res.name <- stri_split_regex(meta$Title, "\\s+", simplify = TRUE)[ , 2L]
+    
+    meta <- cbind(res.name, meta[ , c("SourceUrl", "License", "DOI")])
+    
+    meta <- meta[!duplicated(meta), ]
+    
+    colnames(meta) <- c("resource", "url", "license", "doi")
+    
+    meta <- as.data.frame(meta)
+    return(meta)
+}
+
+
+#' List resource versions registered in the ariadne database
+#' 
 #' @name listResourceVersions
 #' 
 #' @description
