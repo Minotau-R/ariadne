@@ -59,11 +59,14 @@
                 function(vals) stri_replace_first_fixed(vals, "GO:", ""),
                 identity)
         ),
-        GO = function(x) .process_one2one(
-            x, header = FALSE, key.FUN = function(keys){
+        GO = function(x) .process_one2one(x, header = FALSE,
+            key.FUN = function(keys) {
                 keys <- keys |>
                     stri_replace_first_regex(" >.*", "") |>
                     stri_replace_first_regex("^[^:]*:", "")
+            },
+            val.FUN = function(vals) {
+                vals <- stri_replace_first_regex(vals, "^[^:]*:", "")
             }
         ),
         GM = ifelse(to == "ko", .process_complex_modules,

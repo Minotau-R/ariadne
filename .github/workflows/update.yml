@@ -23,7 +23,7 @@ jobs:
             any::usethis
       - name: Run scripts
         run: |
-          Rscript inst/scripts/make-versionMetadata.R
+          Rscript inst/scripts/make-resourceMetadata.R
           Rscript inst/scripts/make-hexSticker.R
       - name: Commit changes
         run: |

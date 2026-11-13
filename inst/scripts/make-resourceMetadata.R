@@ -3,6 +3,24 @@ devtools::load_all()
 source("inst/scripts/utils.R")
 
 default.graph <- 23584782
+
+url <- file.path(
+    "https://zenodo.org/records", default.graph, "files/metadata.csv"
+)
+
+meta <- fread(url)
+
+meta <- meta$Title |>
+    str_split_i("\\s+", 2L) |>
+    cbind(meta[ , c("SourceUrl", "License", "DOI")])
+
+meta <- meta[!duplicated(meta), ]
+
+colnames(meta) <- c("resource", "url", "license", "doi")
+
+resourceCatalogue <- as.data.frame(meta)
+
+# Initialise version dataframes
 dfs <- list()
 
 # Add BugSigDB versions
@@ -84,21 +102,10 @@ df$default <- !duplicated(df$source)
 # Order resources alphabetically
 df <- df[order(df$source), ]
 
-# Add resource base urls as attribute
-attr(df, "urls") <- c(
-    BugSigDB = "https://zenodo.org/records/",
-    ChocoPhlAn = "https://zenodo.org/records/",
-    enviPath = "https://envipath.org/",
-    GM = "https://github.com/",
-    GO = "https://release.geneontology.org/",
-    KEGG = "https://www.genome.jp/kegg",
-    MSigDB = "https://zenodo.org/records/",
-    OTT = "https://opentreeoflife.github.io",
-    Rhea = "https://www.rhea-db.org",
-    TIGRFAMs = "https://ftp.ncbi.nlm.nih.gov/hmm/TIGRFAMs/",
-    UniProt = "https://www.uniprot.org",
-    WoL = "https://ftp.microbio.me/pub/"
-)
+attr(df, "urls") <- setNames(meta$url, meta$resource)
 
 df -> versionMetadata
-usethis::use_data(versionMetadata, internal = TRUE, overwrite = TRUE)
+
+usethis::use_data(
+    resourceCatalogue, versionMetadata, internal = TRUE, overwrite = TRUE
+)

@@ -1,3 +1,29 @@
+#' Consult catalogue of resources registered in the ariadne database
+#' 
+#' @name listResourceCatalogue
+#' 
+#' @description
+#' listResourceCatalogue provides useful information about the available
+#' resources, including related license of usage and primary publications.
+#' 
+#' @returns A data.frame with information on registered resources.
+#' 
+#' @seealso \code{\link{ariadne}}
+#' 
+#' @examples
+#' # View all available resources
+#' listResourceCatalogue()
+NULL
+
+#' @export
+#' @rdname listResourceCatalogue
+listResourceCatalogue <- function(){
+    # Retrieve catalogue of resources
+    meta <- resourceCatalogue
+    return(meta)
+}
+
+
 #' List resource versions registered in the ariadne database
 #' 
 #' @name listResourceVersions

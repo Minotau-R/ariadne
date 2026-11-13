@@ -1,5 +1,10 @@
 test_that("utils", {
     
+    catalogue <- listResourceCatalogue()
+    
+    expect_s3_class(catalogue, "data.frame")
+    expect_named(catalogue, c("resource", "url", "license", "doi"))
+    
     expect_error(
         listResourceVersions(default = c(NA, NA)),
         "'default' must be TRUE or FALSE."

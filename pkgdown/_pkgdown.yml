@@ -48,6 +48,7 @@ reference:
     contents:
       - linkNames
       - drawPath
+      - listResourceCatalogue
       - listResourceVersions
   - title: Work with output sets
     contents:
