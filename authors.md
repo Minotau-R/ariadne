@@ -17,12 +17,12 @@ Source:
 
 Benedetti G, Bastiaanssen T, Lahti L (2026). *ariadne: Assembling
 Relational Information Across the Database NEtwork*. R package version
-0.2.12, <https://codeberg.org/Minotau-R/ariadne>.
+0.2.13, <https://codeberg.org/Minotau-R/ariadne>.
 
 @Manual{,\
   title = {ariadne: Assembling Relational Information Across the Database NEtwork},\
   author = {Giulio Benedetti and Thomaz Bastiaanssen and Leo Lahti},\
   year = {2026},\
-  note = {R package version 0.2.12},\
+  note = {R package version 0.2.13},\
   url = {https://codeberg.org/Minotau-R/ariadne},\
 }

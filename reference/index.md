@@ -20,6 +20,8 @@
   : Link ids to names and vice versa
 - [`drawPath()`](https://minotau-r.github.io/ariadne/reference/drawPath.md)
   : Draw path steps as a reproducible table
+- [`listResourceCatalogue()`](https://minotau-r.github.io/ariadne/reference/listResourceCatalogue.md)
+  : Consult catalogue of resources registered in the ariadne database
 - [`listResourceVersions()`](https://minotau-r.github.io/ariadne/reference/listResourceVersions.md)
   : List resource versions registered in the ariadne database
 

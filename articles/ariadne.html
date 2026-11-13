@@ -21,7 +21,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ariadne</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.12</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.13</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -81,7 +81,7 @@ Benedetti</h4>
 Turku<br><a class="author_email" href="mailto:#"></a><a href="mailto:giulio.benedetti@utu.fi" class="email">giulio.benedetti@utu.fi</a>
       </address>
                   
-            <h4 data-toc-skip class="date">12 November 2026</h4>
+            <h4 data-toc-skip class="date">13 November 2026</h4>
       
       <small class="dont-index">Source: <a href="https://codeberg.org/Minotau-R/ariadne/src/branch/devel/vignettes/ariadne.Rmd" class="external-link"><code>vignettes/ariadne.Rmd</code></a></small>
       <div class="d-none name"><code>ariadne.Rmd</code></div>
@@ -223,7 +223,7 @@ types:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># List neighbours of ko node</span></span>
 <span><span class="fu"><a href="https://r.igraph.org/reference/neighbors.html" class="external-link">neighbors</a></span><span class="op">(</span><span class="va">graph</span>, <span class="st">"ko"</span>, mode <span class="op">=</span> <span class="st">"all"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; + 14/147 vertices, named, from 5769202:</span></span>
+<span><span class="co">#&gt; + 14/147 vertices, named, from 875d240:</span></span>
 <span><span class="co">#&gt;  [1] brite        ec           gbm          gmm          kegg_disease</span></span>
 <span><span class="co">#&gt;  [6] kegg_drug    kegg_genes   kegg_mod     kegg_net     kegg_path   </span></span>
 <span><span class="co">#&gt; [11] kegg_rxn     rclass       uniref50     uniref90</span></span></code></pre></div>
@@ -240,7 +240,7 @@ releases.</p>
 <span><span class="co"># View versions</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/DT/man/datatable.html" class="external-link">datatable</a></span><span class="op">(</span><span class="va">versions</span><span class="op">)</span></span></code></pre></div>
 <div class="datatables html-widget html-fill-item" id="htmlwidget-e5c8c404fe174e4c81bd" style="width:100%;height:auto;"></div>
-<script type="application/json" data-for="htmlwidget-e5c8c404fe174e4c81bd">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6","7","8","9","10","11","12"],["BugSigDB","ChocoPhlAn","enviPath","GM","GO","KEGG","MSigDB","OTT","Rhea","TIGRFAMs","UniProt","WoL"],["v1.3.1","v201901b","latest","v1","2026-08-05","latest","2026.1","latest","latest","v15","latest","v2"],["https://zenodo.org/records/19740674/","https://zenodo.org/records/17100034/","https://envipath.org//","https://github.com/omixer/omixer-rpmR/raw/refs/heads/main/inst/extdata/","https://release.geneontology.org/2026-08-05/","https://www.genome.jp/kegg/","https://zenodo.org/records/18968178/","https://opentreeoflife.github.io/","https://www.rhea-db.org/","https://ftp.ncbi.nlm.nih.gov/hmm/TIGRFAMs/release_15.0/","https://www.uniprot.org/","https://ftp.microbio.me/pub/wol2/"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>resource<\/th>\n      <th>version<\/th>\n      <th>url<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":5,"columnDefs":[{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"resource","targets":1},{"name":"version","targets":2},{"name":"url","targets":3}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[5,10,25,50,100]}},"evals":[],"jsHooks":[]}</script><p>However, historical or specific database releases can be pinned by
+<script type="application/json" data-for="htmlwidget-e5c8c404fe174e4c81bd">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6","7","8","9","10","11","12"],["BugSigDB","ChocoPhlAn","enviPath","GM","GO","KEGG","MSigDB","OTT","Rhea","TIGRFAMs","UniProt","WoL"],["v1.3.1","v201901b","latest","v1","2026-08-05","latest","2026.1","latest","latest","v15","latest","v2"],["https://zenodo.org/records/19740674/","https://zenodo.org/records/17100034/","https://envipath.org//","https://github.com/omixer/omixer-rpmR/raw/refs/heads/main/inst/extdata/","https://release.geneontology.org/2026-08-05/","https://www.kegg.jp//","https://zenodo.org/records/18968178/","https://opentreeoflife.github.io//","https://www.rhea-db.org//","https://ftp.ncbi.nlm.nih.gov/release_15.0/","https://www.uniprot.org/","https://ftp.microbio.me/pub/wol2/"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>resource<\/th>\n      <th>version<\/th>\n      <th>url<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":5,"columnDefs":[{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"resource","targets":1},{"name":"version","targets":2},{"name":"url","targets":3}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[5,10,25,50,100]}},"evals":[],"jsHooks":[]}</script><p>However, historical or specific database releases can be pinned by
 passing a named list to the <code>versions</code> argument.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># List custom versions</span></span>
@@ -518,14 +518,14 @@ Thank you!</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;   Benedetti G, Bastiaanssen T, Lahti L (????). _ariadne: Assembling</span></span>
 <span><span class="co">#&gt;   Relational Information Across the Database NEtwork_. R package</span></span>
-<span><span class="co">#&gt;   version 0.2.12, &lt;https://codeberg.org/Minotau-R/ariadne&gt;.</span></span>
+<span><span class="co">#&gt;   version 0.2.13, &lt;https://codeberg.org/Minotau-R/ariadne&gt;.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; A BibTeX entry for LaTeX users is</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;   @Manual{,</span></span>
 <span><span class="co">#&gt;     title = {ariadne: Assembling Relational Information Across the Database NEtwork},</span></span>
 <span><span class="co">#&gt;     author = {Giulio Benedetti and Thomaz Bastiaanssen and Leo Lahti},</span></span>
-<span><span class="co">#&gt;     note = {R package version 0.2.12},</span></span>
+<span><span class="co">#&gt;     note = {R package version 0.2.13},</span></span>
 <span><span class="co">#&gt;     url = {https://codeberg.org/Minotau-R/ariadne},</span></span>
 <span><span class="co">#&gt;   }</span></span></code></pre></div>
 </div>
@@ -579,13 +579,13 @@ guidelines</a>.</p>
 <span><span class="co">#&gt; [1] stats4    stats     graphics  grDevices utils     datasets  methods   base     </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; other attached packages:</span></span>
-<span><span class="co">#&gt;  [1] DT_0.34.0                       miaViz_1.21.7                   mia_1.21.14                    </span></span>
+<span><span class="co">#&gt;  [1] DT_0.34.0                       miaViz_1.21.14                  mia_1.21.14                    </span></span>
 <span><span class="co">#&gt;  [4] TreeSummarizedExperiment_2.21.0 Biostrings_2.81.9               XVector_0.53.0                 </span></span>
 <span><span class="co">#&gt;  [7] SingleCellExperiment_1.35.2     MultiAssayExperiment_1.39.1     SummarizedExperiment_1.43.0    </span></span>
 <span><span class="co">#&gt; [10] Biobase_2.73.2                  GenomicRanges_1.65.4            Seqinfo_1.3.2                  </span></span>
-<span><span class="co">#&gt; [13] IRanges_2.47.5                  S4Vectors_0.51.10               BiocGenerics_0.59.12           </span></span>
+<span><span class="co">#&gt; [13] IRanges_2.47.5                  S4Vectors_0.51.10               BiocGenerics_0.59.13           </span></span>
 <span><span class="co">#&gt; [16] generics_0.1.4                  MatrixGenerics_1.25.0           matrixStats_1.5.0              </span></span>
-<span><span class="co">#&gt; [19] ariadne_0.2.12                  igraph_2.3.4                    ggraph_2.2.2                   </span></span>
+<span><span class="co">#&gt; [19] ariadne_0.2.13                  igraph_2.3.4                    ggraph_2.2.2                   </span></span>
 <span><span class="co">#&gt; [22] ggplot2_4.0.3                   BiocStyle_2.41.0               </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; loaded via a namespace (and not attached):</span></span>
@@ -601,7 +601,7 @@ guidelines</a>.</p>
 <span><span class="co">#&gt;  [37] pkgdown_2.2.1               permute_0.9-10              DelayedMatrixStats_1.35.0   codetools_0.2-20           </span></span>
 <span><span class="co">#&gt;  [41] DelayedArray_0.39.8         scuttle_1.23.2              ggforce_0.5.0               tidyselect_1.2.1           </span></span>
 <span><span class="co">#&gt;  [45] aplot_0.3.2                 farver_2.1.2                ScaledMatrix_1.21.0         viridis_0.6.5              </span></span>
-<span><span class="co">#&gt;  [49] BiocFileCache_3.3.2         jsonlite_2.0.0              BiocNeighbors_2.7.3         decontam_1.33.0            </span></span>
+<span><span class="co">#&gt;  [49] BiocFileCache_3.3.3         jsonlite_2.0.0              BiocNeighbors_2.7.3         decontam_1.33.0            </span></span>
 <span><span class="co">#&gt;  [53] tidygraph_1.3.1             scater_1.41.3               systemfonts_1.3.2           tools_4.6.1                </span></span>
 <span><span class="co">#&gt;  [57] ggnewscale_0.5.2            progress_1.2.3              treeio_1.37.1               ragg_1.5.2                 </span></span>
 <span><span class="co">#&gt;  [61] Rcpp_1.1.2                  glue_1.8.1                  gridExtra_2.3.1             SparseArray_1.13.4         </span></span>

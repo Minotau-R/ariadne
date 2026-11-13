@@ -146,7 +146,7 @@ We can also compute local neighborhood sizes for specific feature types:
 \
 `# List neighbours of ko node`\
 [`neighbors`](https://r.igraph.org/reference/neighbors.html)`(``graph``, ``"ko"``, mode ``=`` ``"all"``)`\
-`#> + 14/147 vertices, named, from 5769202:`\
+`#> + 14/147 vertices, named, from 875d240:`\
 `#>  [1] brite        ec           gbm          gmm          kegg_disease`\
 `#>  [6] kegg_drug    kegg_genes   kegg_mod     kegg_net     kegg_path   `\
 `#> [11] kegg_rxn     rclass       uniref50     uniref90`
@@ -467,14 +467,14 @@ Thank you!
 `#> `\
 `#>   Benedetti G, Bastiaanssen T, Lahti L (????). _ariadne: Assembling`\
 `#>   Relational Information Across the Database NEtwork_. R package`\
-`#>   version 0.2.12, <https://codeberg.org/Minotau-R/ariadne>.`\
+`#>   version 0.2.13, <https://codeberg.org/Minotau-R/ariadne>.`\
 `#> `\
 `#> A BibTeX entry for LaTeX users is`\
 `#> `\
 `#>   @Manual{,`\
 `#>     title = {ariadne: Assembling Relational Information Across the Database NEtwork},`\
 `#>     author = {Giulio Benedetti and Thomaz Bastiaanssen and Leo Lahti},`\
-`#>     note = {R package version 0.2.12},`\
+`#>     note = {R package version 0.2.13},`\
 `#>     url = {https://codeberg.org/Minotau-R/ariadne},`\
 `#>   }`
 
@@ -520,13 +520,13 @@ R session information:
     #> [1] stats4    stats     graphics  grDevices utils     datasets  methods   base     
     #> 
     #> other attached packages:
-    #>  [1] DT_0.34.0                       miaViz_1.21.7                   mia_1.21.14                    
+    #>  [1] DT_0.34.0                       miaViz_1.21.14                  mia_1.21.14                    
     #>  [4] TreeSummarizedExperiment_2.21.0 Biostrings_2.81.9               XVector_0.53.0                 
     #>  [7] SingleCellExperiment_1.35.2     MultiAssayExperiment_1.39.1     SummarizedExperiment_1.43.0    
     #> [10] Biobase_2.73.2                  GenomicRanges_1.65.4            Seqinfo_1.3.2                  
-    #> [13] IRanges_2.47.5                  S4Vectors_0.51.10               BiocGenerics_0.59.12           
+    #> [13] IRanges_2.47.5                  S4Vectors_0.51.10               BiocGenerics_0.59.13           
     #> [16] generics_0.1.4                  MatrixGenerics_1.25.0           matrixStats_1.5.0              
-    #> [19] ariadne_0.2.12                  igraph_2.3.4                    ggraph_2.2.2                   
+    #> [19] ariadne_0.2.13                  igraph_2.3.4                    ggraph_2.2.2                   
     #> [22] ggplot2_4.0.3                   BiocStyle_2.41.0               
     #> 
     #> loaded via a namespace (and not attached):
@@ -542,7 +542,7 @@ R session information:
     #>  [37] pkgdown_2.2.1               permute_0.9-10              DelayedMatrixStats_1.35.0   codetools_0.2-20           
     #>  [41] DelayedArray_0.39.8         scuttle_1.23.2              ggforce_0.5.0               tidyselect_1.2.1           
     #>  [45] aplot_0.3.2                 farver_2.1.2                ScaledMatrix_1.21.0         viridis_0.6.5              
-    #>  [49] BiocFileCache_3.3.2         jsonlite_2.0.0              BiocNeighbors_2.7.3         decontam_1.33.0            
+    #>  [49] BiocFileCache_3.3.3         jsonlite_2.0.0              BiocNeighbors_2.7.3         decontam_1.33.0            
     #>  [53] tidygraph_1.3.1             scater_1.41.3               systemfonts_1.3.2           tools_4.6.1                
     #>  [57] ggnewscale_0.5.2            progress_1.2.3              treeio_1.37.1               ragg_1.5.2                 
     #>  [61] Rcpp_1.1.2                  glue_1.8.1                  gridExtra_2.3.1             SparseArray_1.13.4         

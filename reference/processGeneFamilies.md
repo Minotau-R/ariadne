@@ -29,6 +29,7 @@ rowData: uniref90, taxname, genus and species.
 
 ``` r
 library(curatedMetagenomicData)
+#> Warning: replacing previous import ‘BiocGenerics::version’ by ‘BiocManager::version’ when loading ‘AnnotationHub’
 
 # Import gene families
 genes <- curatedMetagenomicData(

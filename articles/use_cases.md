@@ -620,14 +620,14 @@ R session information:
     #> [1] stats4    stats     graphics  grDevices utils     datasets  methods   base     
     #> 
     #> other attached packages:
-    #>  [1] DT_0.34.0                       stringr_1.6.0                   miaViz_1.21.7                  
-    #>  [4] mia_1.21.14                     MultiAssayExperiment_1.39.1     curatedMetagenomicData_3.19.0  
+    #>  [1] DT_0.34.0                       stringr_1.6.0                   miaViz_1.21.14                 
+    #>  [4] mia_1.21.14                     MultiAssayExperiment_1.39.1     curatedMetagenomicData_3.21.3  
     #>  [7] TreeSummarizedExperiment_2.21.0 Biostrings_2.81.9               XVector_0.53.0                 
     #> [10] SingleCellExperiment_1.35.2     SummarizedExperiment_1.43.0     Biobase_2.73.2                 
     #> [13] GenomicRanges_1.65.4            Seqinfo_1.3.2                   IRanges_2.47.5                 
-    #> [16] S4Vectors_0.51.10               BiocGenerics_0.59.12            generics_0.1.4                 
+    #> [16] S4Vectors_0.51.10               BiocGenerics_0.59.13            generics_0.1.4                 
     #> [19] MatrixGenerics_1.25.0           matrixStats_1.5.0               anansi_1.3.0                   
-    #> [22] ariadne_0.2.12                  igraph_2.3.4                    ggraph_2.2.2                   
+    #> [22] ariadne_0.2.13                  igraph_2.3.4                    ggraph_2.2.2                   
     #> [25] ggplot2_4.0.3                   BiocStyle_2.41.0               
     #> 
     #> loaded via a namespace (and not attached):
@@ -642,7 +642,7 @@ R session information:
     #>  [33] tidytree_0.4.8              rentrez_1.2.4               vegan_2.7-6                 pkgdown_2.2.1              
     #>  [37] permute_0.9-10              DelayedMatrixStats_1.35.0   codetools_0.2-20            DelayedArray_0.39.8        
     #>  [41] scuttle_1.23.2              ggforce_0.5.0               tidyselect_1.2.1            aplot_0.3.2                
-    #>  [45] farver_2.1.2                ScaledMatrix_1.21.0         viridis_0.6.5               BiocFileCache_3.3.2        
+    #>  [45] farver_2.1.2                ScaledMatrix_1.21.0         viridis_0.6.5               BiocFileCache_3.3.3        
     #>  [49] jsonlite_2.0.0              BiocNeighbors_2.7.3         decontam_1.33.0             tidygraph_1.3.1            
     #>  [53] scater_1.41.3               systemfonts_1.3.2           tools_4.6.1                 ggnewscale_0.5.2           
     #>  [57] progress_1.2.3              treeio_1.37.1               ragg_1.5.2                  Rcpp_1.1.2                 

@@ -89,13 +89,13 @@ listResourceVersions()
 #> 20                            https://release.geneontology.org/2025-06-01/
 #> 21                            https://release.geneontology.org/2025-03-16/
 #> 22                            https://release.geneontology.org/2025-02-06/
-#> 23                                             https://www.genome.jp/kegg/
+#> 23                                                   https://www.kegg.jp//
 #> 24                                    https://zenodo.org/records/18968178/
 #> 25                                    https://zenodo.org/records/15800824/
 #> 26                                    https://zenodo.org/records/15377497/
-#> 27                                       https://opentreeoflife.github.io/
-#> 28                                                https://www.rhea-db.org/
-#> 29                 https://ftp.ncbi.nlm.nih.gov/hmm/TIGRFAMs/release_15.0/
+#> 27                                      https://opentreeoflife.github.io//
+#> 28                                               https://www.rhea-db.org//
+#> 29                              https://ftp.ncbi.nlm.nih.gov/release_15.0/
 #> 30                                                https://www.uniprot.org/
 #> 31                                       https://ftp.microbio.me/pub/wol2/
 #> 32                            https://ftp.microbio.me/pub/wol-20April2021/
@@ -121,11 +121,11 @@ listResourceVersions(default = TRUE)
 #> 3                                                   https://envipath.org//
 #> 4  https://github.com/omixer/omixer-rpmR/raw/refs/heads/main/inst/extdata/
 #> 5                             https://release.geneontology.org/2026-08-05/
-#> 6                                              https://www.genome.jp/kegg/
+#> 6                                                    https://www.kegg.jp//
 #> 7                                     https://zenodo.org/records/18968178/
-#> 8                                        https://opentreeoflife.github.io/
-#> 9                                                 https://www.rhea-db.org/
-#> 10                 https://ftp.ncbi.nlm.nih.gov/hmm/TIGRFAMs/release_15.0/
+#> 8                                       https://opentreeoflife.github.io//
+#> 9                                                https://www.rhea-db.org//
+#> 10                              https://ftp.ncbi.nlm.nih.gov/release_15.0/
 #> 11                                                https://www.uniprot.org/
 #> 12                                       https://ftp.microbio.me/pub/wol2/
 ```
