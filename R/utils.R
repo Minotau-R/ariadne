@@ -1,40 +1,25 @@
-#' List resource versions registered in the ariadne database
+#' Consult catalogue of resources registered in the ariadne database
 #' 
-#' @name listResourceMetadata
+#' @name listResourceCatalogue
 #' 
 #' @description
-#' listResourceVersions shows the available versions for the different resources
-#' registered in the ariadne database. Any of those versions can be passed to
-#' \code{\link{ariadne}}. Resources labelled with \code{"latest"} cannot be
-#' versioned as they are dynamically accessed via their API or SPARQL endpoint.
+#' listResourceCatalogue provides useful information about the available
+#' resources, including related license of usage and primary publications.
 #' 
-#' @returns A data.frame with information on registered resource versions.
+#' @returns A data.frame with information on registered resources.
 #' 
 #' @seealso \code{\link{ariadne}}
 #' 
 #' @examples
-#' # View all available resource versions
-#' listResourceMetadata()
+#' # View all available resources
+#' listResourceCatalogue()
 NULL
 
 #' @export
-#' @rdname listResourceMetadata
-#' @importFrom stringi stri_split_regex
-listResourceMetadata <- function(){
-    
-    url <- "https://zenodo.org/records/23584782/files/metadata.csv"
-    
-    meta <- fread(url)
-    
-    res.name <- stri_split_regex(meta$Title, "\\s+", simplify = TRUE)[ , 2L]
-    
-    meta <- cbind(res.name, meta[ , c("SourceUrl", "License", "DOI")])
-    
-    meta <- meta[!duplicated(meta), ]
-    
-    colnames(meta) <- c("resource", "url", "license", "doi")
-    
-    meta <- as.data.frame(meta)
+#' @rdname listResourceCatalogue
+listResourceCatalogue <- function(){
+    # Retrieve catalogue of resources
+    meta <- resourceCatalogue
     return(meta)
 }
 

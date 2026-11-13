@@ -3,6 +3,25 @@ devtools::load_all()
 source("inst/scripts/utils.R")
 
 default.graph <- 23584782
+
+url <- file.path(
+    "https://zenodo.org/records", default.graph, "files/metadata.csv"
+)
+
+meta <- fread(url)
+
+meta <- meta$Title |>
+    str_split_i("\\s+", 2L) |>
+    cbind(meta[ , c("SourceUrl", "License", "DOI")])
+
+meta <- meta[!duplicated(meta), ]
+
+colnames(meta) <- c("resource", "url", "license", "doi")
+
+resourceCatalogue <- as.data.frame(resourceCatalogue)
+usethis::use_data(resourceCatalogue, internal = TRUE, overwrite = TRUE)
+
+# Initialise version dataframes
 dfs <- list()
 
 # Add BugSigDB versions
@@ -84,7 +103,6 @@ df$default <- !duplicated(df$source)
 # Order resources alphabetically
 df <- df[order(df$source), ]
 
-meta <- listResourceMetadata()
 attr(df, "urls") <- setNames(meta$url, meta$resource)
 
 df -> versionMetadata
