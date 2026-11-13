@@ -18,8 +18,7 @@ meta <- meta[!duplicated(meta), ]
 
 colnames(meta) <- c("resource", "url", "license", "doi")
 
-resourceCatalogue <- as.data.frame(resourceCatalogue)
-usethis::use_data(resourceCatalogue, internal = TRUE, overwrite = TRUE)
+resourceCatalogue <- as.data.frame(meta)
 
 # Initialise version dataframes
 dfs <- list()
@@ -106,4 +105,7 @@ df <- df[order(df$source), ]
 attr(df, "urls") <- setNames(meta$url, meta$resource)
 
 df -> versionMetadata
-usethis::use_data(versionMetadata, internal = TRUE, overwrite = TRUE)
+
+usethis::use_data(
+    resourceCatalogue, versionMetadata, internal = TRUE, overwrite = TRUE
+)
