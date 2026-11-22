@@ -372,7 +372,7 @@ sets <- getSets(
     names = TRUE
 )
 
-# View modules table
+# View sets table
 datatable(sets)
 ```
 
@@ -380,29 +380,29 @@ Using `addSets()`, this module membership table is incorporated directly into
 the experiment side information that can be accessed in downstream analyses.
 
 ```{r}
-# Add modules to experiment as names instead of ids
+# Add sets to experiment as names instead of ids
 tse <- addSets(tse, butyrate, key = "Genus", names = TRUE)
 ```
 
 The `mia` package provides specialised methods for set-aware operations. The
-`agglomerateByModule()` function aggregates assay abundance tables across
+`agglomerateBySet()` function aggregates assay abundance tables across
 features belonging to specific sets.
 
 ```{r}
 # Agglomerate features by membership to butyrate-producer set
-set.se <- agglomerateByModule(tse, by = "rows", group = "Butanoic acid")
+set.se <- agglomerateBySet(tse, by = "rows", group = "Butanoic acid")
 
 # Plot abundance of butyrate producers
 plotAbundance(set.se)
 ```
 
-Additionally, `applyByModule()` enables arbitrary set-wise computations on an
+Additionally, `applyBySet()` enables arbitrary set-wise computations on an
 SE object. For example, it is possible to estimate alpha diversity for each
-module (only one in this case), which is sometimes called _functional diversity_.
+set (only one in this case), which is sometimes called _functional diversity_.
 
 ```{r}
-# Estimate alpha diversity for each module
-tse <- applyByModule(
+# Estimate alpha diversity for each set
+tse <- applyBySet(
     tse,
     .by = "rows",
     .group = "Butanoic acid",

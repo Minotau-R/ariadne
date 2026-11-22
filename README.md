@@ -15,7 +15,12 @@ Python with the package
 [ariadnePy](https://github.com/Minotau-R/ariadnePy/tree/main) and as a web app
 with the Shiny package [ariadneApp](https://github.com/Minotau-R/ariadneApp).
 
-Example applications:
+ariadne fundamentals and basic usage are introduced in
+[this article](https://minotau-r.github.io/ariadne/articles/ariadne.html),
+whereas common use cases in omics data science are extensively described in
+[this article](https://minotau-r.github.io/ariadne/articles/use_cases.html).
+
+Among others, ariadne can be used in the following scenarios:
 
 - Link across omics types based on prior knowledge (KEGG, UniProt, Rhea, etc.)
 - Stratify microbial features by functional modules (BugSig, Gut Modules, etc.)

@@ -59,7 +59,16 @@ setMethod("weaveComplex", signature = c(graph = "igraph"),
         graph, inner_by, k, include, exclude, res.name,
         init, prune, TRUE, verbose, timeout, ...
     )
-    
+    # Set multifactor minimum size
+    min_size <- ifelse(is_complex, 1L, 2L)
+    # Catch single-step pathway cases
+    if( nrow(mf) < min_size ){
+        stop(
+            "'weavePath' currently does not support single-step pathways. We ",
+            "are working on it.", call. = FALSE
+        )
+    }
+    # Weave based on edge type
     if( is_complex ){
         # Print step
         if( verbose ) message(inter_name, " -(GM)-> ", target)

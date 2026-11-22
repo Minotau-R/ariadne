@@ -151,7 +151,7 @@ the features by set.
 genes <- addSets(genes, uniref2gmm, y.names = TRUE)
 
 # Agglomerate experiment by set
-set.se <- agglomerateByModule(
+set.se <- agglomerateBySet(
     genes, by = "rows", group = levels(uniref2gmm$gmm.name)
 )
 
@@ -317,11 +317,11 @@ by set, which returns the per-sample abundance for each set.
 # Add set information to experiment
 tse <- addSets(tse, tax2bugsig, key = "Genus", y.names = TRUE)
 
-# Limit sets to those found by weave (add support to agglomerateByModule)
+# Limit sets to those found by weave (add support to agglomerateBySet)
 adhd.sets <- adhd.sets[adhd.sets$bugsig %in% levels(tax2bugsig$bugsig), ]
 
 # Agglomerate experiment by set
-adhd.se <- agglomerateByModule(tse, by = "rows", group = adhd.sets$bugsig.name)
+adhd.se <- agglomerateBySet(tse, by = "rows", group = adhd.sets$bugsig.name)
 
 # View results
 adhd.se

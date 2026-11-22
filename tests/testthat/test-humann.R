@@ -48,7 +48,7 @@ test_that("humann", {
     
     ko_mat <- se |>
         addSets(uniref2ko, "rows") |>
-        mia::agglomerateByModule(1L, uniref2ko$ko) |>
+        mia::agglomerateBySet(1L, uniref2ko$ko) |>
         SummarizedExperiment::assay() |>
         as.data.frame()
     
