@@ -135,7 +135,7 @@ setMethod("addResource", signature = c(graph = "igraph"),
         node_df[[res.name]] <- NA
     }
     # Add resource-specific names
-    node_df[node_df$name %in% cus_vars, res.name] <- cus_vars
+    node_df[match(cus_vars, node_df$name), res.name] <- cus_vars
     # Store linkmap in cache as parquet file
     .add2cache(linkmap, rname, bfc)
     # Combine edges and nodes data into graph
