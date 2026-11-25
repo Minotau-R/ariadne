@@ -80,7 +80,7 @@
         y <- resp$unique_name
     }else{
         tax_sources <- unlist(resp$tax_sources)
-        # Match source prefix exactly (e.g. "if:" must not match "gbif:")
+        # Match source prefix exactly ("if" != "gbif")
         y <- stri_subset_regex(tax_sources, paste0("^", to, ":"))
     }
     return(y)
@@ -111,8 +111,9 @@
         y <- res$ott_id
     }else{
         # Find ids for each input
-        y <- lapply(tax_sources(res), stri_subset_regex,
-            pattern = paste0("^", to, ":"))
+        y <- lapply(
+            tax_sources(res), stri_subset_regex, pattern = paste0("^", to, ":")
+        )
         # Match ids to input names
         y <- y[res$unique_name]
     }
