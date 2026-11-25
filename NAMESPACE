@@ -143,7 +143,8 @@ importFrom(stringi,
   stri_replace_first_regex,
   stri_split_fixed,
   stri_subset,
-  stri_subset_fixed
+  stri_subset_fixed,
+  stri_trim_right
 )
 importFrom(tidyselect,all_of)
 importFrom(tools,R_user_dir)

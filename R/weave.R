@@ -284,16 +284,14 @@ setMethod("weavePath", signature = c(graph = "igraph"),
     }else if( g$source %in% c("Rhea", "UniProt") ){
         # Add special IRI prefixes
         if( is_init ) init <- .add_iri(init, g$source, g$from)
-        # Select similarity level for uniref clusters
-        uniref.identity <- switch(g$to, uniref50 = 0.5, uniref90 = 0.9, NULL)
         # Query SPARQL endpoint
         df <- .querySPARQL(
-            g$specFrom, g$specTo, g$source, init, uniref.identity, timeout, ...
+            g$from, g$to, g$specFrom, g$specTo, g$source, init, timeout, ...
         )
         # Filter special cases
         if( g$specTo == "BioCyc" ){
             # Get key (metacyc or ecocyc)
-            biocyc_key <- sub("_.+$", "", g$to)
+            biocyc_key <- stri_replace_first_regex(g$to, "_.+$", "")
             # Filter by key
             df <- df[grepl(biocyc_key, df[[2L]], ignore.case = TRUE), ]
             rownames(df) <- NULL

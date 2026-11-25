@@ -151,7 +151,7 @@ setMethod("linkNames", signature = c(graph = "igraph"),
         if( is_init ) init <- .add_iri(init, endpoint, g$name)
         # Fetch names with SPARQL query
         name_links <- .querySPARQL(
-            g$name, "name", endpoint, init, NULL, 1e6, flip = is_exit
+            g$name, "name", g$name, "name", endpoint, init, 1e6, flip = is_exit
         )
         # Strip iri from ids
         name_links[[1L]] <- .strip_iri(name_links[[1L]], g$name)

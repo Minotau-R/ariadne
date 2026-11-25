@@ -10,15 +10,15 @@ url <- file.path(
 
 meta <- fread(url)
 
-meta <- meta$Title |>
-    str_split_i("\\s+", 2L) |>
-    cbind(meta[ , c("SourceUrl", "License", "DOI")])
+meta$Title <-  str_split_i(meta$Title, "\\s+", 2L)
 
-meta <- meta[!duplicated(meta), ]
+df <- meta[ , c("Title", "WebUrl", "License", "DOI")]
 
-colnames(meta) <- c("resource", "url", "license", "doi")
+df <- df[!duplicated(df), ]
 
-resourceCatalogue <- as.data.frame(meta)
+colnames(df) <- c("resource", "url", "license", "doi")
+
+resourceCatalogue <- as.data.frame(df)
 
 # Initialise version dataframes
 dfs <- list()
