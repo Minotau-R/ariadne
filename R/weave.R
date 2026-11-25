@@ -266,7 +266,7 @@ setMethod("weavePath", signature = c(graph = "igraph"),
         # Use initial values as input for genes db
         orig <- if( "kegg_genes" %in% c(g$from, g$to) ) init else g$specFrom
         # Add prefix to external from ids
-        if( is_init && g$from %in% ext ) orig <- paste0(g$specFrom, ":", orig)
+        if( is_init && g$from %in% ext ) orig <- paste0(g$specFrom, ":", init)
         # Send query to keggLink
         kegg_link <- kegg_fun(g$specTo, orig)
         # Convert to data.frame
