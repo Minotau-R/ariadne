@@ -122,14 +122,14 @@ setMethod("drawPath", signature = c(graph = "igraph"),
 }
 
 
-#' @importFrom igraph as_data_frame
+#' @importFrom igraph as_data_frame graph_attr
 .add_edge_metadata <- function(path_df, graph, internal){
     
     graph_df <- as_data_frame(graph, what = "both")
     edge_df <- graph_df$edges
     node_df <- graph_df$vertices
     
-    versions <- attr(graph, "versions")
+    versions <- graph_attr(graph, "versions")
     path_df$version <- versions[path_df$source]
     
     graph_keys <- .get_edge_keys(edge_df)

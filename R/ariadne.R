@@ -30,7 +30,7 @@ NULL
 
 #' @export
 #' @rdname ariadne
-#' @importFrom igraph graph_from_data_frame
+#' @importFrom igraph graph_from_data_frame graph_attr
 #' @importFrom stats setNames
 #' @importFrom BiocParallel bpmapply
 #' @importFrom data.table rbindlist dcast
@@ -96,7 +96,7 @@ ariadne <- function(versions = NULL){
     # Build final resource graph
     graph <- graph_from_data_frame(edge_df, vertices = node_df)
     # Add versions as attribute to graph
-    attr(graph, "versions") <- unlist(versions)
+    graph_attr(graph, "versions") <- unlist(versions)
     return(graph)
 }
 

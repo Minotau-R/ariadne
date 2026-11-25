@@ -56,7 +56,7 @@ NULL
 
 #' @export
 #' @rdname addResource
-#' @importFrom igraph as_data_frame graph_from_data_frame
+#' @importFrom igraph as_data_frame graph_from_data_frame graph_attr
 #' @importFrom BiocFileCache bfcquery
 #' @importFrom dplyr bind_rows
 #' @importFrom data.table fread
@@ -139,10 +139,10 @@ setMethod("addResource", signature = c(graph = "igraph"),
     # Store linkmap in cache as parquet file
     .add2cache(linkmap, rname, bfc)
     # Keep resource versions of the original graph
-    versions <- attr(graph, "versions")
+    g_attr <- graph_attr(graph)
     # Combine edges and nodes data into graph
     graph <- graph_from_data_frame(edge_df, vertices = node_df)
     # Add versions back as attribute to graph
-    attr(graph, "versions") <- versions
+    graph_attr(graph) <- g_attr
     return(graph)
 })
