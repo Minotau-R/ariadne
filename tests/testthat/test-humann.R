@@ -72,7 +72,7 @@ test_that("humann", {
     # db <- loadDB(name = "GMMs.v1.07")
 
     # omixer_gmm <- choco_ko |>
-    #     rpm(minimum.coverage = 0, module.db = db) |>
+    #     rpm(minimum.coverage = 0, module.db = db, complex.rule = "all") |>
     #     asDataFrame("coverage")
     
     # omixer_gmm <- omixer_gmm[omixer_gmm$a > 0, ]
@@ -80,8 +80,6 @@ test_that("humann", {
     
     # omixer_gmm$Description <- NULL
     # colnames(omixer_gmm) <- c("gmm", "cov")
-    
-    # omixer_gmm$cov[omixer_gmm$gmm == "MF0007"] <- 0.2
     
     # write.table(
     #     omixer_gmm, gmm_file, sep = "\t", quote = FALSE, row.names = FALSE
