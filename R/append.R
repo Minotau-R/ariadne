@@ -149,9 +149,8 @@ setMethod("getSets", signature = c(x = "SummarizedExperiment"),
     sets <- as.data.table(sets)
     # Add cov variable if absent
     if( !"cov" %in% colnames(sets) ) sets$cov <- 1
-    # Widen sets (duplicate links, e.g. ids sharing a name, keep max coverage)
-    sets <- dcast(sets, widen_form, value.var = "cov", fun.aggregate = max,
-        fill = 0)
+    # Widen sets
+    sets <- dcast(sets, widen_form, value.var = "cov", fill = 0)
     # Match by rownames
     if( is_rownames ){
         idx <- match(rownames(df), sets[[origin_col]])
