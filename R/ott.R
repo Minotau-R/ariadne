@@ -54,32 +54,30 @@
 
 #' @importFrom stringi stri_subset_fixed
 #' @importFrom httr2 request req_method req_body_json req_perform resp_body_json
-#' @importFrom httr2 req_error resp_is_error resp_status
+#'   req_error resp_is_error resp_status
 .queryTaxonInfo <- function(x, to, prefix, timeout){
-    
+    # Set API url
     url <- "https://api.opentreeoflife.org/v3/taxonomy/taxon_info"
-    
+    # Prepare query body
     body <- list()
     body[[prefix]] <- x
-    
+    # Send query to OTT API
     resp <- request(url) |>
         req_method("POST") |>
         req_body_json(body) |>
         req_timeout(timeout) |>
-        # OTT answers unknown ids with 400 Bad Request; handle it below
+        # Handle unknown OTT ids (400 response status)
         req_error(
             is_error = function(r) resp_is_error(r) && resp_status(r) != 400L
         ) |>
         req_perform()
-    
     # Return missing value for ids unknown to OTT
-    if( resp_status(resp) == 400L ) return(NA_character_)
-    
+    if( resp_status(resp) == 400L ) return(NA)
+    # Retrieve response body
     resp <- resp_body_json(resp)
-    
     # Handle missing or empty responses
     if( is.null(resp) || length(resp) == 0L ){
-        return(NA_character_)
+        return(NA)
     }
     
     if( to == "ott" ){
