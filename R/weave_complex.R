@@ -141,12 +141,14 @@ setMethod("weaveComplex", signature = c(graph = "igraph"),
 
 
 #' @importFrom readr read_lines
-#' @importFrom stringi stri_replace_all_regex stri_split_fixed
+#' @importFrom stringi stri_trim_right stri_replace_all_regex stri_split_fixed
 #' @importFrom multifactor multifactor weave
 .process_complex_modules <- function(
     x, br = "///", AND = ",", OR = "\t", output.format = "linkmap", ...){
     # Read file content
-    x <- read_lines(x, ...)
+    x <- x |>
+        read_lines(...) |>
+        stri_trim_right()
     # Identify break lines
     v_br <- x == br
     # Split content by breaks, excluding break lines themselves
