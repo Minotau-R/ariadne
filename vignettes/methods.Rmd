@@ -1,5 +1,5 @@
 ---
-title: "ariadne definitions and technical details"
+title: "ariadne under the hood: a guide to interested users and contributors"
 author:
   - name: Giulio Benedetti
     affiliation: University of Turku
@@ -14,11 +14,11 @@ output:
         number_sections: true
         self_contained: true
         code_folding: show
-# bibliography: ../inst/REFERENCES.bib
+bibliography: ../inst/REFERENCES.bib
 date: "`r doc_date()`"
 package: "`r pkg_ver('ariadne')`"
 vignette: >
-  %\VignetteIndexEntry{ariadne definitions and technical details}
+  %\VignetteIndexEntry{ariadne under the hood: a guide to users and contributors}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -31,6 +31,10 @@ knitr::opts_chunk$set(
 ```
 
 # Introduction
+
+ariadne is built on the key consideration that, **while resource sizes may
+change over time, links between different resources are relatively stable**.
+Based on this assumption, we have compiled a hosted in ariadneDB
 
 # Definitions
 
@@ -88,6 +92,15 @@ Optimised linkmap generation | Code complexity increases with resource coverage
 **Optimised linkmap generation** through the multifactor class, which
 streamlines factor operations to create linkmaps by sequentially combining them
 along the path from origin to target feature type.
+
+# Contributors' guide
+
+While it is possible to use `addResource()` to temporarily add custom resources
+to the ariadne graph, we may 
+
+- Open an issue 
+
+Reach us 
 
 # Reproducibility
 
