@@ -68,9 +68,8 @@ setMethod("drawPath", signature = c(graph = "igraph"),
     if( !is.null(exclude) && !is.character(exclude) ){
         stop("'exclude' must be a character vector.", call. = FALSE)
     }
-    if( length(intersect(include, exclude)) != 0L ){
-        stop("'include' and 'exclude' cannot overlap.", call. = FALSE)
-    }
+    # Check include and exclude combinations
+    .check_overlap(include, exclude)
     # Extract by vars
     by.vars <- all.vars(by)
     from <- by.vars[1]
@@ -89,9 +88,9 @@ setMethod("drawPath", signature = c(graph = "igraph"),
         sp <- k_shortest_paths(graph, from, to, k = j, mode = "all")
         # Select suitable paths
         keep <- vapply(
-          sp$vpaths,
-          function(v) all(include %in% names(v)) & !any(exclude %in% names(v)),
-          logical(1L)
+            sp$vpaths,
+            function(v) all(include %in% names(v)) & !any(exclude %in% names(v)),
+            logical(1L)
         )
         # Increase buffer and attempt
         j <- buffer.factor * j
@@ -122,14 +121,14 @@ setMethod("drawPath", signature = c(graph = "igraph"),
 }
 
 
-#' @importFrom igraph as_data_frame
+#' @importFrom igraph as_data_frame graph_attr
 .add_edge_metadata <- function(path_df, graph, internal){
     
     graph_df <- as_data_frame(graph, what = "both")
     edge_df <- graph_df$edges
     node_df <- graph_df$vertices
     
-    versions <- attr(graph, "versions")
+    versions <- graph_attr(graph, "versions")
     path_df$version <- versions[path_df$source]
     
     graph_keys <- .get_edge_keys(edge_df)

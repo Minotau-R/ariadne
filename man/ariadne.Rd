@@ -4,18 +4,29 @@
 \alias{ariadne}
 \title{Build ariadne resource graph}
 \usage{
-ariadne(versions = NULL)
+ariadne(versions = NULL, include = NULL, exclude = NULL, force = FALSE)
 }
 \arguments{
 \item{versions}{\code{Character list}. A named list of resource versions to
 load. Latest versions are used if not specified. (Default: \code{NULL})}
+
+\item{include}{\code{Character vector}. A vector of resource names to include
+in the resulting graph. If \code{NULL}, all resources are included.
+(Default: \code{NULL})}
+
+\item{exclude}{\code{Character vector}. A vector of resource names to exclude
+from the resulting graph. If \code{NULL}, all resources are included.
+(Default: \code{NULL})}
+
+\item{force}{\code{Logical scalar}. Whether the local cache of the graph
+should be overwritten. (Default: \code{FALSE})}
 }
 \value{
 An igraph object with the ariadne resource graph.
 }
 \description{
 \code{ariadne} imports the resource graph hosted in the companion package
-ariadneDB.
+ariadneDB, while also creating a local cache.
 }
 \examples{
 # Import default resource graph
@@ -24,6 +35,15 @@ graph <- ariadne()
 # Specify custom resource versions
 versions <- list(BugSigDB = "v1.2.2", WoL = "v20April2021")
 graph <- ariadne(versions = versions)
+
+# Import graph for a resource subset
+graph <- ariadne(include = c("UniProt", "Rhea"))
+
+# Import graph except a resource subset
+graph <- ariadne(exclude = c("UniProt", "Rhea"))
+
+# Download the graph again and overwrite cache
+graph <- ariadne(force = TRUE)
 }
 \seealso{
 \itemize{

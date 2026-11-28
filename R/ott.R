@@ -52,7 +52,7 @@
 }
 
 
-#' @importFrom stringi stri_subset_fixed
+#' @importFrom stringi stri_subset_regex
 #' @importFrom httr2 request req_method req_body_json req_perform resp_body_json
 .queryTaxonInfo <- function(x, to, prefix, timeout){
     
@@ -80,7 +80,8 @@
         y <- resp$unique_name
     }else{
         tax_sources <- unlist(resp$tax_sources)
-        y <- stri_subset_fixed(tax_sources, to)
+        # Match source prefix exactly ("if" != "gbif")
+        y <- stri_subset_regex(tax_sources, paste0("^", to, ":"))
     }
     return(y)
 }
@@ -100,7 +101,7 @@
 
 
 #' @importFrom rotl tnrs_match_names tax_sources
-#' @importFrom stringi stri_subset_fixed
+#' @importFrom stringi stri_subset_regex
 .subqueryTNRS <- function(x, to){
     # Match input names
     res <- tnrs_match_names(x)
@@ -110,7 +111,9 @@
         y <- res$ott_id
     }else{
         # Find ids for each input
-        y <- lapply(tax_sources(res), stri_subset_fixed, pattern = to)
+        y <- lapply(
+            tax_sources(res), stri_subset_regex, pattern = paste0("^", to, ":")
+        )
         # Match ids to input names
         y <- y[res$unique_name]
     }

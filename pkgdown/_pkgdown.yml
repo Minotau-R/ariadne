@@ -24,6 +24,9 @@ articles:
   - title: "ariadne logo: the Labyrinth of Biology"
     navbar: ~
     contents: logo
+  - title: "FAQ"
+    navbar: ~
+    contents: faq
 
 external-articles:
   - name: ariadneDB
