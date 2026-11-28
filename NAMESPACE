@@ -58,7 +58,7 @@ importFrom(arrow,
   write_parquet
 )
 importFrom(data.table,
-  ":=",
+  `:=`,
   as.data.table,
   data.table,
   dcast,
