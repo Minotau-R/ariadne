@@ -2,6 +2,8 @@ Changes in version 0.2.x
 * Made major changes to workflow
 * Switched back to S4
 * Replaced stringr with stringi
+* Revised SPARQL query strategy
+* Added include, exclude and force args to ariadne
 
 Changes in version 0.1.X
 * Switched to S7

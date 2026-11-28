@@ -1,0 +1,89 @@
+---
+title: "Frequently asked questions"
+author:
+  - name: Giulio Benedetti
+    affiliation: University of Turku
+    email: giulio.benedetti@utu.fi
+output:
+    BiocStyle::html_document:
+        fig_height: 7
+        fig_width: 10
+        toc: true
+        toc_float: true
+        toc_depth: 2
+        number_sections: true
+        self_contained: true
+        code_folding: show
+bibliography: ../inst/REFERENCES.bib
+date: "`r doc_date()`"
+package: "`r pkg_ver('ariadne')`"
+vignette: >
+  %\VignetteIndexEntry{FAQ}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+This article tries to clarify the more obscure aspects of ariadne by answering
+questions from the community, myself included.
+
+# Questions & Answers
+
+**How does ariadne fetch online resources?**
+
+Great question! In general, ariadne combines four different resource types:
+
+- Zenodo records
+- Online file directories (FTP)
+- SPARQL endpoints
+- RESTful APIs
+
+For example, ChocoPhlAn, GO, UniProt and KEGG are fetched from
+[this Zenodo record](https://doi.org/10.5281/zenodo.17100033),
+[this FTP folder](https://current.geneontology.org/),
+[this SPARQL endpoint](https://sparql.uniprot.org/) and
+[this API endpoint](https://www.kegg.jp/kegg/rest/keggapi.html), respectively.
+
+**Can I extend the ariadne graph with custom resources?**
+
+You can add custom single linkmaps (both local and remote) to the ariadne graph
+with `addResource()`. If you believe a key resource is missing, you can let us
+know by opening a _resource request_ issue
+[here](https://github.com/Minotau-R/ariadne/issues).
+
+**Can I access a previous resource version?**
+
+Yes, for example you can point to past BugSigDB and WoL releases with
+`ariadne(versions = list(BugSigDB = "v1.2.2", WoL = "v20April2021"))`. Available
+resources and their versions can be listed with `listResources()` and
+`listResourceVersions()`, respectively.
+
+**How does ariadne handle multiple resource versions?**
+
+The [Zenodo record](https://doi.org/10.5281/zenodo.23584782) of the ariadneDB 
+contains `gml` files each describing one resource. As long as the network
+structure of a resource (links between features) stay the same, that resource is
+encoded by the latest ariadneDB release. When a resource structure changes (any
+link between two features is added and/or removed), all versions up to that
+point are fixed to that moment's ariadneDB release, while new versions are
+encoded by the latest ariadneDB release.
+
+**How can a single ariadneDB release encode multiple versions of a resource?**
+
+Even if a resource size changes over time, the links between its features are
+likely to be much more stable. All that matters to ariadne is the network
+structure of a resource, that is, how their features link to each other. For
+simplicity, you can can think of the different `gml` files as mere templates for
+the resource network structures.
+
+With that said, every time `ariadne()` is run, the URL links to the resources
+are updated based on the requested resource versions (in practice, for each
+resource the `"{version}"` placeholder is replaced with the requested version).
+
+An important caveat is that only file-based resources (Zenodo records and online
+file directories) allow access to past resource releases, whereas SPARQL
+endpoints and APIs always point to the current release.
+
+# Support
+
+Got more questions? Chat with us on the
+[Bioconductor Zulip channel](https://community-bioc.zulipchat.com/#narrow/channel/507584-miaverse).
