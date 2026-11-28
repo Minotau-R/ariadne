@@ -37,13 +37,12 @@ modalities, making it applicable to various omics data science scenarios focused
 on enriching analyses with curated knowledge from public databases. This
 tutorial demonstrates the following core applications of `ariadne`:
 
-| **Use case** | **Resources** | **Objective** |
+| **Use case** | **Objective** | **Resources** |
 |--------------|---------------|---------------|
-| Functional annotation | ChocoPhlAn, WoL | Annotate microbial or gene features (UniRef) with sequence-based related functional information (e.g., KO, EC, and Pfam) |
-| Taxonomic translation | OTT, UniProt | Convert taxonomic names and ids across taxonomies (NCBI, SILVA, OTT, etc.) |
-| Set enrichment analysis | BugSigDB, GM, GO, MSigDB | Test for enriched or depleted functional sets of features between conditions |
-| Pathway enrichment analysis | KEGG, Rhea, WoL | Test for enriched or depleted metabolic pathways linked to features between conditions |
-| Knowledge-driven association analysis | KEGG, UniProt | Test previously reported associations between different omics layers (e.g., microbes, metabolites and genes) |
+| Reference-based functional annotation | Annotate microbial or gene features (UniRef) with sequence-based related functional information (e.g., KO, EC, and Pfam) | ChocoPhlAn, WoL |
+| Taxonomic translation | Convert taxonomic names and ids across taxonomies (NCBI, SILVA, OTT, etc.) | OTT, UniProt |
+| Set/Pathway enrichment analysis | Test for enriched or depleted functional feature sets or metabolic pathways between conditions | BugSigDB, GM, GO, MSigDB, KEGG, Rhea, WoL |
+| Knowledge-driven association analysis | Test previously reported associations between different omics layers (e.g., microbes, metabolites and genes) | KEGG, UniProt |
 
 First, we load `ariadne` and additional libraries used across this tutorial.
 
@@ -57,35 +56,25 @@ library(stringr)
 library(DT)
 ```
 
-We also import the `ariadne` resource graph that will be used to link resources
-throughout this tutorial.
+We also import the resource graph with `ariadne()` that will be used to link
+resources throughout this tutorial.
 
 ```{r}
 # Import resource graph
 graph <- ariadne()
 ```
 
-# Functional annotation
+# Reference-based functional annotation
 
 Resources such as ChocoPhlAn and Web of Life (WoL) have been developed to
 annotate microbial features and gene families with relevant functional
 information, including KEGG Orthogroups (KOs), Pfam domains, enzyme commission
-(EC) numbers and Gene Ontology (GO). This allows to derive actionable insight
-directly from biological assays.
-
-Resources such as ChocoPhlAn and the Web of Life (WoL) annotate microbial
-features and gene families with functional metadata—such as KEGG Orthogroups
-(KOs), Pfam domains, Enzyme Commission (EC) numbers and Gene Ontology (GO)
-terms—enabling the derivation of biological insights directly from omics
-datasets.
-
-We import and process the Castro-NallarE_2015 dataset from
-[curatedMetagenomicData](https://doi.org/10.18129/B9.bioc.curatedMetagenomicData),
-which entails 32 oral cavity microbiome samples from individuals with Chron's
-Disease, Type-2 Diabetes and schizophrenia.
+(EC) numbers and Gene Ontology (GO) classes. This allows to derive actionable
+insight directly from omics datasets.
 
 We import and preprocess the `Castro-NallarE_2015` dataset from
-[curatedMetagenomicData](https://doi.org/10.18129/B9.bioc.curatedMetagenomicData), comprising 32 oral cavity microbiome samples from individuals with Crohn's
+[curatedMetagenomicData](https://doi.org/10.18129/B9.bioc.curatedMetagenomicData),
+comprising 32 oral cavity microbiome samples from individuals with Crohn's
 disease, Type 2 diabetes and schizophrenia.
 
 ```{r}
@@ -151,7 +140,7 @@ the features by set.
 genes <- addSets(genes, uniref2gmm, y.names = TRUE)
 
 # Agglomerate experiment by set
-set.se <- agglomerateByModule(
+set.se <- agglomerateBySet(
     genes, by = "rows", group = levels(uniref2gmm$gmm.name)
 )
 
@@ -247,7 +236,9 @@ gg2tax <- weavePath(graph, greengenes ~ taxid)
 datatable(gg2tax)
 ```
 
-# Set enrichment analysis
+# Enrichment analysis
+
+## Set enrichment analysis
 
 Leveraging prior functional or phenotypic annotations, set enrichment analysis
 tests whether predefined feature sets (genes, taxa, or metabolites) are over-
@@ -317,11 +308,11 @@ by set, which returns the per-sample abundance for each set.
 # Add set information to experiment
 tse <- addSets(tse, tax2bugsig, key = "Genus", y.names = TRUE)
 
-# Limit sets to those found by weave (add support to agglomerateByModule)
+# Limit sets to those found by weave (add support to agglomerateBySet)
 adhd.sets <- adhd.sets[adhd.sets$bugsig %in% levels(tax2bugsig$bugsig), ]
 
 # Agglomerate experiment by set
-adhd.se <- agglomerateByModule(tse, by = "rows", group = adhd.sets$bugsig.name)
+adhd.se <- agglomerateBySet(tse, by = "rows", group = adhd.sets$bugsig.name)
 
 # View results
 adhd.se
@@ -334,7 +325,7 @@ Finally, we visualise per-sample set abundances using a heatmap.
 plotHeatmap(adhd.se, assay.type = "relabundance", col.var = "patient_status")
 ```
 
-# Pathway enrichment analysis
+## Pathway enrichment analysis
 
 Analogous to set enrichment, pathway enrichment analysis tests for enriched or
 depleted metabolic pathways based on feature coverage. Representative resources

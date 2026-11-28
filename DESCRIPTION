@@ -1,9 +1,12 @@
 Package: ariadne
-Version: 0.2.13
+Version: 0.2.18
 Authors@R: 
     c(person(given = "Giulio", family = "Benedetti", role = c("aut", "cre"),
           email = "giulio.benedetti@utu.fi",
           comment = c(ORCID = "0000-0002-8732-7692")),
+    person(given = "Tuomas", family = "Borman", role = c("aut"),
+          email = "tuomas.v.borman@utu.fi",
+          comment = c(ORCID = "0000-0002-8563-8884")),
     person("Thomaz", family = "Bastiaanssen", role = c("aut"),
           email = "thomazbastiaanssen@gmail.com",
           comment = c(ORCID = "0000-0001-6891-734X")), 

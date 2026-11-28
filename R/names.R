@@ -77,14 +77,15 @@ setMethod("linkNames", signature = c(graph = "igraph"),
     return(name_links)
 })
 
-#' @importFrom stringi stri_replace_first_fixed stri_replace_all_regex stri_detect_fixed
+#' @importFrom stringi stri_replace_first_fixed stri_replace_first_regex
+#'   stri_replace_all_regex stri_detect_fixed
 #' @importFrom KEGGREST listDatabases keggList
 #' @importFrom arrow read_parquet open_dataset
+#' @importFrom data.table fread as.data.table
 #' @importFrom dplyr select filter collect
 #' @importFrom tidyselect all_of
 #' @importFrom enviPathR epList
 #' @importFrom readr read_lines
-#' @importFrom data.table fread
 #' @importFrom rlang sym
 .fetch_node <- function(g, ids, names){
     # Check if values exist
@@ -126,16 +127,12 @@ setMethod("linkNames", signature = c(graph = "igraph"),
     }else if( g$KEGG %in% c(listDatabases(), "ec", "network") ){
         # Use ids as input if specified and not too many
         if( !is_init || length(init) > 50 ) init <- g$KEGG
-        # Get vector of feature names
-        name_vec <- keggList(init)
-        # Keep only first name (and last for ko)
-        to_remove <- ifelse(g$KEGG == "ko", ".*;", ";.*")
-        # Convert to linkmap
-        name_links <- data.frame(
-            x = names(name_vec),
-            y = stri_replace_first_regex(name_vec, to_remove, ""),
-            row.names = NULL
-        )
+        # Get linkmap of feature names
+        name_links <- init |>
+            keggList() |>
+            as.data.table(keep.rownames = TRUE)
+        # Keep only first name for non-ko features
+        name_links[g$KEGG != "ko", V2 :=  stri_replace_first_regex(V2, ";.*", "")]
     }else if( stri_detect_fixed(g$name, "envipath") ){
         # List available objects
         name_links <- epList(g$enviPath)
@@ -151,7 +148,7 @@ setMethod("linkNames", signature = c(graph = "igraph"),
         if( is_init ) init <- .add_iri(init, endpoint, g$name)
         # Fetch names with SPARQL query
         name_links <- .querySPARQL(
-            g$name, "name", endpoint, init, NULL, 1e6, flip = is_exit
+            g$name, "name", g$name, "name", endpoint, init, 1e6, flip = is_exit
         )
         # Strip iri from ids
         name_links[[1L]] <- .strip_iri(name_links[[1L]], g$name)

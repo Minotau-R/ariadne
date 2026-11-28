@@ -56,7 +56,7 @@ NULL
 
 #' @export
 #' @rdname addResource
-#' @importFrom igraph as_data_frame graph_from_data_frame
+#' @importFrom igraph as_data_frame graph_from_data_frame graph_attr
 #' @importFrom BiocFileCache bfcquery
 #' @importFrom dplyr bind_rows
 #' @importFrom data.table fread
@@ -106,12 +106,12 @@ setMethod("addResource", signature = c(graph = "igraph"),
     }
     # Import linkmap
     linkmap <- fread(file, ...)
-    # Add column names to linkmap
-    colnames(linkmap) <- cus_vars
     # Check that linkmap has two columns
     if( ncol(linkmap) != 2L ){
         stop("'file' must point to a two-column linkmap.", call. = FALSE)
     }
+    # Add column names to linkmap
+    colnames(linkmap) <- cus_vars
     # Add new edge for user-defined linkmap
     edge_df <- rbind(edge_df, data.frame(
         from = cus_vars[1], to = cus_vars[2], source = res.name, url = file
@@ -135,10 +135,14 @@ setMethod("addResource", signature = c(graph = "igraph"),
         node_df[[res.name]] <- NA
     }
     # Add resource-specific names
-    node_df[node_df$name %in% cus_vars, res.name] <- cus_vars
+    node_df[match(cus_vars, node_df$name), res.name] <- cus_vars
     # Store linkmap in cache as parquet file
     .add2cache(linkmap, rname, bfc)
+    # Keep resource versions of the original graph
+    g_attr <- graph_attr(graph)
     # Combine edges and nodes data into graph
     graph <- graph_from_data_frame(edge_df, vertices = node_df)
+    # Add versions back as attribute to graph
+    graph_attr(graph) <- g_attr
     return(graph)
 })
