@@ -96,13 +96,16 @@ importFrom(ggraph,
 importFrom(httr2,
   req_body_form,
   req_body_json,
+  req_error,
   req_headers,
   req_method,
   req_perform,
   req_timeout,
   request,
   resp_body_json,
-  resp_body_string
+  resp_body_string,
+  resp_is_error,
+  resp_status
 )
 importFrom(igraph,
   "E<-",
