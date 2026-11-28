@@ -106,12 +106,12 @@ setMethod("addResource", signature = c(graph = "igraph"),
     }
     # Import linkmap
     linkmap <- fread(file, ...)
-    # Add column names to linkmap
-    colnames(linkmap) <- cus_vars
     # Check that linkmap has two columns
     if( ncol(linkmap) != 2L ){
         stop("'file' must point to a two-column linkmap.", call. = FALSE)
     }
+    # Add column names to linkmap
+    colnames(linkmap) <- cus_vars
     # Add new edge for user-defined linkmap
     edge_df <- rbind(edge_df, data.frame(
         from = cus_vars[1], to = cus_vars[2], source = res.name, url = file
