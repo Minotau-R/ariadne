@@ -4,10 +4,21 @@
 #' 
 #' @description
 #' \code{ariadne} imports the resource graph hosted in the companion package
-#' ariadneDB.
+#' ariadneDB, while also creating a local cache.
 #' 
 #' @param versions \code{Character list}. A named list of resource versions to
 #' load. Latest versions are used if not specified. (Default: \code{NULL})
+#' 
+#' @param include \code{Character vector}. A vector of resource names to include
+#'   in the resulting graph. If \code{NULL}, all resources are included.
+#'   (Default: \code{NULL})
+#' 
+#' @param exclude \code{Character vector}. A vector of resource names to exclude
+#'   from the resulting graph. If \code{NULL}, all resources are included.
+#'   (Default: \code{NULL})
+#' 
+#' @param force \code{Logical scalar}. Whether the local cache of the graph
+#'   should be overwritten. (Default: \code{FALSE})
 #' 
 #' @returns An igraph object with the ariadne resource graph.
 #' 
@@ -25,6 +36,15 @@
 #' # Specify custom resource versions
 #' versions <- list(BugSigDB = "v1.2.2", WoL = "v20April2021")
 #' graph <- ariadne(versions = versions)
+#' 
+#' # Import graph for a resource subset
+#' graph <- ariadne(include = c("UniProt", "Rhea"))
+#' 
+#' # Import graph except a resource subset
+#' graph <- ariadne(exclude = c("UniProt", "Rhea"))
+#' 
+#' # Download the graph again and overwrite cache
+#' graph <- ariadne(force = TRUE)
 NULL
 
 
@@ -34,9 +54,28 @@ NULL
 #' @importFrom stats setNames
 #' @importFrom BiocParallel bpmapply
 #' @importFrom data.table rbindlist dcast
-ariadne <- function(versions = NULL){
+ariadne <- function(versions = NULL, include = NULL, exclude = NULL,
+    force = FALSE){
+    # Check source
+    .check_source_validity(names(versions))
+    # Check include
+    .check_source_validity(include)
+    # Check exclude
+    .check_source_validity(exclude)
+    # Check versions and exclude combinations
+    .check_overlap(versions, exclude)
+    # Check include and exclude combinations
+    .check_overlap(include, exclude)
+    # Check force
+    if( length(force) != 1L || !is.logical(force) || is.na(force) ){
+        stop("'force' must be TRUE or FALSE.", call. = FALSE)
+    }
     # Import version metadata
     meta <- versionMetadata
+    # Include resources
+    if( !is.null(include) ) meta <- meta[meta$source %in% include, ]
+    # Exclude resources
+    if( !is.null(exclude) ) meta <- meta[!meta$source %in% exclude, ]
     # Set default versions
     default_vers <- meta[meta$default, ]
     default_vers <- setNames(default_vers$version, default_vers$source)
@@ -71,6 +110,7 @@ ariadne <- function(versions = NULL){
     graph_dfs <- bpmapply(
         .fetch_graph,
         meta$graph, meta$source, meta$key, urls,
+        MoreArgs = list(force = force),
         SIMPLIFY = FALSE, USE.NAMES = FALSE
     )
     # Name each graph by corresponding resource
@@ -102,9 +142,9 @@ ariadne <- function(versions = NULL){
 
 
 #' @importFrom igraph read_graph as_data_frame
-.fetch_graph <- function(gver, res.name, key, url){
+.fetch_graph <- function(gver, res.name, key, url, force){
     # Cache graph from ariadneDB
-    cached <- .cache_graph(url, gver, res.name)
+    cached <- .cache_graph(url, gver, res.name, force)
     # Read graph from cache
     graph <- read_graph(cached, format = "gml")
     # Retrieve nodes and edges tables
@@ -117,27 +157,33 @@ ariadne <- function(versions = NULL){
 
 #' @importFrom httr2 request req_perform
 #' @importFrom BiocFileCache bfcquery bfcadd
-.cache_graph <- function(url, gver, res.name){
+.cache_graph <- function(url, gver, res.name, force){
     # Initialise cache
     bfc <- .init_cache()
     # Build resource name
     rname <- file.path("ariadneDB", gver, res.name)
     # Check if preprocessed file is cached
-    cached <- bfcquery(bfc, rname)$rpath
+    cached <- bfcquery(bfc, rname, field = "rname")$rpath
+    # Set cached condition
+    is_cached <- length(cached) > 0L
     # Return preprocessed file if available
-    if( length(cached) > 0L ) return(cached[1])
+    if( !force && is_cached ) return(cached[1])
     # Find path for cache subdir
     fpath <- .init_fpath(bfc, rname)
     # Download resource graph
     url |>
         request() |>
         req_perform(fpath)
-    # Cache the preprocessed file using URL as resource name
-    bfcadd(
-        bfc, rname = rname, fpath = fpath, fname = "exact", action = "asis"
-    )
+    # Cache the non-cached GML file
+    if( !is_cached ){
+        # Add to cache
+        bfcadd(
+            bfc, rname = rname, fpath = fpath, fname = "exact", action = "asis"
+        )
+    }
     # Return path to cached preprocessed file
     cached <- bfcquery(bfc, rname)$rpath
+    return(cached)
 }
 
 
@@ -162,4 +208,27 @@ ariadne <- function(versions = NULL){
     # Retrieve specific names by indexing
     specific <- nodes[cbind(idx, idy)]
     return(specific)
+}
+
+
+.check_source_validity <- function(x){
+    # Check that all x are valid resources
+    if( !all(x %in% resourceCatalogue$resource) ){
+        # Get argument name
+        x_name <- deparse(substitute(x))
+        # Raise error
+        stop("Some resources in '", x_name, "' were not found.", call. = FALSE)
+    }
+}
+
+
+.check_overlap <- function(x, y){
+    # Check that x and y do not overlap
+    if( length(intersect(x, y)) != 0L ){
+        # Get argument names
+        x_name <- deparse(substitute(x))
+        y_name <- deparse(substitute(y))
+        # Raise error
+        stop("'", x_name, "' and '", y_name, "' cannot overlap.", call. = FALSE)
+    }
 }
