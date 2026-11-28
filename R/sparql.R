@@ -1,17 +1,21 @@
 
 #' @importFrom BiocParallel bplapply
 #' @importFrom data.table rbindlist
-.querySPARQL <- function(from, to, endpoint, init, uniref.identity, timeout,
+.querySPARQL <- function(from, to, specFrom, specTo, endpoint, init, timeout,
     flip = FALSE, batch.size = 25000, workers = NULL, factor = 3){
+    # Combine origin and target
+    spterms <- c(from, to)
+    names(spterms) <- c(specFrom, specTo)
     # Invert features if flipped
-    if( flip ){
-        tmp <- to
-        to <- from
-        from <- tmp
-    }
+    if( flip ) spterms <- rev(spterms)
+    # Select similarity level for uniref clusters
+    uniref.identity <- switch(spterms[2], uniref50 = 0.5, uniref90 = 0.9)
+    # Remove identity level from UniRef
+    uniref_idx <- which(spterms == "uniref")
+    spterms[uniref_idx] <- "uniref"
     # Set common prefixes
     preface <- paste0("
-        PREFIX chebislash: <http://purl.obolibrary.org/obo/chebi/>
+        PREFIX chemrof: <https://w3id.org/chemrof/>
         PREFIX enzyme: <http://purl.uniprot.org/enzyme/>
         PREFIX obo: <http://purl.obolibrary.org/obo/>
         PREFIX oboInOwl: <http://www.geneontology.org/formats/oboInOwl#>
@@ -22,18 +26,18 @@
         PREFIX uniref: <http://purl.uniprot.org/uniref/>
         PREFIX up: <http://purl.uniprot.org/core/>
         
-        SELECT DISTINCT ?", paste(c(from, to), collapse = " ?"), "
+        SELECT DISTINCT ?", paste(spterms, collapse = " ?"), "
         WHERE {
         "
     )
     # Build triple based on from and to
-    triple <- .triple_table(from, to, uniref.identity)
+    triple <- .triple_table(spterms, uniref.identity)
     # Find starts and ends of init ranges
     ranges <- .get_batches(init, batch.size, workers, factor)
     # Query SPARQL for each range
     out.list <- bplapply(ranges, function(i){
         x <- init[i[1]:i[2]]
-        query <- .composeSPARQL(from, to, preface, triple, endpoint, x)
+        query <- .composeSPARQL(spterms, preface, triple, endpoint, x)
         resp <- .sendSPARQL(query, endpoint, timeout)
     })
     # Bind output linkmaps
@@ -63,13 +67,13 @@
 }
 
 
-.composeSPARQL <- function(from, to, preface, clause, endpoint, init){
+.composeSPARQL <- function(spterms, preface, clause, endpoint, init){
     # If init is defined
     if( !is.null(init) && length(init) != 0L ){
         # Limit query with values
         values <- paste0(
-            "VALUES ?", from, " {\n",
-                paste(.iri_table(init, from, to, endpoint), collapse = " "), "
+            "VALUES ?", spterms[1], " {\n",
+                paste(.iri_table(init, spterms, endpoint), collapse = " "), "
             }\n")
         # Pre-append values to clause
         clause <- paste0(values, clause)
@@ -91,18 +95,18 @@
 }
 
 
-.triple_table <- function(from, to, uniref.identity){
-    
-    spterms <- c(from, to)
-    
+.triple_table <- function(spterms, uniref.identity){
+    # Define internal features
     internals <- c(
-        "uniref", "uniprotkb", "taxid", "enzyme", "rhea", "chebi", "inchikey",
+        "uniref", "uniprotkb", "taxid", "ec", "rhea", "chebi", "inchikey",
         "inchi", "smiles", "name"
     )
-    
-    ext <- setdiff(spterms, internals)
-    
-    which_uniref <- ifelse(to == "uniref", paste0("
+    # Find index of external if any
+    ext_idx <- which(!spterms %in% internals)
+    # Retrieve external generic and specific names
+    ext <- spterms[ext_idx]
+    # Select UniRef identity level
+    which_uniref <- ifelse(spterms[2] == "uniref", paste0("
         ?uniref up:identity ", uniref.identity, ".
     "), "")
     
@@ -124,16 +128,16 @@
         ?uniprotkb up:representativeFor ?uniref.
     ")
     
-    uniprotkb2enzyme <- "
-        ?uniprotkb (up:enzyme|up:domain/up:enzyme|up:component/up:enzyme) ?enzyme.
+    uniprotkb2ec <- "
+        ?uniprotkb (up:enzyme|up:domain/up:enzyme|up:component/up:enzyme) ?ec.
     "
     
-    uniref2enzyme <- paste0(uniref2uniprotkb, uniprotkb2enzyme)
+    uniref2ec <- paste0(uniref2uniprotkb, uniprotkb2ec)
     
     uniprotkb2external <- paste0("
         ?uniprotkb a up:Protein.
         ?uniprotkb rdfs:seeAlso ?", ext, ".
-        ?", ext, " up:database <http://purl.uniprot.org/database/", ext, ">.
+        ?", ext, " up:database <http://purl.uniprot.org/database/", names(ext), ">.
     ")
     
     uniref2external <- paste0(uniref2uniprotkb, uniprotkb2external)
@@ -156,24 +160,24 @@
     "
     
     inchi2chebi <- "
-        ?chebi chebislash:inchi ?inchi.
+        ?chebi chemrof:inchi_string ?inchi.
     "
     
     inchikey2chebi <- "
-        ?chebi chebislash:inchikey ?inchikey.  
+        ?chebi chemrof:inchi_key_string ?inchikey.  
     "
     
     smiles2chebi <- "
-        ?chebi chebislash:smiles ?smiles.
+        ?chebi chemrof:smiles_string ?smiles.
     "
     
     rhea2inchi <- paste0(rhea2chebi, inchi2chebi)
     rhea2inchikey <- paste0(rhea2chebi, inchikey2chebi)
     smiles2rhea <- paste0(rhea2chebi, smiles2chebi)
     
-    rhea2enzyme <- "
+    rhea2ec <- "
         ?rhea rdfs:subClassOf rh:Reaction.
-        ?rhea rh:ec ?enzyme.
+        ?rhea rh:ec ?ec.
     "
     
     rhea2external <- paste0("
@@ -188,28 +192,31 @@
             ?alter rdfs:seeAlso ?", ext, ".
             BIND(?alter as ?rhea)
         }
-        FILTER(contains(str(?", ext, "), '", ext, "'))
+        FILTER(contains(str(?", ext, "), '", names(ext), "'))
     ")
     
     chebi2external <- paste0("
         ?chebi oboInOwl:hasDbXref ?", ext, ".
-        FILTER(contains(?", ext, ", '", ext, ":'))
+        FILTER(contains(?", ext, ", '", names(ext), ":'))
     ")
     
-    key <- paste(rev(sort(spterms)), collapse = "2")
+    key <- spterms |>
+        sort() |>
+        rev() |>
+        paste(collapse = "2")
     
     triple <- switch(
         key,
         uniref2taxid = uniref2taxid,
         taxid2name = taxid2name,
         uniref2uniprotkb = uniref2uniprotkb,
-        uniref2enzyme = uniref2enzyme,
-        uniprotkb2enzyme = uniprotkb2enzyme,
+        uniref2ec = uniref2ec,
+        uniprotkb2ec = uniprotkb2ec,
         uniprotkb2rhea = uniprotkb2rhea,
         uniref2rhea = uniref2rhea,
         rhea2chebi = rhea2chebi,
         name2chebi = name2chebi,
-        rhea2enzyme = rhea2enzyme,
+        rhea2ec = rhea2ec,
         inchi2chebi = inchi2chebi,
         inchikey2chebi = inchikey2chebi,
         smiles2chebi = smiles2chebi,
@@ -236,15 +243,15 @@
 }
 
 
-.iri_table <- function(x, from, to, endpoint) {
+.iri_table <- function(x, spterms, endpoint) {
     
     iri <- switch(
-        from,
+        spterms[1],
         chebi = "obo",
         uniprotkb = "protein",
         uniref = "uniref",
         taxid = "taxon",
-        enzyme = "enzyme",
+        ec = "enzyme",
         rhea = "rh",
         smiles = "",
         inchi = "",
@@ -253,12 +260,15 @@
         "external"
     )
     
+    specFrom <- names(spterms)[1]
     is_external <- iri == "external"
     
-    if( is_external && to == "chebi" ){
-        x <- paste0("'", from, ":", x, "'")
+    if( is_external && spterms[2] == "chebi" ){
+        x <- paste0("'", specFrom, ":", x, "'")
     }else if( is_external ){
-        iri <- .get_external_iri(from, endpoint)
+        # Get IRI for origin feature
+        iri <- .get_external_iri(specFrom, endpoint)
+        # Add IRI to initial values
         x <- paste0("<", iri, x, ">")
     }else if( iri == "" ){
         x <- paste0("'", x, "'")
@@ -270,6 +280,7 @@
 }
 
 
+#' @importFrom stringi stri_replace_first_regex
 .get_external_iri <- function(ext, endpoint, limit = 10) {
     
     uniprot_query <- paste0("
@@ -294,11 +305,12 @@
     
     query <- switch(endpoint, Rhea = rhea_query, UniProt = uniprot_query)
     query <- paste0(query, "} LIMIT ", limit)
-    
-    iri_list <- .sendSPARQL(query, endpoint, 1e6)
-    iri_list <- unlist(iri_list, use.names = FALSE)
-    iri_list <- gsub("([^/]+)$", "", iri_list)
-    iri <- unique(iri_list)
+    # Retrieve all unique IRIs from first N bindings
+    iri <- query |>
+        .sendSPARQL(endpoint, 1e6) |>
+        unlist(use.names = FALSE) |>
+        stri_replace_first_regex("([^/]+)$", "") |>
+        unique()
     
     if( length(iri) > 1L ){
         stop("Multiple prefixes were found in the selected database",
